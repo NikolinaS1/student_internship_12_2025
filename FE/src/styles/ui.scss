@@ -1,0 +1,118 @@
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.muted {
+  color: var(--muted-foreground);
+}
+
+.small {
+  font-size: 0.85rem;
+}
+
+/* card */
+.card {
+  background: var(--card);
+  color: var(--card-foreground);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+}
+
+.card__header {
+  padding: 1.15rem 1.2rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.card__title {
+  font-weight: var(--font-weight-medium);
+}
+
+.card__subtitle {
+  margin-top: 0.25rem;
+  font-size: 0.92rem;
+}
+
+.card__body {
+  padding: 1.2rem;
+}
+
+/* buttons */
+.btn {
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--foreground);
+  padding: 0.72rem 1.05rem;
+  cursor: pointer;
+  transition: background 150ms ease, opacity 150ms ease, transform 80ms ease, box-shadow 150ms ease;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.03);
+}
+
+.btn:hover {
+  background: var(--accent);
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn--primary {
+  border-color: transparent;
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+
+.btn--primary:hover {
+  opacity: 0.92;
+}
+
+.btn--ghost {
+  background: transparent;
+}
+
+/* inputs */
+.input {
+  width: 100%;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  background: var(--input-background);
+  padding: 0.78rem 0.95rem;
+}
+
+.input:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--ring);
+}
+
+/* chips (status only) */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0.22rem 0.65rem;
+  font-size: 0.82rem;
+  border: 1px solid var(--border);
+  background: var(--muted);
+  color: var(--foreground);
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.chip--sent {
+  background: var(--secondary);
+  color: var(--secondary-foreground);
+}
+
+.chip--ack {
+  background: rgba(22, 163, 74, 0.16);
+  border-color: rgba(22, 163, 74, 0.26);
+  color: var(--foreground);
+}
+
+.chip--closed {
+  background: var(--muted);
+  color: var(--muted-foreground);
+}
