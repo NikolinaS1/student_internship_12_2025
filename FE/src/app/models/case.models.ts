@@ -32,4 +32,6 @@ export interface EmsCase {
   vitals: Vitals;
 
   messages: CaseMessage[];
+
+  locationLabel?: string; // e.g., "45.5512° N, 18.6939° E"
 }

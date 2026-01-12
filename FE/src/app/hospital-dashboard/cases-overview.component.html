@@ -1,0 +1,97 @@
+<main class="overview">
+  <!-- Left: Cases -->
+  <section class="overview__left">
+    <div class="heading_flex">
+      <div class="overview__head">
+        <div>
+          <div class="overview__title">Aktivni slučajevi</div>
+          <div class="overview__subtitle">Klikni na slučaj za otvaranje detalja i razgovora.</div>
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="overview__cases">
+      <button
+        *ngFor="let c of cases"
+        type="button"
+        (click)="select.emit(c)"
+        class="case-card"
+        [ngClass]="[
+          !isActive(c) ? 'case-card--disabled' : '',
+          c.priority === 'CRITICAL' ? 'case-card--critical' :
+          c.priority === 'URGENT' ? 'case-card--urgent' :
+          c.priority === 'HIGH' ? 'case-card--high' :
+          c.priority === 'MEDIUM' ? 'case-card--medium' : 'case-card--low'
+        ]"
+      >
+        <div class="case-card__inner">
+          <div class="case-head">
+            <div>
+              <div class="case-name">{{ c.patientName }}</div>
+              <div class="case-meta">{{ c.age }} godina • {{ c.id }}</div>
+            </div>
+            <span class="priority-dot" [ngClass]="[
+              c.priority === 'CRITICAL' ? 'priority-dot--critical' :
+              c.priority === 'URGENT' ? 'priority-dot--urgent' :
+              c.priority === 'HIGH' ? 'priority-dot--high' :
+              c.priority === 'MEDIUM' ? 'priority-dot--medium' : 'priority-dot--low'
+            ]"></span>
+          </div>
+
+          <div class="case-pills">
+            <div class="pill">
+              <div class="pill__label">Kategorija</div>
+              <div class="pill__value">{{ c.priority }}</div>
+            </div>
+            <div class="pill">
+              <div class="pill__label">Status</div>
+              <div class="pill__value">
+                <span
+                  class="status-chip"
+                  [ngClass]="[
+                    c.status === 'ACKNOWLEDGED' ? 'status-chip--ack' :
+                    c.status === 'SENT' ? 'status-chip--sent' :
+                    c.status === 'CLOSED' ? 'status-chip--closed' : 'status-chip--draft'
+                  ]"
+                >
+                  {{c.status === 'ACKNOWLEDGED' ? 'Potvrđeno' :
+                     c.status === 'SENT' ? 'Poslano' :
+                     c.status === 'CLOSED' ? 'Zatvoreno' : 'Draft' }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="case-eta">
+            <div class="case-eta__label">ETA</div>
+            <div class="case-eta__value">{{ c.etaMinutes }} min</div>
+          </div>
+
+          <div class="case-summary">
+            {{ c.summary }}
+          </div>
+        </div>
+      </button>
+    </div>
+  </section>
+
+  <!-- Right: Map (Osijek) -->
+  <aside class="overview__right">
+    <div class="card map-card">
+      <div class="card__header">
+        <div class="muted card__subtitle">Osijek, Hrvatska</div>
+      </div>
+
+      <div class="map-card__body">
+        <iframe
+          class="map-frame"
+          title="Karta: Osijek, Hrvatska"
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+          src="https://www.openstreetmap.org/export/embed.html?bbox=18.6200%2C45.5200%2C18.7700%2C45.6000&layer=mapnik&marker=45.5550%2C18.6950"
+        ></iframe>
+      </div>
+    </div>
+  </aside>
+</main>

@@ -46,38 +46,166 @@
   gap: 0.7rem;
 }
 
-/* VIEW 1 */
-.case-grid {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 2rem 1.2rem;
+/* =========================
+   VIEW 1 (cases left + map right)
+   Cilj: bez scrollanja stranice,
+   mapa stane u visinu i uvijek jednako vidljiva
+   ========================= */
+
+.overview {
+  --topbar-h: 86px;
+  --pad-y: 1.75rem; /* smanji vertikalni padding da stane u viewport */
+  --pad-x: 3rem;
+  --gap-x: 3rem;
+
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--gap-x);
+  padding: var(--pad-y) var(--pad-x);
+  align-items: start;
+
+  /* KLJUČ: cijeli view 1 stane u ekran (nema page scrolla) */
+  height: calc(100vh - var(--topbar-h));
+  box-sizing: border-box;
+  overflow: hidden; /* spriječi da bilo što gura stranicu u scroll */
 }
 
-.case-grid__title {
+/* LIJEVA polovica: sadržaj ide u stupac (title + subtitle + caseovi ispod) */
+.overview__left {
+  grid-column: 1;
+  height: 100%;
+  min-height: 0;          /* bitno za overflow u gridu */
+  overflow: auto;         /* ako ikad bude puno caseova, scrolla samo lijevi dio */
+  padding-right: 0.35rem; /* malo prostora za scrollbar */
+
+  display: flex;
+  flex-direction: column; /* osigurava da su caseovi ispod opisa */
+  align-items: center;    /* centriraj blok unutar lijeve polovice */
+}
+
+/* Title/subtitle/cases imaju zajedničku širinu i centar */
+.overview__title,
+.overview__subtitle,
+.overview__cases {
+  width: 100%;
+  max-width: 1120px;
+}
+
+.heading_flex {
+  display: flex;
+  justify-content: left;
+  width: 100%;
+  margin-bottom: 1.25rem;
+}
+
+.overview__head {
+  margin-left: 1rem;
+}
+
+.overview__title {
   font-size: 1.12rem;
   font-weight: var(--font-weight-medium);
 }
 
-.case-grid__subtitle {
+.overview__subtitle {
   margin-top: 0.35rem;
   font-size: 1rem;
   color: var(--muted-foreground);
 }
 
-.case-grid__items {
+/* Case grid */
+.overview__cases {
   margin-top: 1.35rem;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1.2rem;
+  gap: 1.35rem;
 }
 
+/* DESNA polovica: sticky blok koji u sebi ima map card visine ekrana */
+.overview__right {
+  grid-column: 2;
+  height: 100%;
+  min-height: 0;
+
+  position: sticky;
+  top: var(--topbar-h);
+  display: flex;
+  justify-content: center;
+  align-items: stretch; /* mapa se rastegne po visini desnog stupca */
+}
+
+/* Map card mora fillati desni stupac po visini */
+.map-card {
+  width: 100%;
+  max-width: 900px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Body raste, header ostaje gore */
+.map-card__body {
+  padding: 1rem;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.card__subtitle{
+  font-size: 1.2rem;
+}
+
+/* iframe fill (ovo je ključ da se mapa prilagodi visini bez overflowa) */
+.map-frame {
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  height: auto;
+
+  display: block;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+}
+
+/* Responsive */
 @media (max-width: 1100px) {
-  .case-grid__items {
+  .overview {
+    grid-template-columns: 1fr;
+    --pad-y: 1.25rem;
+    --pad-x: 1.25rem;
+    --gap-x: 1.5rem;
+
+    height: auto;
+    overflow: visible;
+  }
+
+  .overview__left {
+    height: auto;
+    overflow: visible;
+    padding-right: 0;
+  }
+
+  .overview__cases {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .overview__right {
+    position: static;
+    top: auto;
+    height: auto;
+    align-items: flex-start;
+  }
+
+  .map-frame {
+    aspect-ratio: 1 / 1;
+    height: auto;
+  }
 }
+
 @media (max-width: 640px) {
-  .case-grid__items {
+  .overview__cases {
     grid-template-columns: 1fr;
   }
 }
@@ -201,7 +329,7 @@
   line-height: 1.4;
 }
 
-/* VIEW 2 layout */
+/* VIEW 2 layout (ostaje kako je bilo) */
 .dashboard {
   max-width: 1400px;
   margin: 0 auto;
@@ -358,7 +486,7 @@
   margin-top: 1.1rem;
 }
 
-/* CHAT (tvoje poruke crne desno, primljene svijetle lijevo) */
+/* CHAT */
 .chat {
   border: 1px solid var(--border);
   border-radius: var(--radius-xl);

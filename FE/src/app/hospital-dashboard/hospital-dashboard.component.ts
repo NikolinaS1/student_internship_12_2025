@@ -1,9 +1,11 @@
-import { Component, ElementRef, ViewChild, inject } from '@angular/core';
+import { Component, ViewChild, inject } from '@angular/core';
 import { AsyncPipe, CommonModule, DatePipe, NgClass, NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { combineLatest, map } from 'rxjs';
 import { CaseStoreService } from '../services/case-store.service';
 import { EmsCase } from '../models/case.models';
+import { CasesOverviewComponent } from './cases-overview.component';
+import { CaseDetailComponent } from './case-detail.component';
 
 type PriorityChip = { text: string; cls: string };
 type StatusChip = { text: string; cls: string };
@@ -11,7 +13,7 @@ type StatusChip = { text: string; cls: string };
 @Component({
   selector: 'app-hospital-dashboard',
   standalone: true,
-  imports: [CommonModule, AsyncPipe, NgIf, NgFor, NgClass, FormsModule, DatePipe],
+  imports: [CommonModule, AsyncPipe, NgIf, NgFor, NgClass, FormsModule, DatePipe, CasesOverviewComponent, CaseDetailComponent],
   templateUrl: './hospital-dashboard.component.html',
 })
 export class HospitalDashboardComponent {
@@ -26,11 +28,11 @@ export class HospitalDashboardComponent {
 
   messageText = '';
 
-  @ViewChild('chatScroll') chatScroll?: ElementRef<HTMLDivElement>;
+  @ViewChild(CaseDetailComponent) detail?: CaseDetailComponent;
 
   selectCase(c: EmsCase) {
     this.store.selectCase(c.id);
-    setTimeout(() => this.scrollChatToBottom(), 0);
+    setTimeout(() => this.detail?.scrollChatToBottom(), 0);
   }
 
   deselect() {
@@ -52,7 +54,7 @@ export class HospitalDashboardComponent {
     });
 
     this.messageText = '';
-    setTimeout(() => this.scrollChatToBottom(), 0);
+    setTimeout(() => this.detail?.scrollChatToBottom(), 0);
   }
 
   resetDemo() {
@@ -91,11 +93,5 @@ export class HospitalDashboardComponent {
       default:
         return { text: 'Draft', cls: 'bg-[color:var(--muted)] text-[color:var(--muted-foreground)] border border-[color:var(--border)]' };
     }
-  }
-
-  private scrollChatToBottom() {
-    const el = this.chatScroll?.nativeElement;
-    if (!el) return;
-    el.scrollTop = el.scrollHeight;
   }
 }
