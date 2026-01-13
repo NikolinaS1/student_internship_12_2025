@@ -1,0 +1,51 @@
+<div class="admin-layout">
+
+    <!-- HEADER -->
+    <header class="header">
+        <div class="left">
+            <h2>MCX Hospital - Admin Panel</h2>
+            <span>System Administrator (admin)</span>
+        </div>
+
+        <button class="logout" (click)="auth.logout()">Logout</button>
+    </header>
+
+    <!-- STATS  -->
+    <section class="stats">
+        <div class="stat-card">
+            <strong>1</strong>
+            <span>Total Users</span>
+        </div>
+        <div class="stat-card blue">
+            <strong>0</strong>
+            <span>EMS Users</span>
+        </div>
+        <div class="stat-card green">
+            <strong>0</strong>
+            <span>Hospital Users</span>
+        </div>
+        <div class="stat-card purple">
+            <strong>2</strong>
+            <span>Total Cases</span>
+        </div>
+    </section>
+
+    <!-- TABS  -->
+    <section class="tab-wrapper">
+        <div class="tab" [class.active]="activeTab === 'users'" (click)="activeTab = 'users'">
+            <span class="icon">👥</span>
+            <span>User Management</span>
+        </div>
+
+        <div class="tab" [class.active]="activeTab === 'cases'" (click)="activeTab = 'cases'">
+            <span class="icon">📄</span>
+            <span>Case Management</span>
+        </div>
+    </section>
+
+    <!-- CONTENT -->
+    <section class="content">
+
+    </section>
+
+</div>
