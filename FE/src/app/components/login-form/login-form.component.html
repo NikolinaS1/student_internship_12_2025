@@ -2,7 +2,7 @@
     <div class="login-card">
 
         <h1>MCX Hospital</h1>
-        <p class="subtitle">Sign in to your account</p>
+        <p class="subtitle">Sign in to your admin account</p>
 
         <div class="default-admin">
             <strong>Default Admin Account</strong>
@@ -14,9 +14,9 @@
         <input type="text"  [(ngModel)]="username" />
 
         <label>Password</label>
-        <input type="password"  [(ngModel)]="password" />
+        <input type="password" [(ngModel)]="password" />
 
-        <button (click)="submit()" [disabled]="loading">{{ loading ? 'Signing in...' : 'Sign In' }}</button>
+        <button (click)="submit()">Sign In</button>
 
         <p class="error" *ngIf="error">{{ error }}</p>
 

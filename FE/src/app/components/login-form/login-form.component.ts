@@ -14,24 +14,13 @@ export class LoginFormComponent {
   username = '';
   password = '';
   error = '';
-  loading = false;
 
   constructor(private authService: AuthService) { }
 
-  async submit(): Promise<void> {
-    this.error = '';
-    this.loading = true;
-
-    try {
-      console.log('Attempting login with', this.username, this.password);
-      const ok = await this.authService.login(this.username, this.password);
-      if (!ok) {
-        this.error = 'Invalid username or password';
-      }
-    } catch (err) {
-      this.error = 'Login failed. Please try again.';
-    } finally {
-      this.loading = false;
+  submit() {
+    const ok = this.authService.login(this.username, this.password);
+    if (!ok) {
+      this.error = 'Invalid username or password';
     }
   }
 }
