@@ -1,5 +1,6 @@
 package org.acme.resources;
 
+import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
@@ -8,6 +9,7 @@ import jakarta.ws.rs.core.Response;
 import org.acme.dtos.UserLogin;
 import org.acme.enums.Role;
 import org.acme.models.User;
+import org.acme.services.JwtService;
 import org.acme.services.UserService;
 
 import java.util.Map;
@@ -17,6 +19,9 @@ public class UserResource {
 
     @Inject
     UserService userService;
+
+    @Inject
+    JwtService jwtService;
 
     @POST
     @Path("login/")
@@ -30,11 +35,15 @@ public class UserResource {
                     .entity(Map.of("error", "Invalid credentials"))
                     .build();
         }
-        return Response.ok(user).build();
+        String token = jwtService.generateToken(user);
+        return Response.ok(Map.of(
+                "token", token
+        )).build();
     }
 
     @POST
     @Path("logout/")
+    @PermitAll
     @Produces(MediaType.APPLICATION_JSON)
     public Response logout() {
         return Response.ok(Map.of("message", "Logged out successfully")).build();
@@ -42,6 +51,7 @@ public class UserResource {
 
     @GET
     @Path("{id}/")
+    @RolesAllowed("ADMIN")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getUserById(@PathParam("id") Long id) {
         User user = userService.getUserDetails(id);;
