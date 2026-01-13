@@ -1,0 +1,17 @@
+<app-header></app-header>
+
+<div class="layout-wrapper">
+  <app-sidebar [activeCase]="activeCase"></app-sidebar>
+
+  <main class="content-view">
+    @if (!activeCase) {
+      <div class="empty-state">
+        <div class="empty-card">
+          <h2>No Case Selected</h2>
+          <p>Create a new case or SOS emergency to get started</p>
+        </div>
+      </div>
+    } @else {
+      }
+  </main>
+</div>
