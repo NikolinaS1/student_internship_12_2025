@@ -1,14 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-
-export type UserRole = 'EMS' | 'HOSPITAL' | 'ADMIN';
-
-export interface User {
-  id: string;
-  username: string;
-  role: UserRole;
-}
+import { UserService, User, UserRole } from '../../services/user.service';
 
 @Component({
   selector: 'app-user-management',
@@ -17,20 +10,14 @@ export interface User {
   templateUrl: './user-management.component.html',
   styleUrls: ['./user-management.component.scss'],
 })
-export class UserManagementComponent {
+export class UserManagementComponent implements OnInit {
 
   /** STATE */
   showCreateModal = false;
   showEditModal = false;
 
   /** USERS */
-  users: User[] = [
-    {
-      id: 'admin_default_001',
-      username: 'System Administrator',
-      role: 'ADMIN',
-    },
-  ];
+  users: User[] = [];
 
   /** CREATE FORM */
   newUser = {
@@ -41,6 +28,18 @@ export class UserManagementComponent {
 
   /** EDIT FORM */
   editedUser: User | null = null;
+
+  constructor(private userService: UserService) {}
+
+  ngOnInit(): void {
+    this.userService.users$.subscribe(users => {
+      this.users = users;
+    });
+  }
+
+  private loadUsers(): void {
+    // Not needed anymore, but keep for compatibility if called elsewhere
+  }
 
   /* -------------------------
      MODAL CONTROLS
@@ -71,12 +70,13 @@ export class UserManagementComponent {
       return;
     }
 
-    this.users.push({
+    const user: User = {
       id: 'user_' + Date.now(),
       username: this.newUser.username,
       role: this.newUser.role,
-    });
+    };
 
+    this.userService.create(user);
     this.closeModals();
   }
 
@@ -85,15 +85,12 @@ export class UserManagementComponent {
       return;
     }
 
-    this.users = this.users.map(u =>
-      u.id === this.editedUser!.id ? this.editedUser! : u
-    );
-
+    this.userService.update(this.editedUser);
     this.closeModals();
   }
 
-  deleteUser(index: number): void {
-    this.users.splice(index, 1);
+  deleteUser(id: string): void {
+    this.userService.delete(id);
   }
 
   /* -------------------------

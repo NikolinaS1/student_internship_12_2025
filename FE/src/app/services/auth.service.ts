@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private readonly ADMIN_USERNAME = 'admin';
+  private readonly ADMIN_USERNAME = 'admin1';
   private readonly ADMIN_PASS = 'admin123';
 
   constructor(private router: Router) { }

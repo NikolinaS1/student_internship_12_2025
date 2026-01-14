@@ -28,7 +28,7 @@
             <td>{{ user.id }}</td>
             <td>
                 <button class="icon-btn" (click)="openEditUser(user)">Edit</button>
-                <button class="icon-btn danger" (click)="deleteUser(i)">Delete</button>
+                <button class="icon-btn danger" (click)="deleteUser(user.id)">Delete</button>
             </td>
         </tr>
     </tbody>
