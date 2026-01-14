@@ -23,11 +23,9 @@
   --destructive: #d4183d;
   --destructive-foreground: #ffffff;
 
-  /* snažnija narancasta za URGENT/HIGH */
-  --urgent: #ea580c;         /* strong orange */
-  --high: #f97316;           /* orange */
-  --medium: #facc15;         /* yellow */
-  --low: #16a34a;            /* green */
+  --high: #ff0000;           /* red */
+  --medium: #faa215;         /* orange */
+  --low: #fffb00;            /* yellow */
 
   --success: #16a34a;
   --success-foreground: #ffffff;

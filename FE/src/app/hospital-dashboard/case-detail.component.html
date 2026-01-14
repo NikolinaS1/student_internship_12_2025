@@ -1,209 +1,175 @@
 <main class="case-detail">
-<!-- Left: Cases list -->
-    <aside class="case-detail__sidebar">
+  <!-- Left: Cases list -->
+  <aside class="case-detail__sidebar">
+    <div class="card">
+      <div class="card__header">
+        <div class="card__title">Aktivni slučajevi</div>
+        <div class="muted card__subtitle">Odaberi drugi slučaj za prebacivanje.</div>
+      </div>
+
+      <div class="sidebar__list">
+        <!-- TODO: Trebat će parent komponenta koja prosleđuje sve caseove -->
+        <!-- Za sada prikaži samo selektirani case -->
+        <div class="muted" style="padding: 20px; text-align: center;">
+          Lista slučajeva dolazi iz parent komponente
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Middle: Case details + chat -->
+  <section class="case-detail__middle" *ngIf="selectedCase">
+    <div class="case-detail__middle-inner">
+      <!-- Details -->
       <div class="card">
-        <div class="card__header">
-          <div class="card__title">Aktivni slučajevi</div>
-          <div class="muted card__subtitle">Odaberi drugi slučaj za prebacivanje.</div>
+        <div class="card__body">
+          <div class="details__top">
+            <div>
+              <div class="details__name">{{ selectedCase.patientName }}</div>
+              <div class="muted details__meta">
+                {{ selectedCase.priority }} • {{ getAge() }} godina • #{{ selectedCase.id }}
+              </div>
+              <div class="muted details__summary">
+                {{ selectedCase.summary || selectedCase.description }}
+              </div>
+            </div>
+
+            <div class="details__actions">
+              <span
+                class="chip"
+                [ngClass]="{
+                  'chip--sent': selectedCase.status === 'SENT',
+                  'chip--ack': selectedCase.status === 'ACKNOWLEDGED',
+                  'chip--closed': selectedCase.status === 'CLOSED'
+                }"
+              >
+                {{ getStatusText() }}
+              </span>
+
+              <button type="button" class="btn btn--primary" (click)="onDeselect()">Natrag</button>
+            </div>
+          </div>
+
+          <div class="details__info">
+            <!-- Vitalni znakovi -->
+            <div class="pill" *ngIf="getVitalSigns().length > 0">
+              <span class="pill__label">Vitalni znakovi:</span>
+              <span class="pill__value" *ngIf="selectedCase.bpm">❤️ {{ selectedCase.bpm }} bpm</span>
+              <span class="pill__value" *ngIf="selectedCase.systolicPressure && selectedCase.diastolicPressure">
+                🩸 {{ selectedCase.systolicPressure }}/{{ selectedCase.diastolicPressure }} mmHg
+              </span>
+              <span class="pill__value" *ngIf="selectedCase.saturation">💨 {{ selectedCase.saturation }}%</span>
+              <span class="pill__value" *ngIf="selectedCase.temperature">🌡️ {{ selectedCase.temperature }}°C</span>
+              <span class="pill__value" *ngIf="selectedCase.resRate">🫁 {{ selectedCase.resRate }} /min</span>
+            </div>
+
+            <!-- Tip slučaja -->
+            <div class="pill">
+              <span class="pill__label">Tip slučaja:</span>
+              <span class="pill__value">{{ selectedCase.isSos ? '🚨 SOS' : '📋 Obični' }}</span>
+            </div>
+
+            <!-- ETA -->
+            <div class="pill">
+              <span class="pill__label">ETA:</span>
+              <span class="pill__value">{{ selectedCase.etaMinutes ?? '-' }} min</span>
+            </div>
+
+            <!-- Vrijeme kreiranja -->
+            <div class="pill">
+              <span class="pill__label">Kreirano:</span>
+              <span class="pill__value">{{ selectedCase.createdAt | date: 'dd.MM.yyyy HH:mm' }}</span>
+            </div>
+          </div>
+
+          <div class="details__cta">
+            <button
+              *ngIf="isActive() && !isAcknowledged()"
+              type="button"
+              (click)="onAcknowledge()"
+              class="btn btn--primary"
+            >
+              ✓ Potvrdi prijem
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chat -->
+      <div class="chat">
+        <div class="chat__header">Komunikacija slučaja</div>
+
+        <div #chatScroll class="chat__messages">
+          <!-- TODO: Implementiraj chat kada je backend spreman -->
+          <div class="msg msg--other">
+            <div class="bubble bubble--other">
+              <div class="bubble__meta">
+                Sustav • {{ selectedCase.createdAt | date: 'HH:mm' }}
+              </div>
+              <div class="bubble__text">Slučaj je kreiran</div>
+            </div>
+          </div>
+
+          <div class="msg msg--self" *ngIf="isAcknowledged()">
+            <div class="bubble bubble--self">
+              <div class="bubble__meta">
+                Hospital Dispatch • {{ selectedCase.createdAt | date: 'HH:mm' }}
+              </div>
+              <div class="bubble__text">Primljeno i potvrđeno</div>
+            </div>
+          </div>
         </div>
 
-        <div class="sidebar__list">
+        <div class="chat__composer">
+          <input
+            [ngModel]="messageText"
+            (ngModelChange)="messageTextChange.emit($event)"
+            (keydown.enter)="$event.preventDefault(); onSend()"
+            type="text"
+            placeholder="Upiši poruku..."
+            class="input"
+            [disabled]="!isActive()"
+          />
           <button
-            *ngFor="let c of cases"
             type="button"
-            (click)="select.emit(c)"
-            class="sidebar-item"
-            [ngClass]="[
-              selectedCase?.id === c.id ? 'sidebar-item--active' : '',
-              c.priority === 'CRITICAL' ? 'sidebar-item--critical' :
-              c.priority === 'URGENT' ? 'sidebar-item--urgent' :
-              c.priority === 'HIGH' ? 'sidebar-item--high' :
-              c.priority === 'MEDIUM' ? 'sidebar-item--medium' : 'sidebar-item--low'
-            ]"
+            (click)="onSend()"
+            class="btn btn--primary"
+            [disabled]="!messageText.trim() || !isActive()"
           >
-            <div class="sidebar-item__top">
-              <div>
-                <div class="sidebar-item__name">{{ c.patientName }}</div>
-                <div class="sidebar-item__meta">{{ c.age }} godina</div>
-              </div>
-
-              <span
-                class="priority-dot"
-                [ngClass]="{
-                  'dot-critical': c.priority === 'CRITICAL',
-                  'dot-urgent': c.priority === 'URGENT',
-                  'dot-high': c.priority === 'HIGH',
-                  'dot-medium': c.priority === 'MEDIUM',
-                  'dot-low': c.priority === 'LOW'
-                }"
-                aria-hidden="true"
-              ></span>
-            </div>
-
-            <div class="sidebar-item__rows">
-              <div class="row">
-                <span class="row__label">Kategorija:</span>
-                <span class="row__value row__value--strong">{{ c.priority }}</span>
-              </div>
-
-              <div class="row">
-                <span class="row__label">Status:</span>
-                <span
-                  class="chip"
-                  [ngClass]="{
-                    'chip--sent': c.status === 'SENT',
-                    'chip--ack': c.status === 'ACKNOWLEDGED',
-                    'chip--closed': c.status === 'CLOSED'
-                  }"
-                >
-                  {{ c.status === 'SENT' ? 'POSLANO' : (c.status === 'ACKNOWLEDGED' ? 'POTVRĐENO' : 'ZATVORENO') }}
-                </span>
-              </div>
-
-              <div class="case-eta case-eta--compact">
-                <div>ETA</div>
-                <div>{{ c.etaMinutes }} min</div>
-              </div>
-
-              <div class="muted small">
-                Kreirano: {{ c.createdIso | date:'MMM d, HH:mm' }}
-              </div>
-            </div>
+            Pošalji
           </button>
         </div>
       </div>
-    </aside>
+    </div>
+  </section>
 
-    <!-- Middle: Case details + chat -->
-    <section class="case-detail__middle">
-      <div class="case-detail__middle-inner">
-        <!-- Details -->
-        <div class="card">
-          <div class="card__body">
-            <div class="details__top">
-              <div>
-                <div class="details__name">{{ selectedCase.patientName }}</div>
-                <div class="muted details__meta">
-                  {{ selectedCase.priority }} • Prioritet {{ selectedCase.priorityLevel ?? '-' }} • {{ selectedCase.age }} godina • {{ selectedCase.id }}
-                </div>
-                <div class="muted details__summary">
-                  {{ selectedCase.summary }}
-                </div>
-              </div>
+  <!-- Right: Map -->
+  <aside class="case-detail__map" *ngIf="selectedCase">
+    <div class="card map-card">
+      <div class="card__header">
+        <div class="card__title">Karta</div>
+        <div class="muted card__subtitle">Osijek, Hrvatska</div>
+      </div>
 
-              <div class="details__actions">
-                <span
-                  class="chip"
-                  [ngClass]="{
-                    'chip--sent': selectedCase.status === 'SENT',
-                    'chip--ack': selectedCase.status === 'ACKNOWLEDGED',
-                    'chip--closed': selectedCase.status === 'CLOSED'
-                  }"
-                >
-                  {{ selectedCase.status === 'SENT' ? 'POSLANO' : (selectedCase.status === 'ACKNOWLEDGED' ? 'POTVRĐENO' : 'ZATVORENO') }}
-                </span>
+      <div class="map-card__body">
+        <iframe
+          class="map-frame"
+          title="Karta"
+          [src]="'https://www.openstreetmap.org/export/embed.html?bbox=18.66%2C45.53%2C18.78%2C45.60&layer=mapnik&marker=' + selectedCase.latitude + '%2C' + selectedCase.longitude"
+          loading="lazy"
+        ></iframe>
 
-                <button type="button" class="btn btn--primary" (click)="deselect.emit()">Natrag</button>
-              </div>
-            </div>
-
-            <div class="details__info">
-              <div class="pill">
-                <span class="pill__label">Vitalni znakovi:</span>
-                <span class="pill__value">HR {{ selectedCase.vitals.hr ?? '-' }} bpm</span>
-                <span class="pill__value">BP {{ selectedCase.vitals.bp ?? '-' }}</span>
-                <span class="pill__value">O2 {{ selectedCase.vitals.o2 ?? '-' }}%</span>
-              </div>
-
-              <div class="pill">
-                <span class="pill__label">Stanje:</span>
-                <span class="pill__value">{{ selectedCase.condition }}</span>
-              </div>
-
-              <div class="pill">
-                <span class="pill__label">Svijest:</span>
-                <span class="pill__value">{{ selectedCase.consciousness }}</span>
-              </div>
-
-              <div class="pill">
-                <span class="pill__label">ETA:</span>
-                <span class="pill__value">{{ selectedCase.etaMinutes }} min</span>
-              </div>
-            </div>
-
-            <div class="details__cta">
-              <button
-                *ngIf="selectedCase.status !== 'ACKNOWLEDGED' && selectedCase.status !== 'CLOSED'"
-                type="button"
-                (click)="acknowledge.emit(selectedCase.id)"
-                class="btn btn--primary"
-              >
-                Potvrdi prijem
-              </button>
-            </div>
+        <div class="map-meta">
+          <div class="map-meta__row">
+            <span class="muted">Lokacija:</span>
+            <span class="map-meta__value">{{ selectedCase.latitude }}, {{ selectedCase.longitude }}</span>
           </div>
-        </div>
-
-        <!-- Chat -->
-        <div class="chat">
-          <div class="chat__header">Komunikacija slučaja</div>
-
-          <div #chatScroll class="chat__messages">
-            <div
-              *ngFor="let m of selectedCase.messages"
-              class="msg"
-              [ngClass]="m.senderRole === 'HOSPITAL' ? 'msg--self' : 'msg--other'"
-            >
-              <div class="bubble" [ngClass]="m.senderRole === 'HOSPITAL' ? 'bubble--self' : 'bubble--other'">
-                <div class="bubble__meta">
-                  {{ m.senderName }} • {{ m.timestampIso | date:'HH:mm' }}
-                </div>
-                <div class="bubble__text">{{ m.text }}</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="chat__composer">
-            <input
-              [ngModel]="messageText" (ngModelChange)="messageTextChange.emit($event)"
-              (keydown.enter)="$event.preventDefault(); onSend()"
-              type="text"
-              placeholder="Upiši poruku..."
-              class="input"
-            />
-            <button type="button" (click)="onSend()" class="btn btn--primary">Pošalji</button>
+          <div class="map-meta__row">
+            <span class="muted">ETA:</span>
+            <span class="map-meta__value map-meta__value--strong">{{ selectedCase.etaMinutes ?? '-' }} min</span>
           </div>
         </div>
       </div>
-    </section>
-
-    <!-- 3) Desno: karta + ispod lokacija i ETA -->
-    <aside class="case-detail__map">
-      <div class="card map-card">
-        <div class="card__header">
-          <div class="card__title">Karta</div>
-          <div class="muted card__subtitle">Osijek, Hrvatska</div>
-        </div>
-
-        <div class="map-card__body">
-          <iframe
-            class="map-frame"
-            title="Karta"
-            src="https://www.openstreetmap.org/export/embed.html?bbox=18.66%2C45.53%2C18.78%2C45.60&amp;layer=mapnik&amp;marker=45.554%2C18.695"
-            loading="lazy"
-          ></iframe>
-
-          <div class="map-meta">
-            <div class="map-meta__row">
-              <span class="muted">Lokacija:</span>
-              <span class="map-meta__value">{{ selectedCase.locationLabel ?? '—' }}</span>
-            </div>
-            <div class="map-meta__row">
-              <span class="muted">ETA:</span>
-              <span class="map-meta__value map-meta__value--strong">{{ selectedCase.etaMinutes }} min</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </aside>
+    </div>
+  </aside>
 </main>

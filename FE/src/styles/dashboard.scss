@@ -559,3 +559,130 @@
   gap: 0.7rem;
   align-items: center;
 }
+
+
+
+//LEAFLET STILIZACIJA
+
+.leaflet-map {
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+  z-index: 1;
+}
+
+.map-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+  padding: 10px;
+  background: #f0f9ff;
+  border-radius: 6px;
+}
+
+.eta-display {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.eta-label {
+  color: #666;
+}
+
+.eta-value {
+  color: #ef4444;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.distance-value {
+  color: #0284c7;
+  font-size: 13px;
+}
+
+.map-card__body {
+  position: relative;
+  height: 500px;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+/* Leaflet popup stilizacija */
+.leaflet-popup-content {
+  font-family: inherit;
+  font-size: 13px;
+}
+
+.leaflet-popup-content b {
+  color: #333;
+  font-weight: 600;
+}
+
+//LOADING / ERROR STATES
+.loading-state,
+.error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  color: #666;
+}
+
+.error-state {
+  background: #fef2f2;
+  color: #dc2626;
+  border-radius: 8px;
+  margin: 20px;
+}
+
+.spinner {
+  border: 3px solid #f0f0f0;
+  border-top: 3px solid #3b82f6;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 10px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.no-cases {
+  text-align: center;
+  padding: 40px 20px;
+  color: #999;
+}
+
+.case-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+  border-top: 1px solid #f0f0f0;
+  padding-top: 10px;
+}
+
+.btn-acknowledge {
+  flex: 1;
+  padding: 8px 12px;
+  background: #10b981;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-acknowledge:hover {
+  background: #059669;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+}

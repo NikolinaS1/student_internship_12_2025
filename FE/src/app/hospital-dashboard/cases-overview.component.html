@@ -4,93 +4,111 @@
     <div class="heading_flex">
       <div class="overview__head">
         <div>
-          <div class="overview__title">Aktivni slučajevi</div>
-          <div class="overview__subtitle">Klikni na slučaj za otvaranje detalja i razgovora.</div>
+          <div class="overview__title">Active Cases</div>
+          <div class="overview__subtitle">Click on a case to open details and communication.</div>
         </div>
       </div>
     </div>
-    
 
-    <div class="overview__cases">
+    <!-- Loading & Error States -->
+    <div *ngIf="loading$ | async" class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading cases...</p>
+    </div>
+
+    <div *ngIf="error$ | async as error" class="error-state">
+      <p>⚠ {{ error }}</p>
+    </div>
+
+    <!-- Cases List -->
+    <div class="overview__cases" *ngIf="!(loading$ | async)">
       <button
         *ngFor="let c of cases"
         type="button"
-        (click)="select.emit(c)"
+        (click)="selectCaseHandler(c)"
         class="case-card"
-        [ngClass]="[
-          !isActive(c) ? 'case-card--disabled' : '',
-          c.priority === 'CRITICAL' ? 'case-card--critical' :
-          c.priority === 'URGENT' ? 'case-card--urgent' :
-          c.priority === 'HIGH' ? 'case-card--high' :
-          c.priority === 'MEDIUM' ? 'case-card--medium' : 'case-card--low'
-        ]"
+        [ngClass]="{
+          'case-card--disabled': !isActive(c),
+          'case-card--high': c.priority === 'HIGH',
+          'case-card--medium': c.priority === 'MEDIUM',
+          'case-card--low': c.priority === 'LOW'
+        }"
       >
-        <div class="case-card__inner">
-          <div class="case-head">
-            <div>
-              <div class="case-name">{{ c.patientName }}</div>
-              <div class="case-meta">{{ c.age }} godina • {{ c.id }}</div>
-            </div>
-            <span class="priority-dot" [ngClass]="[
-              c.priority === 'CRITICAL' ? 'priority-dot--critical' :
-              c.priority === 'URGENT' ? 'priority-dot--urgent' :
-              c.priority === 'HIGH' ? 'priority-dot--high' :
-              c.priority === 'MEDIUM' ? 'priority-dot--medium' : 'priority-dot--low'
-            ]"></span>
+        <div class="case-card__top">
+          <div>
+            <div class="case-card__name">{{ c.patientName }}</div>
+            <div class="case-card__meta">{{ 2025 - c.birthYear }} years • #{{ c.id }}</div>
           </div>
+          <span class="priority-dot" [ngClass]="{
+            'dot-high': c.priority === 'HIGH',
+            'dot-medium': c.priority === 'MEDIUM',
+            'dot-low': c.priority === 'LOW'
+          }"></span>
+        </div>
 
-          <div class="case-pills">
-            <div class="pill">
-              <div class="pill__label">Kategorija</div>
-              <div class="pill__value">{{ c.priority }}</div>
-            </div>
-            <div class="pill">
-              <div class="pill__label">Status</div>
-              <div class="pill__value">
-                <span
-                  class="status-chip"
-                  [ngClass]="[
-                    c.status === 'ACKNOWLEDGED' ? 'status-chip--ack' :
-                    c.status === 'SENT' ? 'status-chip--sent' :
-                    c.status === 'CLOSED' ? 'status-chip--closed' : 'status-chip--draft'
-                  ]"
-                >
-                  {{c.status === 'ACKNOWLEDGED' ? 'Potvrđeno' :
-                     c.status === 'SENT' ? 'Poslano' :
-                     c.status === 'CLOSED' ? 'Zatvoreno' : 'Draft' }}
-                </span>
-              </div>
+        <div class="case-card__grid">
+          <div class="case-mini">
+            <div class="case-mini__label">Priority</div>
+            <div class="case-mini__value case-mini__value--strong">{{ c.priority }}</div>
+          </div>
+          <div class="case-mini">
+            <div class="case-mini__label">Status</div>
+            <div class="case-mini__value">
+              <span class="chip" [ngClass]="{
+                'chip--ack': c.acknowledged,
+                'chip--sent': !c.acknowledged && c.isActive,
+                'chip--closed': !c.isActive
+              }">
+                {{ c.acknowledged ? 'Confirmed' : (c.isActive ? 'Sent' : 'Closed') }}
+              </span>
             </div>
           </div>
 
           <div class="case-eta">
-            <div class="case-eta__label">ETA</div>
-            <div class="case-eta__value">{{ c.etaMinutes }} min</div>
+            <div>ETA</div>
+            <div>{{ c.etaMinutes || '-' }} min</div>
           </div>
 
           <div class="case-summary">
             {{ c.summary }}
           </div>
         </div>
+
+        <div class="case-actions" *ngIf="c.isActive && !c.acknowledged">
+          <button 
+            type="button"
+            (click)="acknowledgeCaseHandler(c.id, $event)"
+            class="btn-acknowledge"
+          >
+            ✓ Confirm Receipt
+          </button>
+        </div>
       </button>
+
+      <div *ngIf="cases.length === 0" class="no-cases">
+        <p>No active cases</p>
+      </div>
     </div>
   </section>
 
-  <!-- Right: Map (Osijek) -->
+  <!-- Right: Map -->
   <aside class="overview__right">
     <div class="card map-card">
       <div class="card__header">
-        <div class="muted card__subtitle">Osijek, Hrvatska</div>
+        <div class="card__title">Location Map</div>
+        <div class="muted card__subtitle">Osijek, Croatia</div>
       </div>
 
       <div class="map-card__body">
-        <iframe
-          class="map-frame"
-          title="Karta: Osijek, Hrvatska"
-          loading="lazy"
-          referrerpolicy="no-referrer-when-downgrade"
-          src="https://www.openstreetmap.org/export/embed.html?bbox=18.6200%2C45.5200%2C18.7700%2C45.6000&layer=mapnik&marker=45.5550%2C18.6950"
-        ></iframe>
+        <div id="map" class="leaflet-map"></div>
+        
+        <div class="map-info" *ngIf="selectedCaseEta">
+          <div class="eta-display">
+            <span class="eta-label">ETA:</span>
+            <span class="eta-value">{{ selectedCaseEta.minutes }} min</span>
+            <span class="distance-value">({{ selectedCaseEta.km }} km)</span>
+          </div>
+        </div>
       </div>
     </div>
   </aside>

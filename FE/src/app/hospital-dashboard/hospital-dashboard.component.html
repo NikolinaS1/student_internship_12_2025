@@ -16,17 +16,22 @@
   </header>
 
   <ng-container *ngIf="vm$ | async as vm">
-    <app-cases-overview *ngIf="!vm.selected" [cases]="vm.cases" (select)="selectCase($event)"></app-cases-overview>
+    <!-- Pregled svih slučajeva -->
+    <app-cases-overview 
+      *ngIf="!vm.selected" 
+      [cases]="vm.cases" 
+      (select)="selectCase($event)"
+    ></app-cases-overview>
 
-      <app-case-detail *ngIf="vm.selected as selectedCase"
-        [cases]="vm.cases"
-        [selectedCase]="selectedCase"
-        [messageText]="messageText"
-        (messageTextChange)="messageText = $event"
-        (select)="selectCase($event)"
-        (deselect)="deselect()"
-        (acknowledge)="acknowledge($event)"
-        (send)="send($event)"
-      ></app-case-detail>
-</ng-container>
+    <!-- Detalji odabranog slučaja -->
+    <app-case-detail 
+      *ngIf="vm.selected" 
+      [selectedCase]="vm.selected"
+      [messageText]="messageText"
+      (messageTextChange)="messageText = $event"
+      (deselect)="deselect()"
+      (acknowledge)="acknowledge($event)"
+      (send)="send($event)"
+    ></app-case-detail>
+  </ng-container>
 </div>
