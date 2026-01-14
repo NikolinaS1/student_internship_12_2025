@@ -1,0 +1,125 @@
+<!-- HEADER -->
+<div class="users-header">
+    <h3>Users ({{ users.length }})</h3>
+    <button class="btn primary" (click)="openCreateUser()">
+        + Create New User
+    </button>
+</div>
+
+<!-- TABLE -->
+<table class="users-table">
+    <thead>
+        <tr>
+            <th>Username</th>
+            <th>Role</th>
+            <th>User ID</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        <tr *ngFor="let user of users">
+            <td>{{ user.username }}</td>
+            <td>
+                <span class="role-pill" [class.admin]="user.role === 'ADMIN'">
+                    {{ user.role }}
+                </span>
+            </td>
+            <td>{{ user.id }}</td>
+            <td>
+                <button class="icon-btn" (click)="openEditUser(user)">Edit</button>
+                <button class="icon-btn danger" (click)="deleteUser(user)">Delete</button>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<!-- CREATE USER MODAL -->
+<div *ngIf="showCreateModal" class="overlay" (click)="closeModals()">
+    <div class="modal" (click)="$event.stopPropagation()">
+
+        <div class="modal-header">
+            <h2>Create New User</h2>
+            <button class="close-btn" (click)="closeModals()">✕</button>
+        </div>
+
+        <div class="modal-body">
+            <div class="form-group">
+                <label>Username</label>
+                <input [(ngModel)]="newUser.username" type="text" />
+            </div>
+
+            <div class="form-group">
+                <label>Password</label>
+                <input [(ngModel)]="newUser.password" type="password" />
+            </div>
+
+            <div class="form-group">
+                <label>Role</label>
+                <div class="role-select">
+                    <button class="role" [class.active]="newUser.role === 'EMS'" (click)="newUser.role = 'EMS'">
+                        EMS Personnel
+                    </button>
+                    <button class="role" [class.active]="newUser.role === 'HOSPITAL'"
+                        (click)="newUser.role = 'HOSPITAL'">
+                        Hospital Staff
+                    </button>
+                    <button class="role" [class.active]="newUser.role === 'ADMIN'" (click)="newUser.role = 'ADMIN'">
+                        Admin
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn cancel" (click)="closeModals()">Cancel</button>
+            <button class="btn primary" [disabled]="!newUser.username || !newUser.password" (click)="createUser()">
+                Create User
+            </button>
+        </div>
+
+    </div>
+</div>
+
+<!-- EDIT USER MODAL -->
+<div *ngIf="showEditModal && editedUser" class="overlay" (click)="closeModals()">
+    <div class="modal" (click)="$event.stopPropagation()">
+
+        <div class="modal-header">
+            <h2>Edit User</h2>
+            <button class="close-btn" (click)="closeModals()">✕</button>
+        </div>
+
+        <div class="modal-body">
+            <div class="form-group">
+                <label>Username</label>
+                <input [(ngModel)]="editedUser!.username" type="text" />
+            </div>
+
+            <div class="form-group">
+                <label>Role</label>
+                <div class="role-select">
+                    <button class="role" [class.active]="editedUser!.role === 'EMS'" (click)="editedUser!.role = 'EMS'">
+                        EMS Personnel
+                    </button>
+                    <button class="role" [class.active]="editedUser!.role === 'HOSPITAL'"
+                        (click)="editedUser!.role = 'HOSPITAL'">
+                        Hospital Staff
+                    </button>
+                    <button class="role" [class.active]="editedUser!.role === 'ADMIN'"
+                        (click)="editedUser!.role = 'ADMIN'">
+                        Admin
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn cancel" (click)="closeModals()">Cancel</button>
+            <button class="btn primary" [disabled]="!editedUser || !editedUser.username" (click)="saveUserChanges()">
+                Save Changes
+            </button>
+        </div>
+
+    </div>
+</div>

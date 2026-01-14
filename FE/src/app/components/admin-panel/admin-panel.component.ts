@@ -1,17 +1,50 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
+import { UserService, User } from '../../services/user.service';
+import { UserManagementComponent } from '../user-management/user-management.component';
+import { CaseManagementComponent } from '../case-management/case-management.component';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-admin-panel',
   standalone: true,
-  imports: [CommonModule],
+  imports: [
+    CommonModule,
+    UserManagementComponent,
+    CaseManagementComponent
+  ],
   templateUrl: './admin-panel.component.html',
-  styleUrl: './admin-panel.component.scss'
+  styleUrls: ['./admin-panel.component.scss']
 })
-export class AdminPanelComponent {
-
+export class AdminPanelComponent implements OnInit, OnDestroy {
   activeTab: 'users' | 'cases' = 'users';
+  adminUsersCount = 0;
+  emsUsersCount = 0;
+  hospitalUsersCount = 0;
+  totalUsersCount = 0;
+  totalCasesCount = 0; // Placeholder, since case service is empty
 
-  constructor(public auth: AuthService) { }
+  private subscription: Subscription = new Subscription();
+
+  constructor(public auth: AuthService, private userService: UserService) { }
+
+  ngOnInit() {
+    this.subscription.add(
+      this.userService.users$.subscribe(users => {
+        this.updateStats(users);
+      })
+    );
+  }
+
+  ngOnDestroy() {
+    this.subscription.unsubscribe();
+  }
+
+  private updateStats(users: User[]) {
+    this.totalUsersCount = users.length;
+    this.adminUsersCount = users.filter(u => u.role === 'ADMIN').length;
+    this.emsUsersCount = users.filter(u => u.role === 'EMS').length;
+    this.hospitalUsersCount = users.filter(u => u.role === 'HOSPITAL').length;
+  }
 }

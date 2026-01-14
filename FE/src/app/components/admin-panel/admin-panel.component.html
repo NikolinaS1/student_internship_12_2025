@@ -4,7 +4,7 @@
     <header class="header">
         <div class="left">
             <h2>MCX Hospital - Admin Panel</h2>
-            <span>System Administrator (admin)</span>
+            <span>System Administrator</span>
         </div>
 
         <button class="logout" (click)="auth.logout()">Logout</button>
@@ -13,19 +13,19 @@
     <!-- STATS  -->
     <section class="stats">
         <div class="stat-card">
-            <strong>1</strong>
-            <span>Total Users</span>
+            <strong>{{ adminUsersCount }}</strong>
+            <span>Admin Users</span>
         </div>
         <div class="stat-card blue">
-            <strong>0</strong>
+            <strong>{{ emsUsersCount }}</strong>
             <span>EMS Users</span>
         </div>
         <div class="stat-card green">
-            <strong>0</strong>
+            <strong>{{ hospitalUsersCount }}</strong>
             <span>Hospital Users</span>
         </div>
         <div class="stat-card purple">
-            <strong>2</strong>
+            <strong>{{ totalCasesCount }}</strong>
             <span>Total Cases</span>
         </div>
     </section>
@@ -45,7 +45,8 @@
 
     <!-- CONTENT -->
     <section class="content">
-
+        <app-user-management *ngIf="activeTab === 'users'"></app-user-management>
+        <app-case-management *ngIf="activeTab === 'cases'"></app-case-management>
     </section>
 
 </div>
