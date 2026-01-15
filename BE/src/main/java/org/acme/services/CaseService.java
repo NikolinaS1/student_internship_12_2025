@@ -38,7 +38,7 @@ public class CaseService {
 
         Case caseEntity = new Case();
         caseEntity.setCreatedBy(user);
-        caseEntity.setCreatedAt(LocalDateTime.now());
+        caseEntity.setCreatedAt(LocalDateTime.now().withNano(0));
         caseEntity.setPatientName(request.patientName());
         caseEntity.setBirthYear(request.birthYear());
         caseEntity.setSex(request.sex());
@@ -63,7 +63,7 @@ public class CaseService {
 
         Case caseEntity = new Case();
         caseEntity.setCreatedBy(user);
-        caseEntity.setCreatedAt(LocalDateTime.now());
+        caseEntity.setCreatedAt(LocalDateTime.now().withNano(0));
         caseEntity.setPatientName(request.patientName());
         caseEntity.setBirthYear(request.birthYear());
         caseEntity.setSex(request.sex());
