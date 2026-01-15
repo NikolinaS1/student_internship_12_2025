@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { UserService, User, UserRole } from '../../services/user.service';
@@ -24,20 +24,22 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   newUser = {
     username: '',
     password: '',
-    role: 'EMS' as UserRole,
+    role: 'VEHICLE' as UserRole,
   };
 
   /** EDIT FORM */
   editedUser: User | null = null;
+  editedPassword: string = '';
 
   private subscription: Subscription = new Subscription();
 
-  constructor(private userService: UserService) {}
+  constructor(private userService: UserService, private cdr: ChangeDetectorRef) {}
 
   ngOnInit() {
     this.subscription.add(
       this.userService.users$.subscribe(users => {
         this.users = users;
+        this.cdr.markForCheck();
       })
     );
   }
@@ -57,6 +59,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
 
   openEditUser(user: User): void {
     this.editedUser = { ...user };
+    this.editedPassword = '';
     this.showEditModal = true;
   }
 
@@ -75,13 +78,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const user: User = {
-      id: 'user_' + Date.now(),
-      username: this.newUser.username,
-      role: this.newUser.role,
-    };
-
-    this.userService.create(user);
+    this.userService.create(this.newUser);
     this.closeModals();
   }
 
@@ -90,7 +87,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.userService.update(this.editedUser);
+    this.userService.update(this.editedUser, this.editedPassword || undefined);
     this.closeModals();
   }
 
@@ -110,7 +107,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     this.newUser = {
       username: '',
       password: '',
-      role: 'EMS',
+      role: 'VEHICLE',
     };
   }
 }

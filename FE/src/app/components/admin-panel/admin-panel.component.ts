@@ -44,7 +44,7 @@ export class AdminPanelComponent implements OnInit, OnDestroy {
   private updateStats(users: User[]) {
     this.totalUsersCount = users.length;
     this.adminUsersCount = users.filter(u => u.role === 'ADMIN').length;
-    this.emsUsersCount = users.filter(u => u.role === 'EMS').length;
+    this.emsUsersCount = users.filter(u => u.role === 'VEHICLE').length;
     this.hospitalUsersCount = users.filter(u => u.role === 'HOSPITAL').length;
   }
 }

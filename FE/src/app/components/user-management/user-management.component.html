@@ -57,8 +57,8 @@
             <div class="form-group">
                 <label>Role</label>
                 <div class="role-select">
-                    <button class="role" [class.active]="newUser.role === 'EMS'" (click)="newUser.role = 'EMS'">
-                        EMS Personnel
+                    <button class="role" [class.active]="newUser.role === 'VEHICLE'" (click)="newUser.role = 'VEHICLE'">
+                        Vehicle Personnel
                     </button>
                     <button class="role" [class.active]="newUser.role === 'HOSPITAL'"
                         (click)="newUser.role = 'HOSPITAL'">
@@ -97,9 +97,14 @@
             </div>
 
             <div class="form-group">
+                <label>Password (leave empty to keep current)</label>
+                <input [(ngModel)]="editedPassword" type="password" />
+            </div>
+
+            <div class="form-group">
                 <label>Role</label>
                 <div class="role-select">
-                    <button class="role" [class.active]="editedUser!.role === 'EMS'" (click)="editedUser!.role = 'EMS'">
+                    <button class="role" [class.active]="editedUser!.role === 'VEHICLE'" (click)="editedUser!.role = 'VEHICLE'">
                         EMS Personnel
                     </button>
                     <button class="role" [class.active]="editedUser!.role === 'HOSPITAL'"
