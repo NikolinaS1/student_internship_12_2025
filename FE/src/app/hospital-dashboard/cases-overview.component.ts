@@ -1,4 +1,4 @@
-import { Component, AfterViewInit, OnDestroy, Output, EventEmitter, Input, inject, OnInit } from '@angular/core';
+import { Component, AfterViewInit, OnDestroy, Output, EventEmitter, Input, inject, OnInit, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NgClass, NgFor, NgIf, AsyncPipe } from '@angular/common';
 import * as L from 'leaflet';
@@ -27,6 +27,7 @@ export class CasesOverviewComponent implements OnInit, AfterViewInit, OnDestroy 
 
   private map!: L.Map;
   private markers = new Map<number, L.Marker>();
+  private caseMarkers = new Map<number, L.Marker>();
   private routeLayer?: L.GeoJSON;
 
   private readonly HOSPITAL_LAT = 45.558125;
@@ -43,6 +44,13 @@ export class CasesOverviewComponent implements OnInit, AfterViewInit, OnDestroy 
     this.wsService.remoteLocations$.subscribe((locations) => {
       this.updateMarkers(locations);
     });
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    // Ažuriraj sve lokacije caseva na mapi
+    if (changes['cases'] && !changes['cases'].firstChange) {
+      this.updateCaseMarkers();
+    }
   }
 
   ngAfterViewInit() {
@@ -74,6 +82,8 @@ export class CasesOverviewComponent implements OnInit, AfterViewInit, OnDestroy 
     L.marker([this.HOSPITAL_LAT, this.HOSPITAL_LNG], { icon: hospitalIcon })
       .addTo(this.map)
       .bindPopup('<b>KBC Osijek</b>');
+
+      this.updateCaseMarkers();
   }
 
   private updateMarkers(locations: RemoteLocation[]) {
@@ -107,6 +117,40 @@ export class CasesOverviewComponent implements OnInit, AfterViewInit, OnDestroy 
         this.markers.set(loc.caseId, marker);
       } else {
         existing.setLatLng([loc.latitude, loc.longitude]);
+      }
+    }
+  }
+
+  private updateCaseMarkers() {
+    if (!this.map) return;
+
+    // Ukloni stare markere
+    for (const marker of this.caseMarkers.values()) {
+      this.map.removeLayer(marker);
+    }
+    this.caseMarkers.clear();
+
+    // Kreiraj markere za sve aktivne caseve
+    const caseIcon = L.icon({
+      iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-orange.png',
+      shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+      iconSize: [25, 41],
+      iconAnchor: [12, 41],
+      popupAnchor: [1, -34],
+      shadowSize: [41, 41],
+    });
+
+    for (const caseData of this.cases) {
+      if (caseData.isActive) {
+        const marker = L.marker([caseData.latitude, caseData.longitude], { icon: caseIcon })
+          .addTo(this.map)
+          .bindPopup(`<b>${caseData.patientName}</b><br>Case #${caseData.id}<br>ETA: ${caseData.etaMinutes || '-'} min`);
+
+        marker.on('click', () => {
+          this.selectCaseHandler(caseData);
+        });
+
+        this.caseMarkers.set(caseData.id, marker);
       }
     }
   }

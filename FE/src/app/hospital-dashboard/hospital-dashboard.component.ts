@@ -65,11 +65,6 @@ export class HospitalDashboardComponent implements OnInit {
     setTimeout(() => this.detail?.scrollChatToBottom(), 0);
   }
 
-  resetDemo() {
-    console.log('Reset demo');
-  }
-
-  // Prikazuj samo "aktivne" u gridu
   isActive(c: CaseModel): boolean {
     return c.status !== 'CLOSED';
   }

@@ -20,8 +20,8 @@ export interface CaseModel {
   diastolicPressure?: number;
   
   // Lokacija
-  latitude?: number;
-  longitude?: number;
+  latitude: number;
+  longitude: number;
   
   // UI dodatni
   status?: 'DRAFT' | 'SENT' | 'ACKNOWLEDGED' | 'CLOSED';

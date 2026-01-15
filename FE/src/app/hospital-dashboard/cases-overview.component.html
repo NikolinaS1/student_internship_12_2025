@@ -4,8 +4,9 @@
     <div class="heading_flex">
       <div class="overview__head">
         <div>
+          <!-- CHANGED: English translation -->
           <div class="overview__title">Active Cases</div>
-          <div class="overview__subtitle">Click on a case to open details and communication.</div>
+          <div class="overview__subtitle">Click on a case to open details and chat.</div>
         </div>
       </div>
     </div>
@@ -13,6 +14,7 @@
     <!-- Loading & Error States -->
     <div *ngIf="loading$ | async" class="loading-state">
       <div class="spinner"></div>
+      <!-- CHANGED: English translation -->
       <p>Loading cases...</p>
     </div>
 
@@ -27,25 +29,25 @@
         type="button"
         (click)="selectCaseHandler(c)"
         class="case-card"
-        [ngClass]="{
-          'case-card--disabled': !isActive(c),
-          'case-card--high': c.priority === 'HIGH',
-          'case-card--medium': c.priority === 'MEDIUM',
-          'case-card--low': c.priority === 'LOW'
-        }"
+        [ngClass]="[
+          !isActive(c) ? 'case-card--disabled' : '',
+          c.priority === 'HIGH' ? 'case-card--high' :
+          c.priority === 'MEDIUM' ? 'case-card--medium' : 'case-card--low'
+        ]"
       >
+        <!-- CHANGED: Improved card structure -->
         <div class="case-card__top">
           <div>
             <div class="case-card__name">{{ c.patientName }}</div>
-            <div class="case-card__meta">{{ 2025 - c.birthYear }} years • #{{ c.id }}</div>
+            <div class="case-card__meta">{{ 2026 - c.birthYear }} years old • #{{ c.id }}</div>
           </div>
-          <span class="priority-dot" [ngClass]="{
-            'dot-high': c.priority === 'HIGH',
-            'dot-medium': c.priority === 'MEDIUM',
-            'dot-low': c.priority === 'LOW'
-          }"></span>
+          <span class="priority-dot" [ngClass]="[
+            c.priority === 'HIGH' ? 'dot-high' :
+            c.priority === 'MEDIUM' ? 'dot-medium' : 'dot-low'
+          ]"></span>
         </div>
 
+        <!-- CHANGED: Better grid layout for pills -->
         <div class="case-card__grid">
           <div class="case-mini">
             <div class="case-mini__label">Priority</div>
@@ -54,33 +56,39 @@
           <div class="case-mini">
             <div class="case-mini__label">Status</div>
             <div class="case-mini__value">
-              <span class="chip" [ngClass]="{
-                'chip--ack': c.acknowledged,
-                'chip--sent': !c.acknowledged && c.isActive,
-                'chip--closed': !c.isActive
-              }">
-                {{ c.acknowledged ? 'Confirmed' : (c.isActive ? 'Sent' : 'Closed') }}
+              <span
+                class="chip"
+                [ngClass]="[
+                  c.acknowledged ? 'chip--ack' :
+                  c.isActive ? 'chip--sent' : 'chip--closed'
+                ]"
+              >
+                {{ c.acknowledged ? 'Acknowledged' : c.isActive ? 'Sent' : 'Closed' }}
               </span>
             </div>
           </div>
 
-          <div class="case-eta">
+          <!-- CHANGED: ETA in grid -->
+          <div class="case-eta case-eta--compact">
             <div>ETA</div>
             <div>{{ c.etaMinutes || '-' }} min</div>
           </div>
 
+          <!-- CHANGED: Summary spans full width -->
           <div class="case-summary">
             {{ c.summary }}
           </div>
         </div>
 
-        <div class="case-actions" *ngIf="c.isActive && !c.acknowledged">
+        <!-- CHANGED: Acknowledge button with updated styling -->
+        <div class="case-actions">
           <button 
+            *ngIf="c.isActive && !c.acknowledged"
             type="button"
             (click)="acknowledgeCaseHandler(c.id, $event)"
             class="btn-acknowledge"
           >
-            ✓ Confirm Receipt
+            ✓ Acknowledge case
           </button>
         </div>
       </button>
@@ -95,13 +103,8 @@
   <aside class="overview__right">
     <div class="card map-card">
       <div class="card__header">
-        <div class="card__title">Location Map</div>
+        <div class="card__title">Live Map</div>
         <div class="muted card__subtitle">Osijek, Croatia</div>
-      </div>
-
-      <div class="map-card__body">
-        <div id="map" class="leaflet-map"></div>
-        
         <div class="map-info" *ngIf="selectedCaseEta">
           <div class="eta-display">
             <span class="eta-label">ETA:</span>
@@ -109,6 +112,10 @@
             <span class="distance-value">({{ selectedCaseEta.km }} km)</span>
           </div>
         </div>
+      </div>
+
+      <div class="map-card__body">
+        <div id="map" class="leaflet-map"></div>
       </div>
     </div>
   </aside>

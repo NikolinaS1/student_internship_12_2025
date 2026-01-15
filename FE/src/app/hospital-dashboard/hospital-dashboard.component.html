@@ -3,14 +3,13 @@
   <header class="topbar">
     <div class="topbar__inner">
       <div class="brand">
-        <div class="brand__title">MCX Bolnica</div>
-        <div class="brand__subtitle">BOLNIČKI portal</div>
+        <div class="brand__title">MCX Hospital</div>
+        <div class="brand__subtitle">Hospital portal</div>
       </div>
 
       <div class="topbar__actions">
         <span class="muted">KBC Osijek</span>
-        <button type="button" (click)="resetDemo()" class="btn">Resetiraj demo</button>
-        <button type="button" class="btn btn--primary" title="(samo demo)">Odjava</button>
+        <button type="button" class="btn btn--primary" title="(samo demo)">Logout</button>
       </div>
     </div>
   </header>
@@ -27,11 +26,13 @@
     <app-case-detail 
       *ngIf="vm.selected" 
       [selectedCase]="vm.selected"
+      [allCases]="vm.cases"
       [messageText]="messageText"
       (messageTextChange)="messageText = $event"
       (deselect)="deselect()"
       (acknowledge)="acknowledge($event)"
       (send)="send($event)"
+      (caseSelect)="selectCase($event)"
     ></app-case-detail>
   </ng-container>
 </div>
