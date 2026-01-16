@@ -15,7 +15,7 @@ import { CaseWebSocketService } from '../services/case-websocket.service';
   templateUrl: './cases-overview.component.html',
 })
 export class CasesOverviewComponent implements OnInit, AfterViewInit, OnDestroy {
-  @Input() cases: CaseModel[] = []; 
+  @Input() cases: CaseModel[] = [];
   @Output() select = new EventEmitter<CaseModel>();
 
   private wsService = inject(WebSocketLocationService);
@@ -95,7 +95,7 @@ export class CasesOverviewComponent implements OnInit, AfterViewInit, OnDestroy 
       .addTo(this.map)
       .bindPopup('<b>KBC Osijek</b>');
 
-      this.updateCaseMarkers();
+    this.updateCaseMarkers();
   }
 
   private updateMarkers(locations: RemoteLocation[]) {
@@ -110,26 +110,57 @@ export class CasesOverviewComponent implements OnInit, AfterViewInit, OnDestroy 
 
     for (const loc of locations) {
       const existing = this.markers.get(loc.caseId);
+      const caseData = this.getCaseById(loc.caseId);
 
+      // Koristi ambulance ikonice za vozila
       const vehicleIcon = L.icon({
-        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
-        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-        iconSize: [25, 41],
-        iconAnchor: [12, 41],
-        popupAnchor: [1, -34],
-        shadowSize: [41, 41],
+        iconUrl: caseData ? this.getCaseIconUrl(caseData) : 'assets/low priority case.png',
+        iconSize: [32, 32],
+        iconAnchor: [16, 16],
+        popupAnchor: [0, -16],
       });
 
       if (!existing) {
         const marker = L.marker([loc.latitude, loc.longitude], { icon: vehicleIcon })
           .addTo(this.map)
-          .bindPopup(`<b>Case #${loc.caseId}</b>`);
+          .bindPopup(`<b>Vehicle - Case #${loc.caseId}</b>`);
 
         marker.on('click', () => this.showEtaAndRoute(loc.caseId, loc.latitude, loc.longitude));
         this.markers.set(loc.caseId, marker);
       } else {
         existing.setLatLng([loc.latitude, loc.longitude]);
+        // Ažuriraj ikonu ako se prioritet promijenio
+        if (caseData) {
+          existing.setIcon(vehicleIcon);
+        }
       }
+    }
+  }
+
+  /**
+   * Pronađi case po ID-u
+   */
+  private getCaseById(caseId: number): CaseModel | undefined {
+    return this.cases.find(c => c.id === caseId);
+  }
+
+  /**
+   * Vrati URL ikonice ambulance na temelju prioriteta i SOS statusa
+   */
+  private getCaseIconUrl(caseData: CaseModel): string {
+    if (caseData.isSos) {
+      return 'assets/sos case.png';
+    }
+
+    switch (caseData.priority) {
+      case 'HIGH':
+        return 'assets/high priority case.png';
+      case 'MEDIUM':
+        return 'assets/medium priority case.png';
+      case 'LOW':
+        return 'assets/low priority case.png';
+      default:
+        return 'assets/low priority case.png';
     }
   }
 
@@ -142,18 +173,16 @@ export class CasesOverviewComponent implements OnInit, AfterViewInit, OnDestroy 
     }
     this.caseMarkers.clear();
 
-    // Kreiraj markere za sve aktivne caseve
-    const caseIcon = L.icon({
-      iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-orange.png',
-      shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-      iconSize: [25, 41],
-      iconAnchor: [12, 41],
-      popupAnchor: [1, -34],
-      shadowSize: [41, 41],
-    });
-
+    // Kreiraj markere za sve aktivne caseve - ambulance ikonice
     for (const caseData of this.cases) {
       if (caseData.isActive) {
+        const caseIcon = L.icon({
+          iconUrl: this.getCaseIconUrl(caseData),
+          iconSize: [32, 32],
+          iconAnchor: [16, 16],
+          popupAnchor: [0, -16],
+        });
+
         const marker = L.marker([caseData.latitude, caseData.longitude], { icon: caseIcon })
           .addTo(this.map)
           .bindPopup(`<b>${caseData.patientName}</b><br>Case #${caseData.id}<br>ETA: ${caseData.etaMinutes || '-'} min`);
@@ -184,12 +213,10 @@ export class CasesOverviewComponent implements OnInit, AfterViewInit, OnDestroy 
       const caseData = this.cases.find(c => c.id === caseId);
       if (caseData && caseData.isActive) {
         const caseIcon = L.icon({
-          iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-orange.png',
-          shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-          iconSize: [25, 41],
-          iconAnchor: [12, 41],
-          popupAnchor: [1, -34],
-          shadowSize: [41, 41],
+          iconUrl: this.getCaseIconUrl(caseData),
+          iconSize: [32, 32],
+          iconAnchor: [16, 16],
+          popupAnchor: [0, -16],
         });
 
         const marker = L.marker([latitude, longitude], { icon: caseIcon })

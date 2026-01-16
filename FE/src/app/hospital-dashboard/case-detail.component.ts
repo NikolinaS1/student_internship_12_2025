@@ -1,7 +1,8 @@
-import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnDestroy, Output, ViewChild, SimpleChanges } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild, SimpleChanges, inject } from '@angular/core';
 import { CommonModule, DatePipe, NgClass, NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CaseModel } from '../models/case-model';
+import { WebSocketLocationService, RemoteLocation } from '../services/websocket-service';
 import * as L from 'leaflet';
 
 
@@ -11,7 +12,7 @@ import * as L from 'leaflet';
   imports: [CommonModule, NgIf, NgFor, NgClass, FormsModule, DatePipe],
   templateUrl: './case-detail.component.html',
 })
-export class CaseDetailComponent implements AfterViewInit {
+export class CaseDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input({ required: true }) selectedCase!: CaseModel;
   @Input() allCases: CaseModel[] = [];
   @Input() messageText = '';
@@ -24,8 +25,10 @@ export class CaseDetailComponent implements AfterViewInit {
 
   @ViewChild('chatScroll') chatScroll?: ElementRef<HTMLDivElement>;
 
+  private wsService = inject(WebSocketLocationService);
   private detailMap?: L.Map;
   private caseMarker?: L.Marker;
+  private vehicleMarker?: L.Marker; // Marker za vozilo koje se kreće
   private hospitalMarker?: L.Marker;
   private readonly HOSPITAL_LAT = 45.558125;
   private readonly HOSPITAL_LNG = 18.713756;
@@ -42,6 +45,13 @@ export class CaseDetailComponent implements AfterViewInit {
     if (changes['selectedCase'] && !changes['selectedCase'].firstChange) {
       this.updateDetailMapMarkers();
     }
+  }
+
+  ngOnInit() {
+    // Slušaj remote lokacije za vozila
+    this.wsService.remoteLocations$.subscribe((locations) => {
+      this.updateVehicleMarker(locations);
+    });
   }
 
   ngOnDestroy() {
@@ -143,6 +153,26 @@ export class CaseDetailComponent implements AfterViewInit {
     return vitals;
   }
 
+  /**
+   * Vrati URL ikonice ambulance na temelju prioriteta i SOS statusa
+   */
+  private getCaseIconUrl(caseData: CaseModel): string {
+    if (caseData.isSos) {
+      return 'assets/sos case.png';
+    }
+
+    switch (caseData.priority) {
+      case 'HIGH':
+        return 'assets/high priority case.png';
+      case 'MEDIUM':
+        return 'assets/medium priority case.png';
+      case 'LOW':
+        return 'assets/low priority case.png';
+      default:
+        return 'assets/low priority case.png';
+    }
+  }
+
   isActive(): boolean {
     return this.selectedCase?.status !== 'CLOSED';
   }
@@ -181,13 +211,12 @@ export class CaseDetailComponent implements AfterViewInit {
       .addTo(this.detailMap!)
       .bindPopup('<b>KBC Osijek</b>');
 
+    // Ambulance ikonica za početnu lokaciju case-a
     const caseIcon = L.icon({
-      iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
-      shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-      iconSize: [25, 41],
-      iconAnchor: [12, 41],
-      popupAnchor: [1, -34],
-      shadowSize: [41, 41],
+      iconUrl: this.getCaseIconUrl(this.selectedCase!),
+      iconSize: [32, 32],
+      iconAnchor: [16, 16],
+      popupAnchor: [0, -16],
     });
 
     this.caseMarker = L.marker([this.selectedCase!.latitude, this.selectedCase!.longitude], { icon: caseIcon })
@@ -205,14 +234,12 @@ export class CaseDetailComponent implements AfterViewInit {
       this.detailMap.removeLayer(this.caseMarker);
     }
 
-    // Kreiraj novi marker za novi case
+    // Kreiraj novi marker za novi case - ambulance ikonica
     const caseIcon = L.icon({
-      iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
-      shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-      iconSize: [25, 41],
-      iconAnchor: [12, 41],
-      popupAnchor: [1, -34],
-      shadowSize: [41, 41],
+      iconUrl: this.getCaseIconUrl(this.selectedCase),
+      iconSize: [32, 32],
+      iconAnchor: [16, 16],
+      popupAnchor: [0, -16],
     });
 
     this.caseMarker = L.marker([this.selectedCase.latitude, this.selectedCase.longitude], { icon: caseIcon })
@@ -231,5 +258,45 @@ export class CaseDetailComponent implements AfterViewInit {
     );
     this.detailMap.fitBounds(bounds, { padding: [50, 50] });
   }
- 
+
+  /**
+   * Ažuriraj marker vozila na temelju WebSocket location update-a
+   */
+  private updateVehicleMarker(locations: RemoteLocation[]) {
+    if (!this.detailMap || !this.selectedCase) return;
+
+    // Pronađi lokaciju za trenutno selektirani case
+    const vehicleLocation = locations.find(loc => loc.caseId === this.selectedCase.id);
+
+    if (vehicleLocation) {
+      // Ambulance ikonica za vozilo
+      const vehicleIcon = L.icon({
+        iconUrl: this.getCaseIconUrl(this.selectedCase),
+        iconSize: [32, 32],
+        iconAnchor: [16, 16],
+        popupAnchor: [0, -16],
+      });
+
+      if (!this.vehicleMarker) {
+        // Kreiraj novi marker za vozilo
+        this.vehicleMarker = L.marker(
+          [vehicleLocation.latitude, vehicleLocation.longitude],
+          { icon: vehicleIcon }
+        )
+          .addTo(this.detailMap)
+          .bindPopup(`<b>Vehicle - Case #${this.selectedCase.id}</b>`);
+      } else {
+        // Ažuriraj poziciju postojećeg markera
+        this.vehicleMarker.setLatLng([vehicleLocation.latitude, vehicleLocation.longitude]);
+        this.vehicleMarker.setIcon(vehicleIcon);
+      }
+    } else {
+      // Ukloni marker vozila ako nema location update-a
+      if (this.vehicleMarker) {
+        this.detailMap.removeLayer(this.vehicleMarker);
+        this.vehicleMarker = undefined;
+      }
+    }
+  }
+
 }
