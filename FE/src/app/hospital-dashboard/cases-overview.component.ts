@@ -6,6 +6,7 @@ import { WebSocketLocationService, RemoteLocation } from '../services/websocket-
 import { CaseService } from '../services/case-store.service';
 import { AuthService } from '../services/auth-service';
 import { CaseModel } from '../models/case-model';
+import { CaseWebSocketService } from '../services/case-websocket.service';
 
 @Component({
   selector: 'app-cases-overview',
@@ -20,6 +21,7 @@ export class CasesOverviewComponent implements OnInit, AfterViewInit, OnDestroy 
   private wsService = inject(WebSocketLocationService);
   private caseService = inject(CaseService);
   private authService = inject(AuthService);
+  private caseWsService = inject(CaseWebSocketService);
 
   // Observable iz servisa
   loading$ = this.caseService.loading$;
@@ -43,6 +45,16 @@ export class CasesOverviewComponent implements OnInit, AfterViewInit, OnDestroy 
     // Slusaj remote lokacije
     this.wsService.remoteLocations$.subscribe((locations) => {
       this.updateMarkers(locations);
+    });
+
+    // Slušaj WebSocket poruke za case updates
+    this.caseWsService.message$.subscribe((message) => {
+      if (!message) return;
+
+      // Posebno handleaj LOCATION_UPDATE da ažuriraj marker na mapi
+      if (message.type === 'LOCATION_UPDATE' && message.caseId && message.latitude && message.longitude) {
+        this.updateCaseMarkerLocation(message.caseId, message.latitude, message.longitude);
+      }
     });
   }
 
@@ -154,6 +166,46 @@ export class CasesOverviewComponent implements OnInit, AfterViewInit, OnDestroy 
       }
     }
   }
+
+  /**
+   * Ažuriraj lokaciju markera za specifičan case (real-time WebSocket update)
+   * 
+   * MIJENJA POCETNU LOKACIJU
+   */
+  private updateCaseMarkerLocation(caseId: number, latitude: number, longitude: number) {
+    const marker = this.caseMarkers.get(caseId);
+
+    if (marker) {
+      // Ažuriraj postojeći marker
+      marker.setLatLng([latitude, longitude]);
+      console.log(`📍 Map marker updated for case #${caseId}:`, latitude, longitude);
+    } else {
+      // Ako marker ne postoji, kreiraj novi (case možda tek postao aktivan)
+      const caseData = this.cases.find(c => c.id === caseId);
+      if (caseData && caseData.isActive) {
+        const caseIcon = L.icon({
+          iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-orange.png',
+          shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+          iconSize: [25, 41],
+          iconAnchor: [12, 41],
+          popupAnchor: [1, -34],
+          shadowSize: [41, 41],
+        });
+
+        const marker = L.marker([latitude, longitude], { icon: caseIcon })
+          .addTo(this.map)
+          .bindPopup(`<b>${caseData.patientName}</b><br>Case #${caseData.id}<br>ETA: ${caseData.etaMinutes || '-'} min`);
+
+        marker.on('click', () => {
+          this.selectCaseHandler(caseData);
+        });
+
+        this.caseMarkers.set(caseId, marker);
+        console.log(`📍 New map marker created for case #${caseId}:`, latitude, longitude);
+      }
+    }
+  }
+
 
   private async showEtaAndRoute(caseId: number, fromLat: number, fromLng: number) {
     const url =

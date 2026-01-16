@@ -4,11 +4,13 @@ import { BehaviorSubject, Observable, interval, of } from 'rxjs';
 import { switchMap, tap, catchError } from 'rxjs/operators';
 import { CaseModel } from '../models/case-model';
 import { AuthService } from '../services/auth-service';
+import {  CaseWebSocketService } from './case-websocket.service';
 
 @Injectable({ providedIn: 'root' })
 export class CaseService {
   private http = inject(HttpClient);
   private authService = inject(AuthService);
+  private wsService = inject(CaseWebSocketService);
 
   private readonly API_URL = 'http://localhost:8080/cases';
 
@@ -25,13 +27,128 @@ export class CaseService {
   private errorSubject = new BehaviorSubject<string | null>(null);
   public error$ = this.errorSubject.asObservable();
 
-  // Auto-refresh svakih 10 sekundi
-  private autoRefresh$ = interval(100000).pipe(
-    switchMap(() => this.getAllCases())
-  );
+
 
   constructor() {
-    this.initAutoRefresh();
+    this.initWebSocket();
+  }
+
+  /**
+   * Inicijaliziraj WebSocket i slušaj poruke
+   */
+  private initWebSocket() {
+    this.wsService.connect();
+
+    this.wsService.message$.subscribe((message) => {
+      if (!message) return;
+
+      console.log('🔔 Case update received:', message);
+
+      switch (message.type) {
+        case 'CREATE':
+          if (message.data) {
+            this.handleCaseCreate(message.data);
+          }
+          break;
+
+        case 'UPDATE':
+        case 'ACKNOWLEDGE':
+          if (message.data) {
+            this.handleCaseUpdate(message.data);
+          }
+          break;
+
+        case 'DELETE':
+          if (message.data?.id) {
+            this.handleCaseDelete(message.data.id);
+          }
+          break;
+
+        case 'LOCATION_UPDATE':
+          if (message.caseId && message.latitude && message.longitude) {
+            this.handleLocationUpdate(message.caseId, message.latitude, message.longitude);
+          }
+          break;
+      }
+    });
+  }
+
+  /**
+   * Handle novi case (CREATE)
+   */
+  private handleCaseCreate(caseData: CaseModel) {
+    const cases = this.casesSubject.value;
+    const processedCase = this.processCase(caseData);
+
+    // Provjeri da case već ne postoji
+    if (!cases.find(c => c.id === caseData.id)) {
+      this.casesSubject.next([...cases, processedCase]);
+      console.log('✅ New case added:', processedCase.id);
+    }
+  }
+
+  /**
+   * Handle ažuriranje case-a (UPDATE/ACKNOWLEDGE)
+   */
+  private handleCaseUpdate(caseData: CaseModel) {
+    const cases = this.casesSubject.value;
+    const idx = cases.findIndex(c => c.id === caseData.id);
+
+    if (idx >= 0) {
+      cases[idx] = this.processCase(caseData);
+      this.casesSubject.next([...cases]);
+      console.log('✅ Case updated:', caseData.id);
+
+      // Ažuriraj i selektirani case ako je isti
+      if (this.selectedCaseSubject.value?.id === caseData.id) {
+        this.selectedCaseSubject.next(this.processCase(caseData));
+      }
+    }
+  }
+
+  /**
+   * Handle brisanje case-a (DELETE)
+   */
+  private handleCaseDelete(caseId: number) {
+    const cases = this.casesSubject.value;
+    const filtered = cases.filter(c => c.id !== caseId);
+
+    if (filtered.length !== cases.length) {
+      this.casesSubject.next(filtered);
+      console.log('✅ Case deleted:', caseId);
+
+      // Očisti selektirani case ako je obrisan
+      if (this.selectedCaseSubject.value?.id === caseId) {
+        this.selectedCaseSubject.next(null);
+      }
+    }
+  }
+
+  /**
+   * Handle location update za case
+   */
+  private handleLocationUpdate(caseId: number, latitude: number, longitude: number) {
+    const cases = this.casesSubject.value;
+    const idx = cases.findIndex(c => c.id === caseId);
+
+    if (idx >= 0) {
+      cases[idx] = {
+        ...cases[idx],
+        latitude,
+        longitude
+      };
+      this.casesSubject.next([...cases]);
+      console.log('✅ Location updated for case:', caseId, latitude, longitude);
+
+      // Ažuriraj i selektirani case ako je isti
+      if (this.selectedCaseSubject.value?.id === caseId) {
+        this.selectedCaseSubject.next({
+          ...this.selectedCaseSubject.value,
+          latitude,
+          longitude
+        });
+      }
+    }
   }
 
   /**
@@ -176,13 +293,6 @@ export class CaseService {
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json',
     });
-  }
-
-  /**
-   * Auto-refresh svakih 10 sekundi
-   */
-  private initAutoRefresh() {
-    this.autoRefresh$.subscribe();
   }
 
   /**
