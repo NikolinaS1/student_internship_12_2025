@@ -3,10 +3,7 @@ package org.acme.services;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
-import org.acme.dtos.cases.AcknowledgeCaseRequest;
-import org.acme.dtos.cases.RegularCaseCreateRequest;
-import org.acme.dtos.cases.SosCaseCreateRequest;
-import org.acme.dtos.cases.UpdateCaseRequest;
+import org.acme.dtos.cases.*;
 import org.acme.enums.Priority;
 import org.acme.models.Case;
 import org.acme.models.User;
@@ -94,6 +91,17 @@ public class CaseService {
             throw new NotFoundException("Case not found");
         }
         caseEntity.setAcknowledged(request.acknowledged());
+        caseEntity.persist();
+        return caseEntity;
+    }
+
+    @Transactional
+    public Case endCase(Long caseId, EndCaseRequest request) {
+        Case caseEntity = Case.findById(caseId);
+        if (caseEntity == null) {
+            throw new NotFoundException("Case not found");
+        }
+        caseEntity.setIsActive(request.isActive());
         caseEntity.persist();
         return caseEntity;
     }

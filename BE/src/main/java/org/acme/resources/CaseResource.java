@@ -6,11 +6,7 @@ import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import org.acme.dtos.cases.CaseResponse;
-import org.acme.dtos.cases.AcknowledgeCaseRequest;
-import org.acme.dtos.cases.RegularCaseCreateRequest;
-import org.acme.dtos.cases.SosCaseCreateRequest;
-import org.acme.dtos.cases.UpdateCaseRequest;
+import org.acme.dtos.cases.*;
 import org.acme.models.Case;
 import org.acme.services.CaseService;
 import org.acme.websockets.CaseWebSocketEndpoint;
@@ -92,6 +88,17 @@ public class CaseResource {
         Case caseEntity = caseService.acknowledgeCase(id, request);
 
         webSocketEndpoint.broadcastCaseUpdate(CaseResponse.fromEntity(caseEntity), "ACKNOWLEDGE");
+
+        return Response.ok(CaseResponse.fromEntity(caseEntity)).build();
+    }
+
+    @PUT
+    @Path("/{id}/end")
+    @RolesAllowed({"VEHICLE", "ADMIN"})
+    public Response endCase(@PathParam("id") Long id, @Valid EndCaseRequest request) {
+        Case caseEntity = caseService.endCase(id, request);
+
+        webSocketEndpoint.broadcastCaseUpdate(CaseResponse.fromEntity(caseEntity), "END");
 
         return Response.ok(CaseResponse.fromEntity(caseEntity)).build();
     }
