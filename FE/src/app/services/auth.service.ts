@@ -9,6 +9,28 @@ export class AuthService {
 
   constructor(private router: Router, private http: HttpClient) { }
 
+  private decodeJWT(token: string): any {
+    try {
+      const payload = token.split('.')[1];
+      return JSON.parse(atob(payload));
+    } catch (err) {
+      return null;
+    }
+  }
+
+  private getRedirectPath(role: string): string {
+    switch (role?.toLowerCase()) {
+      case 'admin':
+        return '/admin';
+      case 'vehicle':
+        return '/ems';
+      case 'hospital':
+        return '/hospital';
+      default:
+        return '/admin';
+    }
+  }
+
   async login(name: string, password: string): Promise<boolean> {
     try {
       const url = `${this.baseUrl}user/login`;
@@ -20,7 +42,14 @@ export class AuthService {
       if (token) {
         localStorage.setItem('auth_token', token);
         localStorage.setItem('loggedIn', 'true');
-        this.router.navigate(['/admin']);
+        
+        // Decode JWT and get role
+        const decoded = this.decodeJWT(token);
+        const role = decoded?.role || decoded?.roles?.[0] || 'admin';
+        
+        // Redirect based on role
+        const redirectPath = this.getRedirectPath(role);
+        this.router.navigate([redirectPath]);
         return true;
       }
       return false;
