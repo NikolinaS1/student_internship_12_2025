@@ -5,8 +5,10 @@
   </div>
   <div class="user-area">
     <div class="user-info">
-      <span>EMS-Technican-01</span>
+      <span>{{ currentUser?.name || 'EMS-Technican-01' }}</span>
     </div>
-    <button class="btn btn-outline">Logout</button>
+    <button class="btn btn-outline">
+      Logout
+    </button>
   </div>
 </header>

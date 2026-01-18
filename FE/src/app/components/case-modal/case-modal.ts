@@ -100,7 +100,6 @@ export class CaseModal implements OnChanges {
 
     const quickSymptomsFromDescription = this.extractQuickSymptoms(this.existingCase.description);
  
-    // Load existing case data into form
     this.caseData = {
       patientName: this.existingCase.patientName,
       birthYear: this.existingCase.birthYear,
@@ -118,7 +117,6 @@ export class CaseModal implements OnChanges {
       temperature: this.existingCase.temperature,
     };
     
-    // Store original data for comparison
     this.originalCaseData = JSON.parse(JSON.stringify(this.caseData));
   }
 
@@ -141,19 +139,17 @@ export class CaseModal implements OnChanges {
     
     let cleanedDescription = description;
     
-    // Ukloni quick symptoms iz description-a
     quickSymptoms.forEach(symptom => {
       cleanedDescription = cleanedDescription.replace(symptom, '').trim();
     });
     
-    // Ukloni višestruke praznine i zareze
     cleanedDescription = cleanedDescription
-      .replace(/,\s*,/g, ',') // Dvostruki zarezi
-      .replace(/^\.\s*/, '') // Točka na početku
-      .replace(/\.\s*\./g, '.') // Dvostruke točke
-      .replace(/,\s*\./g, '.') // Zarez prije točke
-      .replace(/^\s*,\s*/, '') // Zarez na početku
-      .replace(/\s*,\s*$/, '') // Zarez na kraju
+      .replace(/,\s*,/g, ',') 
+      .replace(/^\.\s*/, '') 
+      .replace(/\.\s*\./g, '.') 
+      .replace(/,\s*\./g, '.') 
+      .replace(/^\s*,\s*/, '')
+      .replace(/\s*,\s*$/, '')
       .trim();
     
     return cleanedDescription;
@@ -229,23 +225,20 @@ export class CaseModal implements OnChanges {
   }
 
   createCase(): void {
-    // If in edit mode and data hasn't changed, don't make request
     if (this.editMode && !this.hasDataChanged()) {
       console.log('No changes detected, closing modal');
       this.closeModal();
       return;
     }
 
-    // Combine symptoms and quickSymptoms into one description
     let fullDescription = this.caseData.symptoms ? this.caseData.symptoms.trim() : '';
   
     if (this.caseData.quickSymptoms && this.caseData.quickSymptoms.length > 0) {
       const quickSymptomsText = this.caseData.quickSymptoms.join(', ');
       
       if (fullDescription) {
-        // Provjeri ima li točka na kraju
         if (!fullDescription.endsWith('.')) {
-          fullDescription += '.'; // Dodaj točku samo ako je nema
+          fullDescription += '.'; 
         }
         fullDescription += ' ' + quickSymptomsText;
       } else {
@@ -269,7 +262,6 @@ export class CaseModal implements OnChanges {
       longitude: 0  // Placeholder, will be set after geolocation
     };
 
-    // Get default location
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -304,7 +296,6 @@ export class CaseModal implements OnChanges {
       next: (response) => {
         console.log(this.editMode ? 'Case updated successfully:' : 'Case created successfully:', response);
         
-        // Create Case object to emit
         const updatedCase: Case = {
           id: response.id || this.existingCase?.id || `case-${Date.now()}`,
           patientName: this.caseData.patientName,

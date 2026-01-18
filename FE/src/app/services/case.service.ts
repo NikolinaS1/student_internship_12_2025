@@ -1,37 +1,48 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { CreateCaseDTO, Case } from '../models/case.model';
+import { Observable, switchMap } from 'rxjs';
+import { CreateCaseDTO } from '../models/case.model';
+import { ConfigService } from './config.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CaseService {
-  private readonly apiUrl = 'http://localhost:8080/cases';
+  
+  constructor(
+    private http: HttpClient,
+    private configService: ConfigService
+  ) {}
 
-  constructor(private http: HttpClient) {}
-
-  createRegularCase(caseData: CreateCaseDTO, token?: string): Observable<any> {
-    let httpHeaders = new HttpHeaders()
+  private createHeaders(token?: string): HttpHeaders {
+    let headers = new HttpHeaders()
       .set('Content-Type', 'application/json')
-      .set('userId', '1')
-    
+      .set('userId', '1'); // TODO: Replace with actual user ID from auth service
+
     if (token) {
-      httpHeaders = httpHeaders.set('Authorization', `Bearer ${token}`);
+      headers = headers.set('Authorization', `Bearer ${token}`);
     }
 
-    return this.http.post(`${this.apiUrl}/regular`, caseData, { headers: httpHeaders });
+    return headers;
+  }
+
+  createRegularCase(caseData: CreateCaseDTO, token?: string): Observable<any> {
+    return this.configService.getConfig().pipe(
+      switchMap(config => {
+        const url = `${config.apiUrl}/cases/regular`;
+        const headers = this.createHeaders(token);
+        return this.http.post(url, caseData, { headers });
+      })
+    );
   }
 
   updateRegularCase(caseId: string, caseData: CreateCaseDTO, token?: string): Observable<any> {
-    let httpHeaders = new HttpHeaders()
-      .set('Content-Type', 'application/json')
-      .set('userId', '1');
-    
-    if (token) {
-      httpHeaders = httpHeaders.set('Authorization', `Bearer ${token}`);
-    }
-
-    return this.http.put(`${this.apiUrl}/${caseId}`, caseData, { headers: httpHeaders });
+    return this.configService.getConfig().pipe(
+      switchMap(config => {
+        const url = `${config.apiUrl}/cases/${caseId}`;
+        const headers = this.createHeaders(token);
+        return this.http.put(url, caseData, { headers });
+      })
+    );
   }
 }

@@ -1,55 +1,55 @@
 .main-header {
-  height: 100px;
-  padding: 0 40px;
+  height: 75px; 
+  padding: 0 30px; 
   background: white;
   border-bottom: 1px solid var(--border-color);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  
+
   .logo-area {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    margin-left: 100px;
-    
+    margin-left: 75px; 
+
     h1 { 
-      font-size: 30px; 
+      font-size: 22px; 
       margin: 0; 
       line-height: 1.1; 
     }
-    
+
     .portal-type { 
-      font-size: 20px; 
+      font-size: 15px; 
       color: #6c757d;
-      margin-top: 12px;
+      margin-top: 9px; 
     }
   }
-  
+
   .user-area {
     display: flex;
     align-items: center;
-    gap: 125px; 
-    margin-right: 100px;
-    
+    gap: 94px; 
+    margin-right: 75px;
+
     .user-info {
       font-weight: 500;
-      font-size: 18px;
+      font-size: 14px; 
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       white-space: nowrap; 
     }
 
     .btn-outline {
       display: flex;
       align-items: center;
-      gap: 8px;
-      padding: 15px 25px;
+      gap: 6px;
+      padding: 11px 19px; 
       background: white;
       border: 1.5px solid #d1d5db;
-      border-radius: 8px;
-      font-size: 17px;
+      border-radius: 6px;
+      font-size: 13px; 
       font-weight: 500;
       color: #1f2937;
       cursor: pointer;

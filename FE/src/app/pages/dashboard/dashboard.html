@@ -1,8 +1,11 @@
-<app-header></app-header>
+<app-header [currentUser]="currentUser"></app-header>
 
 <div class="layout-wrapper">
-  <app-sidebar [activeCase]="activeCase"></app-sidebar>
-
+  <app-sidebar 
+    [activeCase]="activeCase"
+    (newCaseClicked)="openCaseModal()"
+  ></app-sidebar>
+  
   <main class="content-view">
     @if (!activeCase) {
       <div class="empty-state">
@@ -12,6 +15,108 @@
         </div>
       </div>
     } @else {
-      }
+      <div class="case-detail">
+        <!-- Header Section -->
+        <div class="case-detail-header">
+          <div class="header-left">
+            <h1>{{ activeCase.patientName }}</h1>
+            <div class="header-badges">
+              <span class="badge" [class]="'badge-' + activeCase.priority.toLowerCase()">
+                {{ activeCase.priority }} Priority
+              </span>
+            </div>
+          </div>
+          <div class="header-actions">
+            <button class="btn-update" (click)="updateCase()">
+              Update
+            </button>
+            <button class="btn-end-case" (click)="endCase()">End Case</button>
+          </div>
+        </div>
+
+        <!-- Single card with Symptoms + Vitals -->
+        <div class="info-card-combined">
+          <!-- Symptoms Section -->
+          <div class="symptoms-section">
+            <div class="info-label">SYMPTOMS / DESCRIPTION</div>
+            <div class="info-content">
+              <p>{{ activeCase.description }}</p>
+            </div>
+          </div>
+
+          <!-- Vitals Section -->
+          <div class="vitals-section">
+            <div class="info-label">VITAL SIGNS</div>
+            <div class="vitals-row">
+              <div class="vital-item">
+                <span class="vital-emoji">❤️</span>
+                <div class="vital-info">
+                  <div class="vital-label">Heart Rate</div>
+                  <div class="vital-value">{{ activeCase.bpm }} bpm</div>
+                </div>
+              </div>
+
+              <div class="vital-item">
+                <span class="vital-emoji">🩺</span>
+                <div class="vital-info">
+                  <div class="vital-label">Blood Pressure</div>
+                  <div class="vital-value">{{ activeCase.systolicPressure }}/{{ activeCase.diastolicPressure }}</div>
+                </div>
+              </div>
+
+              <div class="vital-item">
+                <span class="vital-emoji">🫁</span>
+                <div class="vital-info">
+                  <div class="vital-label">Resp. Rate</div>
+                  <div class="vital-value">{{ activeCase.resRate }} br/min</div>
+                </div>
+              </div>
+
+              <div class="vital-item">
+                <span class="vital-emoji">💨</span>
+                <div class="vital-info">
+                  <div class="vital-label">O2 Saturation</div>
+                  <div class="vital-value">{{ activeCase.saturation }}%</div>
+                </div>
+              </div>
+
+              <div class="vital-item">
+                <span class="vital-emoji">🌡️</span>
+                <div class="vital-info">
+                  <div class="vital-label">Temperature</div>
+                  <div class="vital-value">{{ activeCase.temperature }}°C</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Communication Section -->
+        <div class="case-communication">
+          <h2>Case Communication</h2>
+          <div class="messages-container">
+            <div class="messages-empty">
+              <p>No messages yet. Start the conversation!</p>
+            </div>
+          </div>
+          <div class="message-input-wrapper">
+            <input type="text" placeholder="Type a message..." class="message-input" />
+            <button class="send-btn">
+              Send
+            </button>
+          </div>
+        </div>
+      </div>
+    }
   </main>
 </div>
+
+<app-case-modal
+  [isOpen]="isModalOpen"
+  [currentUser]="currentUser"
+  [editMode]="isEditMode"
+  [existingCase]="activeCase"
+  (close)="closeCaseModal()"
+  (caseCreated)="onCaseCreated($event)"
+  (caseUpdated)="onCaseUpdated($event)"
+></app-case-modal>

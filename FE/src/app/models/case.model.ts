@@ -4,7 +4,7 @@ export interface Case {
   birthYear: number;
   age: number;
   sex: 'M' | 'F';
-  quickSymptoms?: string[]; // Dodaj ovo
+  quickSymptoms?: string[];
   description: string; // symptoms + quickSymptoms
   
   bpm: number; 
