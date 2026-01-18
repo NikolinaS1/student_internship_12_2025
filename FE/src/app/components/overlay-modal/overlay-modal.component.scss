@@ -1,3 +1,40 @@
+/* OVERLAY BASE STYLES */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(2px);
+}
+
+.modal {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    max-height: 90vh;
+    overflow-y: auto;
+    width: 95%;
+    max-width: 900px;
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95) translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
 .case-wrapper {
     background: #fff;
     border-radius: 18px;
@@ -31,13 +68,41 @@
         font-weight: 600;
         padding: 0 10px 16px 0;
 
-        &:nth-child(1) { width: 20%; } /* Patient */
-        &:nth-child(2) { width: 8%; }  /* Age */
-        &:nth-child(3) { width: 15%; } /* Status */
-        &:nth-child(4) { width: 12%; } /* EMS */
-        &:nth-child(5) { width: 18%; } /* Created */
-        &:nth-child(6) { width: 12%; } /* Priority */
-        &:nth-child(7) { width: 15%; } /* Actions */
+        &:nth-child(1) {
+            width: 20%;
+        }
+
+        /* Patient */
+        &:nth-child(2) {
+            width: 8%;
+        }
+
+        /* Age */
+        &:nth-child(3) {
+            width: 15%;
+        }
+
+        /* Status */
+        &:nth-child(4) {
+            width: 12%;
+        }
+
+        /* EMS */
+        &:nth-child(5) {
+            width: 18%;
+        }
+
+        /* Created */
+        &:nth-child(6) {
+            width: 12%;
+        }
+
+        /* Priority */
+        &:nth-child(7) {
+            width: 15%;
+        }
+
+        /* Actions */
     }
 
     td {
@@ -48,13 +113,41 @@
         text-overflow: ellipsis;
         white-space: nowrap;
 
-        &:nth-child(1) { width: 20%; } /* Patient */
-        &:nth-child(2) { width: 8%; }  /* Age */
-        &:nth-child(3) { width: 15%; } /* Status */
-        &:nth-child(4) { width: 12%; } /* EMS */
-        &:nth-child(5) { width: 18%; } /* Created */
-        &:nth-child(6) { width: 12%; } /* Priority */
-        &:nth-child(7) { width: 15%; } /* Actions */
+        &:nth-child(1) {
+            width: 20%;
+        }
+
+        /* Patient */
+        &:nth-child(2) {
+            width: 8%;
+        }
+
+        /* Age */
+        &:nth-child(3) {
+            width: 15%;
+        }
+
+        /* Status */
+        &:nth-child(4) {
+            width: 12%;
+        }
+
+        /* EMS */
+        &:nth-child(5) {
+            width: 18%;
+        }
+
+        /* Created */
+        &:nth-child(6) {
+            width: 12%;
+        }
+
+        /* Priority */
+        &:nth-child(7) {
+            width: 15%;
+        }
+
+        /* Actions */
     }
 
     .actions {
@@ -168,11 +261,14 @@
 }
 
 @keyframes pulse-sos {
-    0%, 100% { 
+
+    0%,
+    100% {
         box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
         transform: scale(1);
     }
-    50% { 
+
+    50% {
         box-shadow: 0 4px 20px rgba(220, 38, 38, 0.7);
         transform: scale(1.02);
     }
@@ -389,8 +485,17 @@
 }
 
 @keyframes pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.8; transform: scale(1.05); }
+
+    0%,
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.8;
+        transform: scale(1.05);
+    }
 }
 
 .delete-confirmation-modal .modal-body {
