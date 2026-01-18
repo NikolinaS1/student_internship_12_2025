@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { OverlayModalComponent } from '../overlay-modal/overlay-modal.component';
+import { CaseService } from '../../services/case.service';
 
 @Component({
   selector: 'app-case-management',
@@ -9,53 +10,31 @@ import { OverlayModalComponent } from '../overlay-modal/overlay-modal.component'
   templateUrl: './case-management.component.html',
   styleUrl: './case-management.component.scss'
 })
-export class CaseManagementComponent {
+export class CaseManagementComponent implements OnInit {
 
   selectedCase: any = null;
   showDeleteConfirmation: boolean = false;
   caseToDelete: any = null;
-
-
-  cases = [
-    {
-      acknowledged: false,
-      birthYear: 1990,
-      createdAt: "2026-01-12T13:39:10.15504",
-      createdById: 1,
-      description: "Chest pain and shortness of breath. Patient appears anxious.",
-      id: 51,
-      isActive: true,
-      isSos: true,
-      patientName: "Marko Marković",
-      priority: "HIGH",
-      sex: "M",
-      latitude: 45.815399,
-      longitude: 15.966568
-    },
-    {
-      acknowledged: true,
-      birthYear: 1981,
-      createdAt: "2026-01-12T13:39:10.15504",
-      createdById: 2,
-      description: "Motor vehicle accident. Multiple injuries suspected. Patient semi-conscious.",
-      id: 52,
-      isActive: true,
-      isSos: false,
-      patientName: "John Anderson",
-      priority: "MEDIUM",
-      sex: "M",
-      latitude: 45.815399,
-      longitude: 15.966568,
-      bpm: 82,
-      diastolicPressure: 95,
-      systolicPressure: 145,
-      temperature: 37.2,
-      resRate: 18,
-      saturation: 96
-    },
-  ];
+  cases: any[] = [];
 
   currentYear: number = new Date().getFullYear();
+
+  constructor(private caseService: CaseService) { }
+
+  ngOnInit(): void {
+    this.loadCases();
+  }
+
+  loadCases(): void {
+    this.caseService.getAllCases().subscribe({
+      next: (data) => {
+        this.cases = data;
+      },
+      error: (error) => {
+        console.error('Error fetching cases:', error);
+      }
+    });
+  }
 
   openCase(c: any) {
     this.selectedCase = c;
@@ -72,10 +51,20 @@ export class CaseManagementComponent {
 
   confirmDelete() {
     if (this.caseToDelete) {
-      this.cases = this.cases.filter(c => c.id !== this.caseToDelete.id);
-      this.caseToDelete = null;
+      this.caseService.deleteCase(this.caseToDelete.id).subscribe({
+        next: () => {
+          this.cases = this.cases.filter(c => c.id !== this.caseToDelete.id);
+          this.caseToDelete = null;
+          this.showDeleteConfirmation = false;
+        },
+        error: (error) => {
+          console.error('Error deleting case:', error);
+          this.showDeleteConfirmation = false;
+        }
+      });
+    } else {
+      this.showDeleteConfirmation = false;
     }
-    this.showDeleteConfirmation = false;
   }
 
   cancelDelete() {
