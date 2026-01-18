@@ -55,6 +55,8 @@ cases = [
     },
   ];
 
+  currentYear: number = new Date().getFullYear();
+
   openCase(c: any) {
     this.selectedCase = c;
   }

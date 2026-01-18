@@ -23,22 +23,43 @@
 .case-table {
     width: 100%;
     border-collapse: collapse;
+    table-layout: fixed;
 
     th {
         text-align: left;
         font-size: 13px;
         font-weight: 600;
-        padding-bottom: 16px;
+        padding: 0 10px 16px 0;
+
+        &:nth-child(1) { width: 20%; } /* Patient */
+        &:nth-child(2) { width: 8%; }  /* Age */
+        &:nth-child(3) { width: 15%; } /* Status */
+        &:nth-child(4) { width: 12%; } /* EMS */
+        &:nth-child(5) { width: 18%; } /* Created */
+        &:nth-child(6) { width: 12%; } /* Priority */
+        &:nth-child(7) { width: 15%; } /* Actions */
     }
 
     td {
-        padding: 20px 10px;
+        padding: 20px 10px 20px 0;
         border-top: 1px solid #e5e7eb;
         font-size: 14px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+
+        &:nth-child(1) { width: 20%; } /* Patient */
+        &:nth-child(2) { width: 8%; }  /* Age */
+        &:nth-child(3) { width: 15%; } /* Status */
+        &:nth-child(4) { width: 12%; } /* EMS */
+        &:nth-child(5) { width: 18%; } /* Created */
+        &:nth-child(6) { width: 12%; } /* Priority */
+        &:nth-child(7) { width: 15%; } /* Actions */
     }
 
     .actions {
-        width: 160px;
+        width: 15%;
+        text-align: center;
     }
 }
 

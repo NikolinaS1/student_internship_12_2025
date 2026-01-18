@@ -21,7 +21,7 @@
     <tbody>
       <tr *ngFor="let c of cases">
         <td>{{ c.patientName }}</td>
-        <td>{{ 2026 - c.birthYear }}</td>
+        <td>{{ currentYear - c.birthYear }}</td>
 
         <td>
           <span class="badge" [ngClass]="c.acknowledged ? 'acknowledged' : 'sent'">
@@ -61,7 +61,8 @@
       </div>
       <div class="header-badges">
         <span *ngIf="selectedCase.isSos" class="badge-sos">🚨 SOS EMERGENCY</span>
-        <span class="badge-priority" [ngClass]="getPriorityClass(selectedCase.priority)">Priority: {{ selectedCase.priority }}</span>
+        <span class="badge-priority" [ngClass]="getPriorityClass(selectedCase.priority)">Priority: {{
+          selectedCase.priority }}</span>
       </div>
     </div>
 
@@ -77,7 +78,7 @@
         </div>
         <div class="info-item">
           <label>Age</label>
-          <span>{{ 2026 - selectedCase.birthYear }} years</span>
+          <span>{{ currentYear - selectedCase.birthYear }} years</span>
         </div>
         <div class="info-item">
           <label>Sex</label>
@@ -99,7 +100,7 @@
     </section>
 
     <!-- VITALS -->
-    <section class="section" *ngIf="!selectedCase.isSos">
+    <section class="section" *ngIf="selectedCase.bpm || selectedCase.systolicPressure || selectedCase.diastolicPressure || selectedCase.resRate || selectedCase.saturation || selectedCase.temperature">
       <div class="section-header">
         <h3>Vital Signs</h3>
       </div>
@@ -139,7 +140,8 @@
         </div>
         <div class="info-item">
           <label>Status</label>
-          <span class="status-badge" [ngClass]="selectedCase.acknowledged ? 'acknowledged' : 'sent'">{{ selectedCase.acknowledged ? 'Acknowledged' : 'Sent' }}</span>
+          <span class="status-badge" [ngClass]="selectedCase.acknowledged ? 'acknowledged' : 'sent'">{{
+            selectedCase.acknowledged ? 'Acknowledged' : 'Sent' }}</span>
         </div>
         <div class="info-item">
           <label>Active</label>
