@@ -7,7 +7,6 @@ import jakarta.websocket.*;
 import jakarta.websocket.server.ServerEndpoint;
 import org.acme.dtos.cases.CaseResponse;
 
-import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
