@@ -35,13 +35,13 @@ export class CaseService {
   private apiUrl = '';
 
   constructor(
-  private http: HttpClient,
-  private configService: ConfigService
-) {
-  this.configService.getConfig().subscribe(config => {
-    this.apiUrl = `${config.apiUrl}/cases`;
-  });
-}
+    private http: HttpClient,
+    private configService: ConfigService
+  ) {
+    this.configService.getConfig().subscribe(config => {
+      this.apiUrl = `${config.apiUrl}/cases`;
+    });
+  }
 
 
   getAllCases(): Observable<Case[]> {
@@ -64,7 +64,7 @@ export class CaseService {
 
   private handleError(error: HttpErrorResponse): Observable<never> {
     let errorMessage = 'An error occurred';
-    
+
     if (error.error instanceof ErrorEvent) {
       // Client-side error
       errorMessage = `Client error: ${error.error.message}`;
@@ -72,7 +72,7 @@ export class CaseService {
       // Server-side error
       errorMessage = `Server error: ${error.status} - ${error.message}`;
     }
-    
+
     console.error(errorMessage);
     return throwError(() => new Error(errorMessage));
   }
