@@ -1,7 +1,6 @@
-import { Component, ViewChild, inject, OnInit } from '@angular/core';
-import { AsyncPipe, CommonModule, DatePipe, NgClass, NgFor, NgIf } from '@angular/common';
+import { Component, ViewChild, inject, OnInit, computed } from '@angular/core';
+import { CommonModule, DatePipe, NgClass, NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { combineLatest, map } from 'rxjs';
 import { CaseService } from '../services/case-store.service';
 import { CaseModel } from '../models/case-model';
 import { CasesOverviewComponent } from './cases-overview.component';
@@ -14,26 +13,17 @@ type StatusChip = { text: string; cls: string };
 @Component({
   selector: 'app-hospital-dashboard',
   standalone: true,
-  imports: [CommonModule, AsyncPipe, NgIf, NgFor, NgClass, FormsModule, DatePipe, CasesOverviewComponent, CaseDetailComponent, HospitalMapComponent],
+  imports: [CommonModule, NgIf, NgFor, NgClass, FormsModule, DatePipe, CasesOverviewComponent, CaseDetailComponent, HospitalMapComponent],
   templateUrl: './hospital-dashboard.component.html',
 })
 export class HospitalDashboardComponent implements OnInit {
-  private readonly store = inject(CaseService);
-
-  // Koristi selectedCase$ umjesto selectedCaseId$
-  readonly vm$ = combineLatest([this.store.cases$, this.store.selectedCase$]).pipe(
-    map(([cases, selected]) => {
-      const selectedId = selected?.id ?? null;
-      return { cases, selectedId, selected };
-    })
-  );
+  readonly store = inject(CaseService);
 
   messageText = '';
 
   @ViewChild(CaseDetailComponent) detail?: CaseDetailComponent;
 
   ngOnInit() {
-    // Učitaj sve slučajeve na početku
     this.store.getAllCases().subscribe();
   }
 
@@ -43,7 +33,7 @@ export class HospitalDashboardComponent implements OnInit {
   }
 
   deselect() {
-    this.store.selectCase(null as any); // Null za deselect
+    this.store.selectCase(null as any);
   }
 
   acknowledge(caseId: number | string) {
@@ -58,7 +48,6 @@ export class HospitalDashboardComponent implements OnInit {
     const text = this.messageText.trim();
     if (!text) return;
 
-    // TODO: Implementiraj chat funkcionalnost ako je potrebna
     console.log(`Message sent to case #${caseId}: ${text}`);
 
     this.messageText = '';
@@ -69,7 +58,6 @@ export class HospitalDashboardComponent implements OnInit {
     return c.status !== 'CLOSED';
   }
 
-  // UI helpers
   priorityChip(p: CaseModel['priority']): PriorityChip {
     switch (p) {
       case 'HIGH':

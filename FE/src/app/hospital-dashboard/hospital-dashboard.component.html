@@ -14,19 +14,19 @@
     </div>
   </header>
 
-  <ng-container *ngIf="vm$ | async as vm">
-    <!-- Pregled svih slučajeva -->
+  <!-- Pregled svih slučajeva -->
+  @if (!store.selectedCase()) {
     <app-cases-overview 
-      *ngIf="!vm.selected" 
-      [cases]="vm.cases" 
+      [cases]="store.cases()" 
       (select)="selectCase($event)"
     ></app-cases-overview>
+  }
 
-    <!-- Detalji odabranog slučaja -->
+  <!-- Detalji odabranog slučaja -->
+  @if (store.selectedCase()) {
     <app-case-detail 
-      *ngIf="vm.selected" 
-      [selectedCase]="vm.selected"
-      [allCases]="vm.cases"
+      [selectedCase]="store.selectedCase()!"
+      [allCases]="store.cases()"
       [messageText]="messageText"
       (messageTextChange)="messageText = $event"
       (deselect)="deselect()"
@@ -34,5 +34,5 @@
       (send)="send($event)"
       (caseSelect)="selectCase($event)"
     ></app-case-detail>
-  </ng-container>
+  }
 </div>

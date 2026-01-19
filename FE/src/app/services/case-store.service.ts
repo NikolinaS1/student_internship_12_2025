@@ -1,10 +1,10 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, signal, effect } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { BehaviorSubject, Observable, interval, of } from 'rxjs';
-import { switchMap, tap, catchError } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
+import { tap, catchError } from 'rxjs/operators';
 import { CaseModel } from '../models/case-model';
 import { AuthService } from '../services/auth-service';
-import {  CaseWebSocketService } from './case-websocket.service';
+import { CaseWebSocketService } from './case-websocket.service';
 
 @Injectable({ providedIn: 'root' })
 export class CaseService {
@@ -14,20 +14,11 @@ export class CaseService {
 
   private readonly API_URL = 'http://localhost:8080/cases';
 
-  // BehaviorSubject za real-time ažuriranje
-  private casesSubject = new BehaviorSubject<CaseModel[]>([]);
-  public cases$ = this.casesSubject.asObservable();
-
-  private selectedCaseSubject = new BehaviorSubject<CaseModel | null>(null);
-  public selectedCase$ = this.selectedCaseSubject.asObservable();
-
-  private loadingSubject = new BehaviorSubject<boolean>(false);
-  public loading$ = this.loadingSubject.asObservable();
-
-  private errorSubject = new BehaviorSubject<string | null>(null);
-  public error$ = this.errorSubject.asObservable();
-
-
+  // Zamjena BehaviorSubject sa Signals
+  cases = signal<CaseModel[]>([]);
+  selectedCase = signal<CaseModel | null>(null);
+  loading = signal<boolean>(false);
+  error = signal<string | null>(null);
 
   constructor() {
     this.initWebSocket();
@@ -77,12 +68,11 @@ export class CaseService {
    * Handle novi case (CREATE)
    */
   private handleCaseCreate(caseData: CaseModel) {
-    const cases = this.casesSubject.value;
     const processedCase = this.processCase(caseData);
-
+    
     // Provjeri da case već ne postoji
-    if (!cases.find(c => c.id === caseData.id)) {
-      this.casesSubject.next([...cases, processedCase]);
+    if (!this.cases().find(c => c.id === caseData.id)) {
+      this.cases.update(cases => [...cases, processedCase]);
       console.log('✅ New case added:', processedCase.id);
     }
   }
@@ -91,17 +81,19 @@ export class CaseService {
    * Handle ažuriranje case-a (UPDATE/ACKNOWLEDGE)
    */
   private handleCaseUpdate(caseData: CaseModel) {
-    const cases = this.casesSubject.value;
-    const idx = cases.findIndex(c => c.id === caseData.id);
+    const idx = this.cases().findIndex(c => c.id === caseData.id);
 
     if (idx >= 0) {
-      cases[idx] = this.processCase(caseData);
-      this.casesSubject.next([...cases]);
+      this.cases.update(cases => {
+        const updated = [...cases];
+        updated[idx] = this.processCase(caseData);
+        return updated;
+      });
       console.log('✅ Case updated:', caseData.id);
 
       // Ažuriraj i selektirani case ako je isti
-      if (this.selectedCaseSubject.value?.id === caseData.id) {
-        this.selectedCaseSubject.next(this.processCase(caseData));
+      if (this.selectedCase()?.id === caseData.id) {
+        this.selectedCase.set(this.processCase(caseData));
       }
     }
   }
@@ -110,16 +102,15 @@ export class CaseService {
    * Handle brisanje case-a (DELETE)
    */
   private handleCaseDelete(caseId: number) {
-    const cases = this.casesSubject.value;
-    const filtered = cases.filter(c => c.id !== caseId);
+    const filtered = this.cases().filter(c => c.id !== caseId);
 
-    if (filtered.length !== cases.length) {
-      this.casesSubject.next(filtered);
+    if (filtered.length !== this.cases().length) {
+      this.cases.set(filtered);
       console.log('✅ Case deleted:', caseId);
 
       // Očisti selektirani case ako je obrisan
-      if (this.selectedCaseSubject.value?.id === caseId) {
-        this.selectedCaseSubject.next(null);
+      if (this.selectedCase()?.id === caseId) {
+        this.selectedCase.set(null);
       }
     }
   }
@@ -128,25 +119,27 @@ export class CaseService {
    * Handle location update za case
    */
   private handleLocationUpdate(caseId: number, latitude: number, longitude: number) {
-    const cases = this.casesSubject.value;
-    const idx = cases.findIndex(c => c.id === caseId);
+    const idx = this.cases().findIndex(c => c.id === caseId);
 
     if (idx >= 0) {
-      cases[idx] = {
-        ...cases[idx],
-        latitude,
-        longitude
-      };
-      this.casesSubject.next([...cases]);
+      this.cases.update(cases => {
+        const updated = [...cases];
+        updated[idx] = {
+          ...updated[idx],
+          latitude,
+          longitude
+        };
+        return updated;
+      });
       console.log('✅ Location updated for case:', caseId, latitude, longitude);
 
       // Ažuriraj i selektirani case ako je isti
-      if (this.selectedCaseSubject.value?.id === caseId) {
-        this.selectedCaseSubject.next({
-          ...this.selectedCaseSubject.value,
+      if (this.selectedCase()?.id === caseId) {
+        this.selectedCase.update(current => current ? {
+          ...current,
           latitude,
           longitude
-        });
+        } : null);
       }
     }
   }
@@ -155,8 +148,8 @@ export class CaseService {
    * Dohvati sve caseove (GET /cases)
    */
   getAllCases(): Observable<CaseModel[]> {
-    this.loadingSubject.next(true);
-    this.errorSubject.next(null);
+    this.loading.set(true);
+    this.error.set(null);
 
     console.log('🔄 Dohvaćam cases sa:', this.API_URL);
 
@@ -164,22 +157,19 @@ export class CaseService {
       tap((cases) => {
         console.log('✅ Backend odgovorio sa:', cases);
         
-        // Procesira cases
         const processedCases = Array.isArray(cases) 
           ? cases.map(c => this.processCase(c))
           : [];
         
         console.log('📋 Procesiran broj slučajeva:', processedCases.length);
         
-        this.casesSubject.next(processedCases);
-        this.loadingSubject.next(false);
+        this.cases.set(processedCases);
+        this.loading.set(false);
       }),
       catchError((error) => {
         console.error('❌ Greška pri učitavanju slučajeva:', error);
-        const errorMsg = 'Greška pri učitavanju slučajeva';
-        this.errorSubject.next(errorMsg);
-        this.loadingSubject.next(false);
-        // ← VAŽNO: Vrati prazan niz umjesto da baci error!
+        this.error.set('Greška pri učitavanju slučajeva');
+        this.loading.set(false);
         return of([]);
       })
     );
@@ -189,21 +179,20 @@ export class CaseService {
    * Dohvati specifičan case (GET /cases/{id})
    */
   getCase(id: number): Observable<CaseModel> {
-    this.loadingSubject.next(true);
-    this.errorSubject.next(null);
+    this.loading.set(true);
+    this.error.set(null);
 
     return this.http.get<CaseModel>(`${this.API_URL}/${id}`).pipe(
       tap((caseData) => {
         const processedCase = this.processCase(caseData);
-        this.selectedCaseSubject.next(processedCase);
-        this.loadingSubject.next(false);
+        this.selectedCase.set(processedCase);
+        this.loading.set(false);
       }),
       catchError((error) => {
         console.error(`❌ Greška pri učitavanju slučaja #${id}:`, error);
-        const errorMsg = `Greška pri učitavanju slučaja #${id}`;
-        this.errorSubject.next(errorMsg);
-        this.loadingSubject.next(false);
-        return of(null as any); // ← Vrati null umjesto da baci error
+        this.error.set(`Greška pri učitavanju slučaja #${id}`);
+        this.loading.set(false);
+        return of(null as any);
       })
     );
   }
@@ -212,8 +201,8 @@ export class CaseService {
    * Potvrdi primanje slučaja (PUT /cases/{id}/acknowledge)
    */
   acknowledgeCase(id: number): Observable<CaseModel> {
-    this.loadingSubject.next(true);
-    this.errorSubject.next(null);
+    this.loading.set(true);
+    this.error.set(null);
 
     const body = { acknowledged: true };
 
@@ -222,25 +211,26 @@ export class CaseService {
     }).pipe(
       tap((updatedCase) => {
         // Ažuriraj u listi
-        const cases = this.casesSubject.value;
-        const idx = cases.findIndex((c) => c.id === id);
+        const idx = this.cases().findIndex((c) => c.id === id);
         if (idx >= 0) {
-          cases[idx] = this.processCase(updatedCase);
-          this.casesSubject.next([...cases]);
+          this.cases.update(cases => {
+            const updated = [...cases];
+            updated[idx] = this.processCase(updatedCase);
+            return updated;
+          });
         }
 
         // Ažuriraj selektirani case ako je isti
-        if (this.selectedCaseSubject.value?.id === id) {
-          this.selectedCaseSubject.next(this.processCase(updatedCase));
+        if (this.selectedCase()?.id === id) {
+          this.selectedCase.set(this.processCase(updatedCase));
         }
 
-        this.loadingSubject.next(false);
+        this.loading.set(false);
       }),
       catchError((error) => {
-        const errorMsg = `Greška pri potvrdi slučaja #${id}`;
-        this.errorSubject.next(errorMsg);
-        this.loadingSubject.next(false);
-        console.error(errorMsg, error);
+        this.error.set(`Greška pri potvrdi slučaja #${id}`);
+        this.loading.set(false);
+        console.error('Greška pri potvrdi slučaja', error);
         throw error;
       })
     );
@@ -259,7 +249,6 @@ export class CaseService {
   private processCase(caseData: CaseModel): CaseModel {
     const age = new Date().getFullYear() - caseData.birthYear;
 
-    // Mapiranje prioriteta na status
     let status: 'DRAFT' | 'SENT' | 'ACKNOWLEDGED' | 'CLOSED' = 'SENT';
     if (caseData.acknowledged) {
       status = 'ACKNOWLEDGED';
@@ -268,7 +257,6 @@ export class CaseService {
       status = 'CLOSED';
     }
 
-    // Kreiraj summary od dostupnih podataka
     let summary = caseData.description;
     if (caseData.bpm) {
       summary += ` • ❤️ ${caseData.bpm} bpm`;
@@ -299,22 +287,20 @@ export class CaseService {
    * Setter za selektirani case
    */
   selectCase(caseData: CaseModel) {
-    this.selectedCaseSubject.next(caseData);
+    this.selectedCase.set(caseData);
   }
 
   /**
    * Getter za trenutne caseove
    */
   getCasesSync(): CaseModel[] {
-    return this.casesSubject.value;
+    return this.cases();
   }
 
   /**
    * Getter za selektirani case
    */
   getSelectedCaseSync(): CaseModel | null {
-    return this.selectedCaseSubject.value;
+    return this.selectedCase();
   }
-
-  
 }

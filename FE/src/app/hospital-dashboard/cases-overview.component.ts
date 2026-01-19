@@ -24,8 +24,8 @@ export class CasesOverviewComponent implements OnInit, AfterViewInit, OnDestroy 
   private caseWsService = inject(CaseWebSocketService);
 
   // Observable iz servisa
-  loading$ = this.caseService.loading$;
-  error$ = this.caseService.error$;
+  loading = this.caseService.loading;
+  error = this.caseService.error;
 
   private map!: L.Map;
   private markers = new Map<number, L.Marker>();
