@@ -1,8 +1,10 @@
 import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild, SimpleChanges, inject } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { CommonModule, DatePipe, NgClass, NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CaseModel } from '../models/case-model';
 import { WebSocketLocationService, RemoteLocation } from '../services/websocket-service';
+import { ConfigService } from '../services/config-service';
 import * as L from 'leaflet';
 
 
@@ -26,12 +28,16 @@ export class CaseDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('chatScroll') chatScroll?: ElementRef<HTMLDivElement>;
 
   private wsService = inject(WebSocketLocationService);
+  private configService = inject(ConfigService);
   private detailMap?: L.Map;
   private caseMarker?: L.Marker;
-  private vehicleMarker?: L.Marker; // Marker za vozilo koje se kreće
+
+  private vehicleMarker?: L.Marker; // Vehicle movement marker
   private hospitalMarker?: L.Marker;
-  private readonly HOSPITAL_LAT = 45.558125;
-  private readonly HOSPITAL_LNG = 18.713756;
+  private sub?: Subscription;
+
+  private get HOSPITAL_LAT() { return this.configService.hospitalLat; }
+  private get HOSPITAL_LNG() { return this.configService.hospitalLng; }
 
   ngAfterViewInit() {
     setTimeout(() => {
@@ -41,20 +47,20 @@ export class CaseDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    // Kada se selectedCase promijeni, ažuriraj mapu
     if (changes['selectedCase'] && !changes['selectedCase'].firstChange) {
       this.updateDetailMapMarkers();
     }
   }
 
   ngOnInit() {
-    // Slušaj remote lokacije za vozila
-    this.wsService.remoteLocations$.subscribe((locations) => {
+    // Listen for vehicle remote locations
+    this.sub = this.wsService.remoteLocations$.subscribe((locations) => {
       this.updateVehicleMarker(locations);
     });
   }
 
   ngOnDestroy() {
+    this.sub?.unsubscribe();
     this.detailMap?.remove();
   }
 
@@ -84,7 +90,7 @@ export class CaseDetailComponent implements OnInit, AfterViewInit, OnDestroy {
     this.deselect.emit();
   }
 
-  // Helper metode za prikaz podataka
+  // Helper methods for data display
   getStatusText(): string {
     switch (this.selectedCase?.status) {
       case 'ACKNOWLEDGED':
@@ -154,22 +160,22 @@ export class CaseDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   /**
-   * Vrati URL ikonice ambulance na temelju prioriteta i SOS statusa
+   * Get ambulance icon URL based on priority and SOS status
    */
   private getCaseIconUrl(caseData: CaseModel): string {
     if (caseData.isSos) {
-      return 'assets/sos case.png';
+      return 'assets/images/sos case.png';
     }
 
     switch (caseData.priority) {
       case 'HIGH':
-        return 'assets/high priority case.png';
+        return 'assets/images/high priority case.png';
       case 'MEDIUM':
-        return 'assets/medium priority case.png';
+        return 'assets/images/medium priority case.png';
       case 'LOW':
-        return 'assets/low priority case.png';
+        return 'assets/images/low priority case.png';
       default:
-        return 'assets/low priority case.png';
+        return 'assets/images/low priority case.png';
     }
   }
 
@@ -211,7 +217,7 @@ export class CaseDetailComponent implements OnInit, AfterViewInit, OnDestroy {
       .addTo(this.detailMap!)
       .bindPopup('<b>KBC Osijek</b>');
 
-    // Ambulance ikonica za početnu lokaciju case-a
+    // Ambulance icon for initial case location
     const caseIcon = L.icon({
       iconUrl: this.getCaseIconUrl(this.selectedCase!),
       iconSize: [32, 32],
@@ -229,12 +235,12 @@ export class CaseDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   private updateDetailMapMarkers() {
     if (!this.detailMap || !this.selectedCase) return;
 
-    // Ukloni stari marker
+    // Remove old marker
     if (this.caseMarker) {
       this.detailMap.removeLayer(this.caseMarker);
     }
 
-    // Kreiraj novi marker za novi case - ambulance ikonica
+    // Create new marker for new case
     const caseIcon = L.icon({
       iconUrl: this.getCaseIconUrl(this.selectedCase),
       iconSize: [32, 32],
@@ -260,16 +266,16 @@ export class CaseDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   /**
-   * Ažuriraj marker vozila na temelju WebSocket location update-a
+   * Update vehicle marker based on WebSocket location update
    */
   private updateVehicleMarker(locations: RemoteLocation[]) {
     if (!this.detailMap || !this.selectedCase) return;
 
-    // Pronađi lokaciju za trenutno selektirani case
+    // Find location for currently selected case
     const vehicleLocation = locations.find(loc => loc.caseId === this.selectedCase.id);
 
     if (vehicleLocation) {
-      // Ambulance ikonica za vozilo
+      // Ambulance icon for vehicle
       const vehicleIcon = L.icon({
         iconUrl: this.getCaseIconUrl(this.selectedCase),
         iconSize: [32, 32],
@@ -278,7 +284,7 @@ export class CaseDetailComponent implements OnInit, AfterViewInit, OnDestroy {
       });
 
       if (!this.vehicleMarker) {
-        // Kreiraj novi marker za vozilo
+        // Create new vehicle marker
         this.vehicleMarker = L.marker(
           [vehicleLocation.latitude, vehicleLocation.longitude],
           { icon: vehicleIcon }
@@ -286,12 +292,12 @@ export class CaseDetailComponent implements OnInit, AfterViewInit, OnDestroy {
           .addTo(this.detailMap)
           .bindPopup(`<b>Vehicle - Case #${this.selectedCase.id}</b>`);
       } else {
-        // Ažuriraj poziciju postojećeg markera
+        // Update existing marker position
         this.vehicleMarker.setLatLng([vehicleLocation.latitude, vehicleLocation.longitude]);
         this.vehicleMarker.setIcon(vehicleIcon);
       }
     } else {
-      // Ukloni marker vozila ako nema location update-a
+      // Remove vehicle marker if no location update
       if (this.vehicleMarker) {
         this.detailMap.removeLayer(this.vehicleMarker);
         this.vehicleMarker = undefined;

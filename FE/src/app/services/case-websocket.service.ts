@@ -1,4 +1,5 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
+import { ConfigService } from './config-service';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { CaseModel } from '../models/case-model';
 
@@ -12,30 +13,31 @@ export interface WebSocketMessage {
 
 @Injectable({ providedIn: 'root' })
 export class CaseWebSocketService {
+  private configService = inject(ConfigService);
   private ws?: WebSocket;
   private reconnectInterval?: any;
   private reconnectDelay = 3000;
 
-  // Subject za case update poruke
+  // Subject for case update messages
   private messageSubject = new BehaviorSubject<WebSocketMessage | null>(null);
   public message$ = this.messageSubject.asObservable();
 
-  // Subject za connection status
+  // Subject for connection status
   private connectedSubject = new BehaviorSubject<boolean>(false);
   public connected$ = this.connectedSubject.asObservable();
 
   connect() {
-    const wsUrl = 'ws://localhost:8080/ws/cases';
-    
+    const wsUrl = this.configService.wsUrl;
+
     console.log('🔌 Connecting to WebSocket:', wsUrl);
-    
+
     try {
       this.ws = new WebSocket(wsUrl);
 
       this.ws.onopen = () => {
         console.log('✅ WebSocket connected to /ws/cases');
         this.connectedSubject.next(true);
-        
+
         // Clear any reconnect attempts
         if (this.reconnectInterval) {
           clearTimeout(this.reconnectInterval);
@@ -60,7 +62,7 @@ export class CaseWebSocketService {
       this.ws.onclose = () => {
         console.log('🔌 WebSocket closed, reconnecting in', this.reconnectDelay / 1000, 'seconds...');
         this.connectedSubject.next(false);
-        
+
         // Auto-reconnect after delay
         this.reconnectInterval = setTimeout(() => {
           this.connect();
@@ -77,12 +79,12 @@ export class CaseWebSocketService {
       clearTimeout(this.reconnectInterval);
       this.reconnectInterval = undefined;
     }
-    
+
     if (this.ws) {
       this.ws.close();
       this.ws = undefined;
     }
-    
+
     this.connectedSubject.next(false);
   }
 

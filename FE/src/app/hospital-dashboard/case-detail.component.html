@@ -1,14 +1,14 @@
 <main class="case-detail">
-  <!-- CHANGED: Left sidebar now shows ALL cases from parent -->
+  <!-- Left sidebar now shows ALL cases from parent -->
   <aside class="case-detail__sidebar">
     <div class="card">
       <div class="card__header">
-        <!-- CHANGED: English translation -->
+        <!-- English translation -->
         <div class="card__title">Active Cases</div>
         <div class="muted card__subtitle">Select another case to switch.</div>
       </div>
 
-      <!-- CHANGED: Display all cases passed from parent -->
+      <!-- Display all cases passed from parent -->
       <div class="sidebar__list">
         <button
           *ngFor="let c of allCases"
@@ -16,7 +16,7 @@
           (click)="onCaseSelect(c)"
           class="sidebar-item"
           [ngClass]="[
-            c.id === selectedCase?.id ? 'sidebar-item--active' : '',
+            c.id === selectedCase.id ? 'sidebar-item--active' : '',
             c.priority === 'HIGH' ? 'sidebar-item--high' :
             c.priority === 'MEDIUM' ? 'sidebar-item--medium' : 'sidebar-item--low'
           ]"
@@ -62,7 +62,7 @@
   <!-- Middle: Case details + chat -->
   <section class="case-detail__middle" *ngIf="selectedCase">
     <div class="case-detail__middle-inner">
-      <!-- CHANGED: Enhanced details card -->
+      <!-- Enhanced details card -->
       <div class="card">
         <div class="card__body">
           <div class="details__top">
@@ -77,7 +77,7 @@
             </div>
 
             <div class="details__actions">
-              <!-- CHANGED: Show status OR acknowledge button -->
+              <!-- Show status OR acknowledge button -->
               <span
                 *ngIf="isAcknowledged()"
                 class="chip chip--ack chip--large"
@@ -100,7 +100,7 @@
             </div>
           </div>
 
-          <!-- CHANGED: Better vital signs layout -->
+          <!-- Better vital signs layout -->
           <div class="details__vitals" *ngIf="getVitalSigns().length > 0">
             <div class="vitals-grid">
               <div class="vital-card" *ngFor="let vital of getVitalSigns()">
@@ -113,7 +113,7 @@
             </div>
           </div>
 
-          <!-- CHANGED: Enhanced info pills -->
+          <!-- Enhanced info pills -->
           <div class="details__info">
             <div class="pill pill--highlight">
               <span class="pill__label">Case Type:</span>
@@ -133,7 +133,7 @@
         </div>
       </div>
 
-      <!-- CHANGED: Enhanced chat -->
+      <!-- Enhanced chat -->
       <div class="chat">
         <div class="chat__header">
           <span>Case Communication</span>
@@ -185,7 +185,7 @@
     </div>
   </section>
 
-  <!-- CHANGED: Right map with Leaflet integration -->
+  <!-- Right map with Leaflet integration -->
   <aside class="case-detail__map" *ngIf="selectedCase">
     <div class="card map-card">
       <div class="card__header">
@@ -194,7 +194,7 @@
       </div>
 
       <div class="map-card__body">
-        <!-- CHANGED: Use Leaflet map instead of iframe -->
+        <!-- Use Leaflet map instead of iframe -->
         <div id="detail-map" class="map-frame leaflet-map"></div>
 
         <div class="map-meta">

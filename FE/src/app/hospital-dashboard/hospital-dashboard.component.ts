@@ -1,11 +1,11 @@
-import { Component, ViewChild, inject, OnInit, computed } from '@angular/core';
-import { CommonModule, DatePipe, NgClass, NgFor, NgIf } from '@angular/common';
+import { Component, ViewChild, inject, OnInit, computed, OnDestroy } from '@angular/core';
+import { Subscription } from 'rxjs';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CaseService } from '../services/case-store.service';
 import { CaseModel } from '../models/case-model';
 import { CasesOverviewComponent } from './cases-overview.component';
 import { CaseDetailComponent } from './case-detail.component';
-import { HospitalMapComponent } from '../map/map-component';
 
 type PriorityChip = { text: string; cls: string };
 type StatusChip = { text: string; cls: string };
@@ -13,18 +13,23 @@ type StatusChip = { text: string; cls: string };
 @Component({
   selector: 'app-hospital-dashboard',
   standalone: true,
-  imports: [CommonModule, NgIf, NgFor, NgClass, FormsModule, DatePipe, CasesOverviewComponent, CaseDetailComponent, HospitalMapComponent],
+  imports: [CommonModule, FormsModule, CasesOverviewComponent, CaseDetailComponent],
   templateUrl: './hospital-dashboard.component.html',
 })
-export class HospitalDashboardComponent implements OnInit {
+export class HospitalDashboardComponent implements OnInit, OnDestroy {
   readonly store = inject(CaseService);
+  private sub?: Subscription;
 
   messageText = '';
 
   @ViewChild(CaseDetailComponent) detail?: CaseDetailComponent;
 
   ngOnInit() {
-    this.store.getAllCases().subscribe();
+    this.sub = this.store.getAllCases().subscribe();
+  }
+
+  ngOnDestroy() {
+    this.sub?.unsubscribe();
   }
 
   selectCase(c: CaseModel) {
@@ -33,7 +38,7 @@ export class HospitalDashboardComponent implements OnInit {
   }
 
   deselect() {
-    this.store.selectCase(null as any);
+    this.store.selectCase(null);
   }
 
   acknowledge(caseId: number | string) {
@@ -61,19 +66,19 @@ export class HospitalDashboardComponent implements OnInit {
   priorityChip(p: CaseModel['priority']): PriorityChip {
     switch (p) {
       case 'HIGH':
-        return { 
-          text: 'VISOKO', 
-          cls: 'bg-[color:var(--secondary)] text-[color:var(--secondary-foreground)] border border-[color:var(--border)]' 
+        return {
+          text: 'VISOKO',
+          cls: 'bg-[color:var(--secondary)] text-[color:var(--secondary-foreground)] border border-[color:var(--border)]'
         };
       case 'MEDIUM':
-        return { 
-          text: 'SREDNJE', 
-          cls: 'bg-[color:var(--muted)] text-[color:var(--foreground)] border border-[color:var(--border)]' 
+        return {
+          text: 'SREDNJE',
+          cls: 'bg-[color:var(--muted)] text-[color:var(--foreground)] border border-[color:var(--border)]'
         };
       default:
-        return { 
-          text: 'NISKO', 
-          cls: 'bg-[color:var(--muted)] text-[color:var(--muted-foreground)] border border-[color:var(--border)]' 
+        return {
+          text: 'NISKO',
+          cls: 'bg-[color:var(--muted)] text-[color:var(--muted-foreground)] border border-[color:var(--border)]'
         };
     }
   }
@@ -81,24 +86,24 @@ export class HospitalDashboardComponent implements OnInit {
   statusChip(s: CaseModel['status'] | undefined): StatusChip {
     switch (s) {
       case 'SENT':
-        return { 
-          text: 'Poslano', 
-          cls: 'bg-[color:var(--secondary)] text-[color:var(--secondary-foreground)] border border-[color:var(--border)]' 
+        return {
+          text: 'Poslano',
+          cls: 'bg-[color:var(--secondary)] text-[color:var(--secondary-foreground)] border border-[color:var(--border)]'
         };
       case 'ACKNOWLEDGED':
-        return { 
-          text: 'Potvrđeno', 
-          cls: 'bg-[color:var(--accent)] text-[color:var(--accent-foreground)] border border-[color:var(--border)]' 
+        return {
+          text: 'Potvrđeno',
+          cls: 'bg-[color:var(--accent)] text-[color:var(--accent-foreground)] border border-[color:var(--border)]'
         };
       case 'CLOSED':
-        return { 
-          text: 'Zatvoreno', 
-          cls: 'bg-[color:var(--muted)] text-[color:var(--muted-foreground)] border border-[color:var(--border)]' 
+        return {
+          text: 'Zatvoreno',
+          cls: 'bg-[color:var(--muted)] text-[color:var(--muted-foreground)] border border-[color:var(--border)]'
         };
       default:
-        return { 
-          text: 'Draft', 
-          cls: 'bg-[color:var(--muted)] text-[color:var(--muted-foreground)] border border-[color:var(--border)]' 
+        return {
+          text: 'Draft',
+          cls: 'bg-[color:var(--muted)] text-[color:var(--muted-foreground)] border border-[color:var(--border)]'
         };
     }
   }

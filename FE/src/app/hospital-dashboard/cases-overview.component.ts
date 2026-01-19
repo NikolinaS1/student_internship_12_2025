@@ -1,17 +1,18 @@
 import { Component, AfterViewInit, OnDestroy, Output, EventEmitter, Input, inject, OnInit, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { NgClass, NgFor, NgIf, AsyncPipe } from '@angular/common';
+import { NgClass } from '@angular/common';
 import * as L from 'leaflet';
 import { WebSocketLocationService, RemoteLocation } from '../services/websocket-service';
 import { CaseService } from '../services/case-store.service';
 import { AuthService } from '../services/auth-service';
 import { CaseModel } from '../models/case-model';
 import { CaseWebSocketService } from '../services/case-websocket.service';
+import { ConfigService } from '../services/config-service';
 
 @Component({
   selector: 'app-cases-overview',
   standalone: true,
-  imports: [CommonModule, NgClass, NgFor, NgIf, AsyncPipe],
+  imports: [CommonModule, NgClass],
   templateUrl: './cases-overview.component.html',
 })
 export class CasesOverviewComponent implements OnInit, AfterViewInit, OnDestroy {
@@ -22,8 +23,9 @@ export class CasesOverviewComponent implements OnInit, AfterViewInit, OnDestroy 
   private caseService = inject(CaseService);
   private authService = inject(AuthService);
   private caseWsService = inject(CaseWebSocketService);
+  private configService = inject(ConfigService);
 
-  // Observable iz servisa
+  // Service observables
   loading = this.caseService.loading;
   error = this.caseService.error;
 
@@ -32,26 +34,26 @@ export class CasesOverviewComponent implements OnInit, AfterViewInit, OnDestroy 
   private caseMarkers = new Map<number, L.Marker>();
   private routeLayer?: L.GeoJSON;
 
-  private readonly HOSPITAL_LAT = 45.558125;
-  private readonly HOSPITAL_LNG = 18.713756;
+  private get HOSPITAL_LAT() { return this.configService.hospitalLat; }
+  private get HOSPITAL_LNG() { return this.configService.hospitalLng; }
 
   selectedCaseEta?: { minutes: number; km: number };
 
   ngOnInit() {
-    // Spoji WebSocket za lokacije vozila
+    // Connect WebSocket for vehicle locations
     const token = this.authService.getToken();
     this.wsService.connect(token);
 
-    // Slusaj remote lokacije
+    // Listen for remote locations
     this.wsService.remoteLocations$.subscribe((locations) => {
       this.updateMarkers(locations);
     });
 
-    // Slušaj WebSocket poruke za case updates
+    // Listen for WebSocket messages for case updates
     this.caseWsService.message$.subscribe((message) => {
       if (!message) return;
 
-      // Posebno handleaj LOCATION_UPDATE da ažuriraj marker na mapi
+      // Handle LOCATION_UPDATE specially to update map marker
       if (message.type === 'LOCATION_UPDATE' && message.caseId && message.latitude && message.longitude) {
         this.updateCaseMarkerLocation(message.caseId, message.latitude, message.longitude);
       }
@@ -59,7 +61,7 @@ export class CasesOverviewComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    // Ažuriraj sve lokacije caseva na mapi
+    // Update all case locations on map
     if (changes['cases'] && !changes['cases'].firstChange) {
       this.updateCaseMarkers();
     }
@@ -112,7 +114,7 @@ export class CasesOverviewComponent implements OnInit, AfterViewInit, OnDestroy 
       const existing = this.markers.get(loc.caseId);
       const caseData = this.getCaseById(loc.caseId);
 
-      // Koristi ambulance ikonice za vozila
+      // Use ambulance icons for vehicles
       const vehicleIcon = L.icon({
         iconUrl: caseData ? this.getCaseIconUrl(caseData) : 'assets/low priority case.png',
         iconSize: [32, 32],
@@ -129,7 +131,7 @@ export class CasesOverviewComponent implements OnInit, AfterViewInit, OnDestroy 
         this.markers.set(loc.caseId, marker);
       } else {
         existing.setLatLng([loc.latitude, loc.longitude]);
-        // Ažuriraj ikonu ako se prioritet promijenio
+        // Update icon if priority changed
         if (caseData) {
           existing.setIcon(vehicleIcon);
         }
@@ -138,42 +140,42 @@ export class CasesOverviewComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   /**
-   * Pronađi case po ID-u
+   * Find case by ID
    */
   private getCaseById(caseId: number): CaseModel | undefined {
     return this.cases.find(c => c.id === caseId);
   }
 
   /**
-   * Vrati URL ikonice ambulance na temelju prioriteta i SOS statusa
+   * Get ambulance icon URL based on priority and SOS status
    */
   private getCaseIconUrl(caseData: CaseModel): string {
     if (caseData.isSos) {
-      return 'assets/sos case.png';
+      return 'assets/images/sos case.png';
     }
 
     switch (caseData.priority) {
       case 'HIGH':
-        return 'assets/high priority case.png';
+        return 'assets/images/high priority case.png';
       case 'MEDIUM':
-        return 'assets/medium priority case.png';
+        return 'assets/images/medium priority case.png';
       case 'LOW':
-        return 'assets/low priority case.png';
+        return 'assets/images/low priority case.png';
       default:
-        return 'assets/low priority case.png';
+        return 'assets/images/low priority case.png';
     }
   }
 
   private updateCaseMarkers() {
     if (!this.map) return;
 
-    // Ukloni stare markere
+    // Remove old markers
     for (const marker of this.caseMarkers.values()) {
       this.map.removeLayer(marker);
     }
     this.caseMarkers.clear();
 
-    // Kreiraj markere za sve aktivne caseve - ambulance ikonice
+    // Create markers for all active cases
     for (const caseData of this.cases) {
       if (caseData.isActive) {
         const caseIcon = L.icon({
@@ -197,19 +199,17 @@ export class CasesOverviewComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   /**
-   * Ažuriraj lokaciju markera za specifičan case (real-time WebSocket update)
-   * 
-   * MIJENJA POCETNU LOKACIJU
+   * Update marker location for specific case (real-time WebSocket update)
    */
   private updateCaseMarkerLocation(caseId: number, latitude: number, longitude: number) {
     const marker = this.caseMarkers.get(caseId);
 
     if (marker) {
-      // Ažuriraj postojeći marker
+      // Update existing marker
       marker.setLatLng([latitude, longitude]);
       console.log(`📍 Map marker updated for case #${caseId}:`, latitude, longitude);
     } else {
-      // Ako marker ne postoji, kreiraj novi (case možda tek postao aktivan)
+      // If marker doesn't exist, create new one
       const caseData = this.cases.find(c => c.id === caseId);
       if (caseData && caseData.isActive) {
         const caseIcon = L.icon({

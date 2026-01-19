@@ -5,16 +5,19 @@ import { tap, catchError } from 'rxjs/operators';
 import { CaseModel } from '../models/case-model';
 import { AuthService } from '../services/auth-service';
 import { CaseWebSocketService } from './case-websocket.service';
+import { ConfigService } from './config-service';
 
 @Injectable({ providedIn: 'root' })
 export class CaseService {
   private http = inject(HttpClient);
   private authService = inject(AuthService);
   private wsService = inject(CaseWebSocketService);
+  private configService = inject(ConfigService);
 
-  private readonly API_URL = 'http://localhost:8080/cases';
+  private get API_URL(): string {
+    return this.configService.apiUrl + '/cases';
+  }
 
-  // Zamjena BehaviorSubject sa Signals
   cases = signal<CaseModel[]>([]);
   selectedCase = signal<CaseModel | null>(null);
   loading = signal<boolean>(false);
@@ -25,7 +28,7 @@ export class CaseService {
   }
 
   /**
-   * Inicijaliziraj WebSocket i slušaj poruke
+   * Initialize WebSocket and listen for messages
    */
   private initWebSocket() {
     this.wsService.connect();
@@ -65,12 +68,12 @@ export class CaseService {
   }
 
   /**
-   * Handle novi case (CREATE)
+   * Handle new case (CREATE)
    */
   private handleCaseCreate(caseData: CaseModel) {
     const processedCase = this.processCase(caseData);
-    
-    // Provjeri da case već ne postoji
+
+    // Check if case already exists
     if (!this.cases().find(c => c.id === caseData.id)) {
       this.cases.update(cases => [...cases, processedCase]);
       console.log('✅ New case added:', processedCase.id);
@@ -78,7 +81,7 @@ export class CaseService {
   }
 
   /**
-   * Handle ažuriranje case-a (UPDATE/ACKNOWLEDGE)
+   * Handle case update (UPDATE/ACKNOWLEDGE)
    */
   private handleCaseUpdate(caseData: CaseModel) {
     const idx = this.cases().findIndex(c => c.id === caseData.id);
@@ -91,7 +94,7 @@ export class CaseService {
       });
       console.log('✅ Case updated:', caseData.id);
 
-      // Ažuriraj i selektirani case ako je isti
+      // Update selected case if it matches
       if (this.selectedCase()?.id === caseData.id) {
         this.selectedCase.set(this.processCase(caseData));
       }
@@ -99,7 +102,7 @@ export class CaseService {
   }
 
   /**
-   * Handle brisanje case-a (DELETE)
+   * Handle case deletion (DELETE)
    */
   private handleCaseDelete(caseId: number) {
     const filtered = this.cases().filter(c => c.id !== caseId);
@@ -108,7 +111,7 @@ export class CaseService {
       this.cases.set(filtered);
       console.log('✅ Case deleted:', caseId);
 
-      // Očisti selektirani case ako je obrisan
+      // Clear selected case if deleted
       if (this.selectedCase()?.id === caseId) {
         this.selectedCase.set(null);
       }
@@ -116,7 +119,7 @@ export class CaseService {
   }
 
   /**
-   * Handle location update za case
+   * Handle location update for case
    */
   private handleLocationUpdate(caseId: number, latitude: number, longitude: number) {
     const idx = this.cases().findIndex(c => c.id === caseId);
@@ -133,7 +136,7 @@ export class CaseService {
       });
       console.log('✅ Location updated for case:', caseId, latitude, longitude);
 
-      // Ažuriraj i selektirani case ako je isti
+      // Update selected case if it matches
       if (this.selectedCase()?.id === caseId) {
         this.selectedCase.update(current => current ? {
           ...current,
@@ -145,7 +148,7 @@ export class CaseService {
   }
 
   /**
-   * Dohvati sve caseove (GET /cases)
+   * Get all cases (GET /cases)
    */
   getAllCases(): Observable<CaseModel[]> {
     this.loading.set(true);
@@ -156,13 +159,13 @@ export class CaseService {
     return this.http.get<CaseModel[]>(this.API_URL).pipe(
       tap((cases) => {
         console.log('✅ Backend odgovorio sa:', cases);
-        
-        const processedCases = Array.isArray(cases) 
+
+        const processedCases = Array.isArray(cases)
           ? cases.map(c => this.processCase(c))
           : [];
-        
+
         console.log('📋 Procesiran broj slučajeva:', processedCases.length);
-        
+
         this.cases.set(processedCases);
         this.loading.set(false);
       }),
@@ -176,7 +179,7 @@ export class CaseService {
   }
 
   /**
-   * Dohvati specifičan case (GET /cases/{id})
+   * Get specific case (GET /cases/{id})
    */
   getCase(id: number): Observable<CaseModel> {
     this.loading.set(true);
@@ -198,7 +201,7 @@ export class CaseService {
   }
 
   /**
-   * Potvrdi primanje slučaja (PUT /cases/{id}/acknowledge)
+   * Acknowledge case (PUT /cases/{id}/acknowledge)
    */
   acknowledgeCase(id: number): Observable<CaseModel> {
     this.loading.set(true);
@@ -210,7 +213,7 @@ export class CaseService {
       headers: this.getAuthHeaders(),
     }).pipe(
       tap((updatedCase) => {
-        // Ažuriraj u listi
+        // Update in list
         const idx = this.cases().findIndex((c) => c.id === id);
         if (idx >= 0) {
           this.cases.update(cases => {
@@ -220,7 +223,7 @@ export class CaseService {
           });
         }
 
-        // Ažuriraj selektirani case ako je isti
+        // Update selected case if it matches
         if (this.selectedCase()?.id === id) {
           this.selectedCase.set(this.processCase(updatedCase));
         }
@@ -237,14 +240,14 @@ export class CaseService {
   }
 
   /**
-   * Manualno osvježi sve slučajeve
+   * Manually refresh all cases
    */
   refreshCases(): Observable<CaseModel[]> {
     return this.getAllCases();
   }
 
   /**
-   * Procesira case podatke (transformacija, mapiranje)
+   * Process case data (transformation, mapping)
    */
   private processCase(caseData: CaseModel): CaseModel {
     const age = new Date().getFullYear() - caseData.birthYear;
@@ -273,7 +276,7 @@ export class CaseService {
   }
 
   /**
-   * Pripremi HTTP headers sa JWT tokenom
+   * Prepare HTTP headers with JWT token
    */
   private getAuthHeaders(): HttpHeaders {
     const token = this.authService.getToken();
@@ -284,21 +287,21 @@ export class CaseService {
   }
 
   /**
-   * Setter za selektirani case
+   * Setter for selected case
    */
-  selectCase(caseData: CaseModel) {
+  selectCase(caseData: CaseModel | null) {
     this.selectedCase.set(caseData);
   }
 
   /**
-   * Getter za trenutne caseove
+   * Getter for current cases
    */
   getCasesSync(): CaseModel[] {
     return this.cases();
   }
 
   /**
-   * Getter za selektirani case
+   * Getter for selected case
    */
   getSelectedCaseSync(): CaseModel | null {
     return this.selectedCase();
