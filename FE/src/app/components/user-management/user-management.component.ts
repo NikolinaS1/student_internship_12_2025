@@ -140,6 +140,9 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     if (!username || username.trim() === '') {
       return 'Username is required';
     }
+    if (username.trim().length < 3) {
+      return 'Username must be at least 3 characters long';
+    }
     return '';
   }
 
