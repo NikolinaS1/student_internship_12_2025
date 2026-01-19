@@ -1,6 +1,29 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+
+export interface Case {
+  id: number;
+  acknowledged: boolean;
+  birthYear: number;
+  bpm: number;
+  createdAt: string;
+  createdById: number;
+  description: string;
+  diastolicPressure: number;
+  isActive: boolean;
+  isSos: boolean;
+  patientName: string;
+  priority: string;
+  resRate: number;
+  saturation: number;
+  sex: string;
+  systolicPressure: number;
+  temperature: number;
+  latitude: number;
+  longitude: number;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -11,15 +34,36 @@ export class CaseService {
 
   constructor(private http: HttpClient) { }
 
-  getAllCases(): Observable<any[]> {
-    return this.http.get<any[]>(this.apiUrl);
+  getAllCases(): Observable<Case[]> {
+    return this.http.get<Case[]>(this.apiUrl).pipe(
+      catchError(this.handleError)
+    );
   }
 
-  getCaseById(id: number): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/${id}`);
+  getCaseById(id: number): Observable<Case> {
+    return this.http.get<Case>(`${this.apiUrl}/${id}`).pipe(
+      catchError(this.handleError)
+    );
   }
 
   deleteCase(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+    return this.http.delete<void>(`${this.apiUrl}/${id}`).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  private handleError(error: HttpErrorResponse): Observable<never> {
+    let errorMessage = 'An error occurred';
+    
+    if (error.error instanceof ErrorEvent) {
+      // Client-side error
+      errorMessage = `Client error: ${error.error.message}`;
+    } else {
+      // Server-side error
+      errorMessage = `Server error: ${error.status} - ${error.message}`;
+    }
+    
+    console.error(errorMessage);
+    return throwError(() => new Error(errorMessage));
   }
 }

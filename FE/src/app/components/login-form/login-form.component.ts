@@ -23,7 +23,6 @@ export class LoginFormComponent {
     this.loading = true;
 
     try {
-      console.log('Attempting login with', this.username, this.password);
       const ok = await this.authService.login(this.username, this.password);
       if (!ok) {
         this.error = 'Invalid username or password';
