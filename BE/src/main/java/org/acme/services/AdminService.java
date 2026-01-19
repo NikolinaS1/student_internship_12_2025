@@ -1,11 +1,15 @@
 package org.acme.services;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.acme.exeptions.ConflictException;
+import org.acme.exeptions.NotFoundException;
 import org.acme.models.User;
 import org.acme.dtos.admin.UserResponse;
 import org.acme.dtos.admin.CreateUserRequest;
@@ -14,6 +18,10 @@ import org.acme.dtos.admin.UpdateUserRequest;
 
 @ApplicationScoped
     public class AdminService {
+
+    @Inject
+    PasswordService passwordService;
+
     public List<UserResponse> getAllUsers() {
         return User.<User>listAll()
                 .stream()
@@ -24,9 +32,14 @@ import org.acme.dtos.admin.UpdateUserRequest;
 
     @Transactional
     public UserResponse createUser(CreateUserRequest request) {
+
+        if (User.find("name", request.username()).firstResult() != null) {
+            throw new ConflictException("Username already exists");
+        }
+
         User user = new User();
         user.setName(request.username());
-        user.setPassword(hashPassword(request.password()));
+        user.setPassword(passwordService.hash(request.password()));
         user.setRole(request.role());
 
         user.persist();
@@ -35,8 +48,19 @@ import org.acme.dtos.admin.UpdateUserRequest;
 
 
     @Transactional
-    public boolean deleteUser(Long id) {
-        return User.deleteById(id);
+    public void deleteUser(Long id) {
+        if (!User.deleteById(id)) {
+
+            throw new NotFoundException("User with id " + id + " not found");
+
+        }
+        /*User user = User.findById(id);
+
+        if (user == null) {
+            throw new NotFoundException("User with id " + id + " not found");
+        }
+
+        User.deleteById(id);*/
     }
 
     @Transactional
@@ -44,39 +68,25 @@ import org.acme.dtos.admin.UpdateUserRequest;
         User user = User.findById(userId);
 
         if (user == null) {
-            throw new RuntimeException("User not found");
+            throw new NotFoundException("User with ID " + userId + " not found");
         }
 
-        user.setPassword(hashPassword(request.newPassword()));
+        user.setPassword(passwordService.hash(request.newPassword()));
     }
 
     @Transactional
     public UserResponse updateUser(Long id, UpdateUserRequest request) {
         User user = User.findById(id);
         if (user == null) {
-            throw new RuntimeException("User not found");
+            throw new NotFoundException("User with ID " + id + " not found");
         }
         user.setName(request.username());
         user.setRole(request.role());
-        //user.persist(); // saves changes
+        //user.persist();
         return UserResponse.from(user);
     }
 
-    private String hashPassword(String password) {
-        try {
-            MessageDigest md = MessageDigest.getInstance("SHA-256");
-            byte[] hash = md.digest(password.getBytes(StandardCharsets.UTF_8));
 
-            StringBuilder hex = new StringBuilder();
-            for (byte b : hash) {
-                hex.append(String.format("%02x", b));
-            }
-            return hex.toString();
-
-        } catch (Exception e) {
-            throw new RuntimeException("Password hashing failed", e);
-        }
-    }
 
 
 }

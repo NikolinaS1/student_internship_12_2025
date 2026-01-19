@@ -3,7 +3,7 @@ import org.acme.models.User;
 import org.acme.enums.Role;
 
 public record UserResponse(
-        Long id,
+        String id,
         String username,
         Role role
 ) {
@@ -11,7 +11,7 @@ public record UserResponse(
     public static UserResponse from(User user) {
 
         return new UserResponse(
-                user.id,
+                user.id.toString(),
                 user.getName(),
                 user.getRole()
         );
