@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { ConfigService } from './config.service';
+
 
 export interface Case {
   id: number;
@@ -30,9 +32,17 @@ export interface Case {
 })
 export class CaseService {
 
-  private apiUrl = 'http://localhost:8080/cases';
+  private apiUrl = '';
 
-  constructor(private http: HttpClient) { }
+  constructor(
+  private http: HttpClient,
+  private configService: ConfigService
+) {
+  this.configService.getConfig().subscribe(config => {
+    this.apiUrl = `${config.apiUrl}/cases`;
+  });
+}
+
 
   getAllCases(): Observable<Case[]> {
     return this.http.get<Case[]>(this.apiUrl).pipe(
