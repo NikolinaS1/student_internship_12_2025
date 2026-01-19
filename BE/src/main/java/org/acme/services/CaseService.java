@@ -3,7 +3,10 @@ package org.acme.services;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
-import org.acme.dtos.cases.*;
+import org.acme.dtos.cases.AcknowledgeCaseRequest;
+import org.acme.dtos.cases.RegularCaseCreateRequest;
+import org.acme.dtos.cases.SosCaseCreateRequest;
+import org.acme.dtos.cases.UpdateCaseRequest;
 import org.acme.enums.Priority;
 import org.acme.models.Case;
 import org.acme.models.User;
@@ -19,32 +22,17 @@ public class CaseService {
     }
 
     public Case getCaseById(Long id) {
-        Case caseEntity = Case.findById(id);
-        if (caseEntity == null) {
-            throw new NotFoundException("Case not found");
-        }
-        return caseEntity;
+        return getCaseOrThrow(id);
     }
 
     @Transactional
     public Case createSosCase(SosCaseCreateRequest request, Long userId) {
-        User user = User.findById(userId);
-        if (user == null) {
-            throw new NotFoundException("User not found");
-        }
+        User user = getUserOrThrow(userId);
 
         Case caseEntity = new Case();
-        caseEntity.setCreatedBy(user);
-        caseEntity.setCreatedAt(LocalDateTime.now().withNano(0));
-        caseEntity.setPatientName(request.patientName());
-        caseEntity.setBirthYear(request.birthYear());
-        caseEntity.setSex(request.sex());
-        caseEntity.setDescription(request.description());
+        populateCommonFields(caseEntity, user, request.patientName(), request.birthYear(),
+                request.sex(), request.description(), request.latitude(), request.longitude());
         caseEntity.setIsSos(true);
-        caseEntity.setAcknowledged(false);
-        caseEntity.setIsActive(true);
-        caseEntity.setLatitude(request.latitude());
-        caseEntity.setLongitude(request.longitude());
         caseEntity.setPriority(Priority.HIGH);
 
         caseEntity.persist();
@@ -53,18 +41,12 @@ public class CaseService {
 
     @Transactional
     public Case createRegularCase(RegularCaseCreateRequest request, Long userId) {
-        User user = User.findById(userId);
-        if (user == null) {
-            throw new NotFoundException("User not found");
-        }
+        User user = getUserOrThrow(userId);
 
         Case caseEntity = new Case();
-        caseEntity.setCreatedBy(user);
-        caseEntity.setCreatedAt(LocalDateTime.now().withNano(0));
-        caseEntity.setPatientName(request.patientName());
-        caseEntity.setBirthYear(request.birthYear());
-        caseEntity.setSex(request.sex());
-        caseEntity.setDescription(request.description());
+        populateCommonFields(caseEntity, user, request.patientName(), request.birthYear(),
+                request.sex(), request.description(), request.latitude(), request.longitude());
+
         caseEntity.setBpm(request.bpm());
         caseEntity.setSystolicPressure(request.systolicPressure());
         caseEntity.setDiastolicPressure(request.diastolicPressure());
@@ -72,10 +54,6 @@ public class CaseService {
         caseEntity.setSaturation(request.saturation());
         caseEntity.setTemperature(request.temperature());
         caseEntity.setIsSos(false);
-        caseEntity.setAcknowledged(false);
-        caseEntity.setIsActive(true);
-        caseEntity.setLatitude(request.latitude());
-        caseEntity.setLongitude(request.longitude());
 
         Priority priority = calculatePriority(caseEntity);
         caseEntity.setPriority(priority);
@@ -86,32 +64,16 @@ public class CaseService {
 
     @Transactional
     public Case acknowledgeCase(Long caseId, AcknowledgeCaseRequest request) {
-        Case caseEntity = Case.findById(caseId);
-        if (caseEntity == null) {
-            throw new NotFoundException("Case not found");
-        }
+        Case caseEntity = getCaseById(caseId);
+
         caseEntity.setAcknowledged(request.acknowledged());
         caseEntity.persist();
         return caseEntity;
     }
 
     @Transactional
-    public Case endCase(Long caseId, EndCaseRequest request) {
-        Case caseEntity = Case.findById(caseId);
-        if (caseEntity == null) {
-            throw new NotFoundException("Case not found");
-        }
-        caseEntity.setIsActive(request.isActive());
-        caseEntity.persist();
-        return caseEntity;
-    }
-
-    @Transactional
     public Case updateCase(Long caseId, UpdateCaseRequest request) {
-        Case caseEntity = Case.findById(caseId);
-        if (caseEntity == null) {
-            throw new NotFoundException("Case not found");
-        }
+        Case caseEntity = getCaseOrThrow(caseId);
 
         caseEntity.setPatientName(request.patientName());
         caseEntity.setBirthYear(request.birthYear());
@@ -148,11 +110,39 @@ public class CaseService {
 
     @Transactional
     public void deleteCase(Long id) {
-        Case caseEntity = Case.findById(id);
+        Case caseEntity = getCaseOrThrow(id);
+        caseEntity.delete();
+    }
+
+    private User getUserOrThrow(Long userId) {
+        User user = User.findById(userId);
+        if (user == null) {
+            throw new NotFoundException("User not found");
+        }
+        return user;
+    }
+
+    private Case getCaseOrThrow(Long caseId) {
+        Case caseEntity = Case.findById(caseId);
         if (caseEntity == null) {
             throw new NotFoundException("Case not found");
         }
-        caseEntity.delete();
+        return caseEntity;
+    }
+
+    private void populateCommonFields(Case caseEntity, User user, String patientName,
+                                      Integer birthYear, String sex, String description,
+                                      Double latitude, Double longitude) {
+        caseEntity.setCreatedBy(user);
+        caseEntity.setCreatedAt(LocalDateTime.now().withNano(0));
+        caseEntity.setPatientName(patientName);
+        caseEntity.setBirthYear(birthYear);
+        caseEntity.setSex(sex);
+        caseEntity.setDescription(description);
+        caseEntity.setAcknowledged(false);
+        caseEntity.setIsActive(true);
+        caseEntity.setLatitude(latitude);
+        caseEntity.setLongitude(longitude);
     }
 
     private Priority calculatePriority(Case caseEntity) {
