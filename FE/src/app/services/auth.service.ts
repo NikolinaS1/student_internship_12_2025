@@ -27,7 +27,7 @@ export class AuthService {
       case 'hospital':
         return '/hospital';
       default:
-        return '/admin';
+        return '/hospital';
     }
   }
 
@@ -45,7 +45,7 @@ export class AuthService {
         
         // Decode JWT and get role
         const decoded = this.decodeJWT(token);
-        const role = decoded?.role || decoded?.roles?.[0] || 'admin';
+        const role = decoded?.group || decoded?.groups?.[0] || 'hospital';
         
         // Redirect based on role
         const redirectPath = this.getRedirectPath(role);

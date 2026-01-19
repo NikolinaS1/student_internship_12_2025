@@ -47,11 +47,24 @@
             <div class="form-group">
                 <label>Username</label>
                 <input [(ngModel)]="newUser.username" type="text" />
+                <div *ngIf="usernameError" class="error-message">{{ usernameError }}</div>
             </div>
 
             <div class="form-group">
                 <label>Password</label>
-                <input [(ngModel)]="newUser.password" type="password" />
+                <div class="password-input-wrapper">
+                    <input [(ngModel)]="newUser.password" [type]="showPassword ? 'text' : 'password'" />
+                    <button type="button" class="toggle-password" (click)="showPassword = !showPassword">
+                        {{ showPassword ? '👁️' : '👁️‍🗨️' }}
+                    </button>
+                </div>
+                <div class="password-requirements">
+                    <small>Password must be at least 8 characters with:</small>
+                    <small>• At least one capital letter</small>
+                    <small>• At least one number</small>
+                    <small>• At least one special character</small>
+                </div>
+                <div *ngIf="passwordError" class="error-message">{{ passwordError }}</div>
             </div>
 
             <div class="form-group">
@@ -94,11 +107,24 @@
             <div class="form-group">
                 <label>Username</label>
                 <input [(ngModel)]="editedUser!.username" type="text" />
+                <div *ngIf="editUsernameError" class="error-message">{{ editUsernameError }}</div>
             </div>
 
             <div class="form-group">
                 <label>Password (leave empty to keep current)</label>
-                <input [(ngModel)]="editedPassword" type="password" />
+                <div class="password-input-wrapper">
+                    <input [(ngModel)]="editedPassword" [type]="showEditPassword ? 'text' : 'password'" />
+                    <button type="button" class="toggle-password" (click)="showEditPassword = !showEditPassword">
+                        {{ showEditPassword ? '👁️' : '👁️‍🗨️' }}
+                    </button>
+                </div>
+                <div class="password-requirements" *ngIf="editedPassword">
+                    <small>Password must be at least 8 characters with:</small>
+                    <small>• At least one capital letter</small>
+                    <small>• At least one number</small>
+                    <small>• At least one special character</small>
+                </div>
+                <div *ngIf="editPasswordError" class="error-message">{{ editPasswordError }}</div>
             </div>
 
             <div class="form-group">

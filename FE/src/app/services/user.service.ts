@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
-import * as CryptoJS from 'crypto-js';
 
 export type UserRole = 'VEHICLE' | 'HOSPITAL' | 'ADMIN';
 
@@ -48,8 +47,7 @@ export class UserService {
     }
 
     create(userData: { username: string; password: string; role: UserRole }): void {
-        const hashedPassword = CryptoJS.SHA256(userData.password).toString();
-        this.http.post<User>(this.apiUrl, { ...userData, password: hashedPassword }, { headers: this.ngrokHeaders }).subscribe({
+        this.http.post<User>(this.apiUrl, userData, { headers: this.ngrokHeaders }).subscribe({
             next: newUser => {
                 console.log('User created successfully:', newUser);
                 const users = [...this.usersSubject.value, newUser];
@@ -72,7 +70,7 @@ export class UserService {
     update(user: User, password?: string): void {
         const updateData: any = { username: user.username, role: user.role };
         if (password) {
-            updateData.password = CryptoJS.SHA256(password).toString();
+            updateData.password = password;
         }
         this.http.put<User>(`${this.apiUrl}/${user.id}`, updateData, { headers: this.ngrokHeaders }).subscribe({
             next: updatedUser => {

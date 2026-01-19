@@ -31,6 +31,14 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   editedUser: User | null = null;
   editedPassword: string = '';
 
+  /** VALIDATION */
+  usernameError: string = '';
+  editUsernameError: string = '';
+  passwordError: string = '';
+  editPasswordError: string = '';
+  showPassword: boolean = false;
+  showEditPassword: boolean = false;
+
   private subscription: Subscription = new Subscription();
 
   constructor(private userService: UserService, private cdr: ChangeDetectorRef) {}
@@ -54,12 +62,18 @@ export class UserManagementComponent implements OnInit, OnDestroy {
 
   openCreateUser(): void {
     this.resetCreateForm();
+    this.usernameError = '';
+    this.passwordError = '';
+    this.showPassword = false;
     this.showCreateModal = true;
   }
 
   openEditUser(user: User): void {
     this.editedUser = { ...user };
     this.editedPassword = '';
+    this.editUsernameError = '';
+    this.editPasswordError = '';
+    this.showEditPassword = false;
     this.showEditModal = true;
   }
 
@@ -74,7 +88,18 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   -------------------------- */
 
   createUser(): void {
-    if (!this.newUser.username || !this.newUser.password) {
+    this.usernameError = this.validateUsername(this.newUser.username);
+    if (this.usernameError) {
+      return;
+    }
+
+    if (!this.newUser.password) {
+      this.passwordError = 'Password is required';
+      return;
+    }
+
+    this.passwordError = this.validatePassword(this.newUser.password);
+    if (this.passwordError) {
       return;
     }
 
@@ -85,6 +110,18 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   saveUserChanges(): void {
     if (!this.editedUser) {
       return;
+    }
+
+    this.editUsernameError = this.validateUsername(this.editedUser.username);
+    if (this.editUsernameError) {
+      return;
+    }
+
+    if (this.editedPassword) {
+      this.editPasswordError = this.validatePassword(this.editedPassword);
+      if (this.editPasswordError) {
+        return;
+      }
     }
 
     this.userService.update(this.editedUser, this.editedPassword || undefined);
@@ -98,6 +135,29 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   /* -------------------------
      VALIDATION
   -------------------------- */
+
+  validateUsername(username: string): string {
+    if (!username || username.trim() === '') {
+      return 'Username is required';
+    }
+    return '';
+  }
+
+  validatePassword(password: string): string {
+    if (password.length < 8) {
+      return 'Password must be at least 8 characters long';
+    }
+    if (!/[A-Z]/.test(password)) {
+      return 'Password must contain at least one capital letter';
+    }
+    if (!/[0-9]/.test(password)) {
+      return 'Password must contain at least one number';
+    }
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+      return 'Password must contain at least one special character';
+    }
+    return '';
+  }
 
   /* -------------------------
      HELPERS
