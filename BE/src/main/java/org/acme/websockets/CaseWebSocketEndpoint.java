@@ -61,9 +61,9 @@ public class CaseWebSocketEndpoint {
         sessions.values().forEach(session -> {
             if (session.isOpen()) {
                 try {
-                    session.getBasicRemote().sendText(message);
-                } catch (IOException e) {
-                    e.printStackTrace();
+                    session.getAsyncRemote().sendText(message);
+                } catch (Exception e) {
+                    System.err.println("Greška pri slanju sesiji " + session.getId() + ": " + e.getMessage());
                 }
             }
         });
