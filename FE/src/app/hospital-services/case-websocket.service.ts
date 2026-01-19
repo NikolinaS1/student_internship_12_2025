@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { ConfigService } from './config-service';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { CaseModel } from '../models/case-model';
+import { CaseModel } from '../hospital-models/case-model';
 
 export interface WebSocketMessage {
   type: 'CREATE' | 'UPDATE' | 'ACKNOWLEDGE' | 'DELETE' | 'LOCATION_UPDATE';

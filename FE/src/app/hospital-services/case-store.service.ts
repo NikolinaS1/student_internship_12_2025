@@ -2,8 +2,8 @@ import { Injectable, inject, signal, effect } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { tap, catchError } from 'rxjs/operators';
-import { CaseModel } from '../models/case-model';
-import { AuthService } from '../services/auth-service';
+import { CaseModel } from '../hospital-models/case-model';
+import { AuthService } from './auth-service';
 import { CaseWebSocketService } from './case-websocket.service';
 import { ConfigService } from './config-service';
 

@@ -1,9 +1,9 @@
 import { Component, AfterViewInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import * as L from 'leaflet';
-import { WebSocketLocationService, RemoteLocation } from '../services/websocket-service';
-import { LocationService, LocationData } from '../services/location-service';
-import { AuthService } from '../services/auth-service';
+import { WebSocketLocationService, RemoteLocation } from '../hospital-services/websocket-service';
+import { LocationService, LocationData } from '../hospital-services/location-service';
+import { AuthService } from '../hospital-services/auth-service';
 
 @Component({
   selector: 'app-hospital-map',

@@ -2,9 +2,9 @@ import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnDestroy, O
 import { Subscription } from 'rxjs';
 import { CommonModule, DatePipe, NgClass, NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { CaseModel } from '../models/case-model';
-import { WebSocketLocationService, RemoteLocation } from '../services/websocket-service';
-import { ConfigService } from '../services/config-service';
+import { CaseModel } from '../hospital-models/case-model';
+import { WebSocketLocationService, RemoteLocation } from '../hospital-services/websocket-service';
+import { ConfigService } from '../hospital-services/config-service';
 import * as L from 'leaflet';
 
 

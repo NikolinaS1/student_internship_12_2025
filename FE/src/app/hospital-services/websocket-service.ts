@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { LocationService, LocationData } from '../services/location-service';
+import { LocationService, LocationData } from './location-service';
 
 export interface RemoteLocation {
   caseId: number;

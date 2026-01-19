@@ -2,12 +2,12 @@ import { Component, AfterViewInit, OnDestroy, Output, EventEmitter, Input, injec
 import { CommonModule } from '@angular/common';
 import { NgClass } from '@angular/common';
 import * as L from 'leaflet';
-import { WebSocketLocationService, RemoteLocation } from '../services/websocket-service';
-import { CaseService } from '../services/case-store.service';
-import { AuthService } from '../services/auth-service';
-import { CaseModel } from '../models/case-model';
-import { CaseWebSocketService } from '../services/case-websocket.service';
-import { ConfigService } from '../services/config-service';
+import { WebSocketLocationService, RemoteLocation } from '../hospital-services/websocket-service';
+import { CaseService } from '../hospital-services/case-store.service';
+import { AuthService } from '../hospital-services/auth-service';
+import { CaseModel } from '../hospital-models/case-model';
+import { CaseWebSocketService } from '../hospital-services/case-websocket.service';
+import { ConfigService } from '../hospital-services/config-service';
 
 @Component({
   selector: 'app-cases-overview',
