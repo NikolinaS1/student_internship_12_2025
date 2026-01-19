@@ -1,41 +1,281 @@
 .layout-wrapper { 
   display: flex; 
-  height: calc(100vh - 88px);
+  height: calc(100vh - 75px); 
 }
 
 .content-view {
   flex: 1; 
   background: #fcfcfd; 
   display: flex;
-
+  overflow: hidden;
+  
   .empty-state {
     flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 40px;
-
+    padding: 30px; 
+    
     .empty-card {
       background: white;
       width: 100%;
-      max-width: 560px; 
-      padding: 80px 40px; 
-      border-radius: 24px; 
+      max-width: 420px; 
+      padding: 60px 30px; 
+      border-radius: 18px; 
       border: 1px solid var(--border-color);
       text-align: center;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.03);
-
+      box-shadow: 0 3px 15px rgba(0,0,0,0.03); 
+      
       h2 { 
-        font-size: 32px; 
+        font-size: 24px; 
         font-weight: 700;
-        margin-bottom: 16px;
+        margin-bottom: 12px; 
         letter-spacing: -0.03em;
       }
-
+      
       p { 
-        font-size: 18px; 
-        color: var(--text-muted);
+        font-size: 14px; 
+        color: #6c757d;
         line-height: 1.5;
+      }
+    }
+  }
+}
+
+.case-detail {
+  flex: 1;
+  padding: 15px 20px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; 
+  
+  .case-detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 18px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #e9ecef;
+    flex-shrink: 0;
+    
+    .header-left {
+      h1 {
+        font-size: 27px; 
+        font-weight: 700;
+        margin: 0 0 9px 0; 
+      }
+      
+      .header-badges {
+        display: flex;
+        gap: 9px;
+        
+        .badge {
+          padding: 6px 12px; 
+          border-radius: 6px;
+          font-size: 10px; 
+          font-weight: 600;
+          border: 2px solid;
+          text-transform: uppercase;
+          
+          &.badge-low {
+            background: #f0fdf4;
+            border-color: #22c55e;
+            color: #16a34a;
+          }
+          
+          &.badge-medium {
+            background: #fff7ed;
+            border-color: #f97316;
+            color: #ea580c;
+          }
+          
+          &.badge-high {
+            background: #fef2f2;
+            border-color: #ef4444;
+            color: #dc2626;
+          }
+        }
+      }
+    }
+    
+    .header-actions {
+      display: flex;
+      gap: 9px;
+      padding-top: 17px;
+      
+      button {
+        padding: 9px 18px; 
+        border-radius: 6px;
+        font-size: 11px; 
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: none;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      
+      .btn-update {
+        background: #f1f3f5;
+        color: #495057;
+        
+        &:hover {
+          background: #e9ecef;
+        }
+      }
+      
+      .btn-end-case {
+        background: #dc2626;
+        color: white;
+        
+        &:hover {
+          background: #b91c1c;
+        }
+      }
+    }
+  }
+  
+  .info-card-combined {
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 9px;
+    padding: 18px;
+    margin-bottom: 18px;
+    flex-shrink: 0;
+    
+    .info-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: #6c757d;
+      margin-bottom: 10px;
+      letter-spacing: 0.5px;
+    }
+    
+    .symptoms-section {
+      margin-bottom: 18px;
+      
+      .info-content {
+        p {
+          margin: 0;
+          font-size: 11px;
+          line-height: 1.5;
+          max-height: 50px; 
+          overflow-y: auto;
+        }
+      }
+    }
+    
+    .vitals-section {
+      .vitals-row {
+        display: flex;
+        gap: 15px;
+        justify-content: space-between;
+        
+        .vital-item {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          flex: 1;
+          min-width: 0;
+          
+          .vital-emoji {
+            font-size: 18px;
+            flex-shrink: 0;
+          }
+          
+          .vital-info {
+            flex: 1;
+            min-width: 0;
+            
+            .vital-label {
+              font-size: 8px;
+              color: #6c757d;
+              margin-bottom: 2px;
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
+            }
+            
+            .vital-value {
+              font-size: 11px;
+              font-weight: 700;
+              color: #212529;
+              white-space: nowrap;
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  .case-communication {
+    flex: 1;
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 9px;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    min-height: 0; 
+    
+    h2 {
+      font-size: 15px;
+      font-weight: 700;
+      margin: 0 0 15px 0;
+      flex-shrink: 0;
+    }
+    
+    .messages-container {
+      flex: 1;
+      overflow-y: auto;
+      margin-bottom: 15px;
+      min-height: 0;
+      
+      .messages-empty {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        color: #adb5bd;
+        font-size: 11px;
+      }
+    }
+    
+    .message-input-wrapper {
+      display: flex;
+      gap: 9px;
+      flex-shrink: 0;
+      
+      .message-input {
+        flex: 1;
+        padding: 9px 12px;
+        border: 2px solid #e9ecef;
+        border-radius: 6px;
+        font-size: 11px;
+        
+        &:focus {
+          outline: none;
+          border-color: #2563eb;
+        }
+      }
+      
+      .send-btn {
+        padding: 9px 15px;
+        background: #000;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        
+        &:hover {
+          background: #2d2d2d;
+        }
       }
     }
   }
