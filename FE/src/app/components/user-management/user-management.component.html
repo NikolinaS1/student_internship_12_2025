@@ -28,7 +28,7 @@
             <td>{{ user.id }}</td>
             <td>
                 <button class="icon-btn" (click)="openEditUser(user)">Edit</button>
-                <button class="icon-btn danger" (click)="deleteUser(user)">Delete</button>
+                <button class="icon-btn danger" (click)="confirmDeleteUser(user)">Delete</button>
             </td>
         </tr>
     </tbody>
@@ -149,6 +149,30 @@
             <button class="btn cancel" (click)="closeModals()">Cancel</button>
             <button class="btn primary" [disabled]="!editedUser || !editedUser.username" (click)="saveUserChanges()">
                 Save Changes
+            </button>
+        </div>
+
+    </div>
+</div>
+
+<!-- DELETE CONFIRMATION MODAL -->
+<div *ngIf="showDeleteModal && userToDelete" class="overlay" (click)="closeModals()">
+    <div class="modal" (click)="$event.stopPropagation()">
+
+        <div class="modal-header">
+            <h2>Confirm Delete</h2>
+            <button class="close-btn" (click)="closeModals()">✕</button>
+        </div>
+
+        <div class="modal-body">
+            <p>You are about to delete user <strong>{{ userToDelete.username }}</strong> ({{ userToDelete.role }}).</p>
+            <p>This action cannot be undone. Are you sure you want to proceed?</p>
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn cancel" (click)="closeModals()">Cancel</button>
+            <button class="btn danger" (click)="deleteUser()">
+                Delete User
             </button>
         </div>
 

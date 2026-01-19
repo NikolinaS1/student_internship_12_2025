@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { UserService, User, UserRole } from '../../services/user.service';
@@ -16,6 +16,8 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   /** STATE */
   showCreateModal = false;
   showEditModal = false;
+  showDeleteModal = false;
+  userToDelete: User | null = null;
 
   /** USERS */
   users: User[] = [];
@@ -41,13 +43,12 @@ export class UserManagementComponent implements OnInit, OnDestroy {
 
   private subscription: Subscription = new Subscription();
 
-  constructor(private userService: UserService, private cdr: ChangeDetectorRef) {}
+  constructor(private userService: UserService) {}
 
   ngOnInit() {
     this.subscription.add(
       this.userService.users$.subscribe(users => {
         this.users = users;
-        this.cdr.markForCheck();
       })
     );
   }
@@ -80,7 +81,9 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   closeModals(): void {
     this.showCreateModal = false;
     this.showEditModal = false;
+    this.showDeleteModal = false;
     this.editedUser = null;
+    this.userToDelete = null;
   }
 
   /* -------------------------
@@ -128,8 +131,16 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     this.closeModals();
   }
 
-  deleteUser(user: User): void {
-    this.userService.delete(user.id);
+  confirmDeleteUser(user: User): void {
+    this.userToDelete = user;
+    this.showDeleteModal = true;
+  }
+
+  deleteUser(): void {
+    if (this.userToDelete) {
+      this.userService.delete(this.userToDelete.id);
+      this.closeModals();
+    }
   }
 
   /* -------------------------

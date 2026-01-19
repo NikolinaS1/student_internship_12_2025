@@ -29,7 +29,6 @@ export class UserService {
     private loadUsers(): void {
         this.http.get<User[]>(this.apiUrl, { headers: this.ngrokHeaders }).subscribe({
             next: users => {
-                console.log('Fetched users:', users);
                 this.usersSubject.next(users);
             },
             error: error => {
@@ -49,7 +48,6 @@ export class UserService {
     create(userData: { username: string; password: string; role: UserRole }): void {
         this.http.post<User>(this.apiUrl, userData, { headers: this.ngrokHeaders }).subscribe({
             next: newUser => {
-                console.log('User created successfully:', newUser);
                 const users = [...this.usersSubject.value, newUser];
                 this.usersSubject.next(users);
             },
@@ -74,7 +72,6 @@ export class UserService {
         }
         this.http.put<User>(`${this.apiUrl}/${user.id}`, updateData, { headers: this.ngrokHeaders }).subscribe({
             next: updatedUser => {
-                console.log('User updated successfully:', updatedUser);
                 const users = this.usersSubject.value.map(u =>
                     u.id === user.id ? updatedUser : u
                 );
@@ -94,7 +91,6 @@ export class UserService {
     delete(id: string): void {
         this.http.delete(`${this.apiUrl}/${id}`, { headers: this.ngrokHeaders }).subscribe({
             next: () => {
-                console.log('User deleted successfully');
                 const users = this.usersSubject.value.filter(u => u.id !== id);
                 this.usersSubject.next(users);
             },
