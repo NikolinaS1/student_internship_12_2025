@@ -27,7 +27,7 @@ export class AuthService {
       case 'hospital':
         return '/hospital';
       default:
-        return '/hospital';
+        return '/error';
     }
   }
 
