@@ -7,7 +7,6 @@ import jakarta.websocket.*;
 import jakarta.websocket.server.ServerEndpoint;
 import org.acme.dtos.cases.CaseResponse;
 
-import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -61,9 +60,9 @@ public class CaseWebSocketEndpoint {
         sessions.values().forEach(session -> {
             if (session.isOpen()) {
                 try {
-                    session.getBasicRemote().sendText(message);
-                } catch (IOException e) {
-                    e.printStackTrace();
+                    session.getAsyncRemote().sendText(message);
+                } catch (Exception e) {
+                    System.err.println("Greška pri slanju sesiji " + session.getId() + ": " + e.getMessage());
                 }
             }
         });
