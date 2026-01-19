@@ -6,13 +6,10 @@ import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import org.acme.dtos.cases.CaseResponse;
-import org.acme.dtos.cases.AcknowledgeCaseRequest;
-import org.acme.dtos.cases.RegularCaseCreateRequest;
-import org.acme.dtos.cases.SosCaseCreateRequest;
-import org.acme.dtos.cases.UpdateCaseRequest;
+import org.acme.dtos.cases.*;
 import org.acme.models.Case;
 import org.acme.services.CaseService;
+import org.acme.websockets.CaseWebSocketEndpoint;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,6 +21,9 @@ public class CaseResource {
 
     @Inject
     CaseService caseService;
+
+    @Inject
+    CaseWebSocketEndpoint webSocketEndpoint;
 
     @GET
     @RolesAllowed({"ADMIN", "HOSPITAL"})
@@ -54,6 +54,9 @@ public class CaseResource {
         }
 
         Case createdCase = caseService.createSosCase(request, userId);
+
+        webSocketEndpoint.broadcastCaseUpdate(CaseResponse.fromEntity(createdCase), "CREATE");
+
         return Response.status(Response.Status.CREATED)
                 .entity(CaseResponse.fromEntity(createdCase))
                 .build();
@@ -70,6 +73,9 @@ public class CaseResource {
         }
 
         Case createdCase = caseService.createRegularCase(request, userId);
+
+        webSocketEndpoint.broadcastCaseUpdate(CaseResponse.fromEntity(createdCase), "CREATE");
+
         return Response.status(Response.Status.CREATED)
                 .entity(CaseResponse.fromEntity(createdCase))
                 .build();
@@ -80,6 +86,20 @@ public class CaseResource {
     @RolesAllowed({"HOSPITAL"})
     public Response acknowledgeCase(@PathParam("id") Long id, @Valid AcknowledgeCaseRequest request) {
         Case caseEntity = caseService.acknowledgeCase(id, request);
+
+        webSocketEndpoint.broadcastCaseUpdate(CaseResponse.fromEntity(caseEntity), "ACKNOWLEDGE");
+
+        return Response.ok(CaseResponse.fromEntity(caseEntity)).build();
+    }
+
+    @PUT
+    @Path("/{id}/end")
+    @RolesAllowed({"VEHICLE", "ADMIN"})
+    public Response endCase(@PathParam("id") Long id, @Valid EndCaseRequest request) {
+        Case caseEntity = caseService.endCase(id, request);
+
+        webSocketEndpoint.broadcastCaseUpdate(CaseResponse.fromEntity(caseEntity), "END");
+
         return Response.ok(CaseResponse.fromEntity(caseEntity)).build();
     }
 
@@ -88,6 +108,9 @@ public class CaseResource {
     @RolesAllowed({"VEHICLE", "ADMIN"})
     public Response updateCase(@PathParam("id") Long id, @Valid UpdateCaseRequest request) {
         Case caseEntity = caseService.updateCase(id, request);
+
+        webSocketEndpoint.broadcastCaseUpdate(CaseResponse.fromEntity(caseEntity), "UPDATE");
+
         return Response.ok(CaseResponse.fromEntity(caseEntity)).build();
     }
 
