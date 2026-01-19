@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { LocationService, LocationData } from './location-service';
+import { BehaviorSubject } from 'rxjs';
+
 
 export interface RemoteLocation {
   caseId: number;
@@ -11,7 +11,6 @@ export interface RemoteLocation {
 
 @Injectable({ providedIn: 'root' })
 export class WebSocketLocationService {
-  private locService = inject(LocationService);
 
   private ws?: WebSocket;
   private remoteLocationsSubject = new BehaviorSubject<RemoteLocation[]>([]);
@@ -25,8 +24,6 @@ export class WebSocketLocationService {
 
     this.ws.onopen = () => {
       console.log('WebSocket connected');
-      // počni slati lokaciju svakih 5 sekundi
-      this.pollInterval = window.setInterval(() => this.sendLocation(), 5000);
     };
 
     this.ws.onmessage = (event) => {
@@ -51,22 +48,6 @@ export class WebSocketLocationService {
     if (this.ws) this.ws.close();
   }
 
-  private sendLocation() {
-    this.locService.location$.subscribe((loc) => {
-      if (loc && this.ws && this.ws.readyState === WebSocket.OPEN) {
-        // ako user ima selektuirani case, pošalji njegovu lokaciju
-        const caseId = sessionStorage.getItem('activeCaseId');
-        if (caseId) {
-          const msg = {
-            caseId: parseInt(caseId),
-            latitude: loc.latitude,
-            longitude: loc.longitude,
-          };
-          this.ws.send(JSON.stringify(msg));
-        }
-      }
-    }).unsubscribe();
-  }
 
   private updateRemoteLocations(update: RemoteLocation) {
     const current = this.remoteLocationsSubject.value;

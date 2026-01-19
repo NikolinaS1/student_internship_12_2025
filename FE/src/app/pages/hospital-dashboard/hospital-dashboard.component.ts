@@ -2,8 +2,8 @@ import { Component, ViewChild, inject, OnInit, computed, OnDestroy } from '@angu
 import { Subscription } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { CaseService } from '../hospital-services/case-store.service';
-import { CaseModel } from '../hospital-models/case-model';
+import { CaseService } from '../../hospital-services/case-store.service';
+import { CaseModel } from '../../hospital-models/case-model';
 import { CasesOverviewComponent } from './cases-overview.component';
 import { CaseDetailComponent } from './case-detail.component';
 
