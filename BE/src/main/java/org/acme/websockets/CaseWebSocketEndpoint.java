@@ -60,7 +60,7 @@ public class CaseWebSocketEndpoint {
             try {
                 session.getAsyncRemote().sendText(message);
             } catch (Exception e) {
-                System.err.println("Greška pri slanju sesiji " + session.getId() + ": " + e.getMessage());
+                System.err.println("Error sending message to session " + session.getId() + ": " + e.getMessage());
             }
         });
     }

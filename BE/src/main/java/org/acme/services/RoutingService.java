@@ -32,7 +32,7 @@ public class RoutingService {
 
             return Math.round((seconds / 60.0) * 10.0) / 10.0;
         } catch (Exception e) {
-            System.err.println("Greška pri pozivu OSRM: " + e.getMessage());
+            System.err.println("Failed to fetch OSRM routing data: " + e.getMessage());
             return -1.0;
         }
     }
