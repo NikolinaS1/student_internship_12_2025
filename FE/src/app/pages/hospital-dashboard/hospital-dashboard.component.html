@@ -1,0 +1,38 @@
+<div class="page">
+  <!-- Top Header -->
+  <header class="topbar">
+    <div class="topbar__inner">
+      <div class="brand">
+        <div class="brand__title">MCX Hospital</div>
+        <div class="brand__subtitle">Hospital portal</div>
+      </div>
+
+      <div class="topbar__actions">
+        <span class="muted">KBC Osijek</span>
+        <button type="button" class="btn btn--primary" title="(samo demo)">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Pregled svih slučajeva -->
+  @if (!store.selectedCase()) {
+    <app-cases-overview 
+      [cases]="store.cases()" 
+      (select)="selectCase($event)"
+    ></app-cases-overview>
+  }
+
+  <!-- Detalji odabranog slučaja -->
+  @if (store.selectedCase()) {
+    <app-case-detail 
+      [selectedCase]="store.selectedCase()!"
+      [allCases]="store.cases()"
+      [messageText]="messageText"
+      (messageTextChange)="messageText = $event"
+      (deselect)="deselect()"
+      (acknowledge)="acknowledge($event)"
+      (send)="send($event)"
+      (caseSelect)="selectCase($event)"
+    ></app-case-detail>
+  }
+</div>
