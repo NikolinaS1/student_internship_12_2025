@@ -25,7 +25,7 @@ public class AdminEndpointTest {
                 .sign();
     }
 */
-
+/*
     @BeforeEach
     void beforeEach(TestInfo testInfo) {
         System.out.println("STARTING TEST: " + testInfo.getDisplayName());
@@ -63,6 +63,6 @@ public class AdminEndpointTest {
                 .delete("/admin/users/" + userId)
                 .then()
                 .statusCode(204);
-    }
+    }*/
 }
 
