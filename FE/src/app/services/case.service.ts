@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
-import { Observable, throwError, switchMap } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
+import { catchError, switchMap } from 'rxjs/operators';
 import { ConfigService } from './config.service';
 import { CreateCaseDTO } from '../models/case.model';
+
 
 export interface Case {
   id: number;
@@ -44,41 +45,25 @@ export class CaseService {
   }
 
 
-  // ----- BASIC CRUD -----
   getAllCases(): Observable<Case[]> {
-    return this.configService.getConfig().pipe(
-      switchMap(config => {
-        const url = `${config.Urls.apiUrl}/cases`;
-        return this.http.get<Case[]>(url).pipe(
-          catchError(this.handleError)
-        );
-      })
+    return this.http.get<Case[]>(this.apiUrl).pipe(
+      catchError(this.handleError)
     );
   }
 
   getCaseById(id: number): Observable<Case> {
-    return this.configService.getConfig().pipe(
-      switchMap(config => {
-        const url = `${config.Urls.apiUrl}/cases/${id}`;
-        return this.http.get<Case>(url).pipe(
-          catchError(this.handleError)
-        );
-      })
+    return this.http.get<Case>(`${this.apiUrl}/${id}`).pipe(
+      catchError(this.handleError)
     );
   }
 
   deleteCase(id: number): Observable<void> {
-    return this.configService.getConfig().pipe(
-      switchMap(config => {
-        const url = `${config.Urls.apiUrl}/cases/${id}`;
-        return this.http.delete<void>(url).pipe(
-          catchError(this.handleError)
-        );
-      })
+    return this.http.delete<void>(`${this.apiUrl}/${id}`).pipe(
+      catchError(this.handleError)
     );
   }
 
-  // ----- REGULAR CASE -----
+    // ----- REGULAR CASE -----
   createRegularCase(caseData: CreateCaseDTO, token?: string): Observable<any> {
     return this.configService.getConfig().pipe(
       switchMap(config => {
@@ -103,8 +88,7 @@ export class CaseService {
     );
   }
 
-  // ----- HELPERS -----
-  private createHeaders(token?: string): HttpHeaders {
+    private createHeaders(token?: string): HttpHeaders {
     let headers = new HttpHeaders()
       .set('Content-Type', 'application/json')
       .set('userId', '1'); // TODO: Replace with actual user ID from auth service
