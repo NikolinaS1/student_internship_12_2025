@@ -10,9 +10,7 @@ public class PasswordService {
 
 
     public String hash(String plainPassword) {
-        if (plainPassword == null || plainPassword.isBlank()) {
-            throw new IllegalArgumentException("Password must not be blank");
-        }
+        validatePassword(plainPassword);
         return BCrypt.hashpw(plainPassword, BCrypt.gensalt(COST));
     }
 
