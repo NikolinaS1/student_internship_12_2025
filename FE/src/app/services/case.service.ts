@@ -36,12 +36,22 @@ export class CaseService {
     );
   }
 
-  updateRegularCase(caseId: string, caseData: CreateCaseDTO, token?: string): Observable<any> {
+  updateRegularCase(caseId: number, caseData: CreateCaseDTO, token?: string): Observable<any> {
     return this.configService.getConfig().pipe(
       switchMap(config => {
         const url = `${config.apiUrl}/cases/${caseId}`;
         const headers = this.createHeaders(token);
         return this.http.put(url, caseData, { headers });
+      })
+    );
+  }
+
+  getCaseById(caseId: number, token?: string): Observable<any> {
+    return this.configService.getConfig().pipe(
+      switchMap(config => {
+        const url = `${config.apiUrl}/cases/${caseId}`;
+        const headers = this.createHeaders(token);
+        return this.http.get(url, { headers });
       })
     );
   }

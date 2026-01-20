@@ -16,7 +16,6 @@
       </div>
       <p class="case-age">{{ activeCase.age }} years old</p>
       
-      <!-- Patient Info Section -->
       <div class="patient-info-section">
         <div class="info-label">PATIENT INFO</div>
         <div class="info-row">
@@ -39,7 +38,7 @@
         <div class="meta-row">
           <span class="meta-label">Status:</span>
           <span class="meta-value status-badge" [class]="getStatusBadgeClass()">
-            {{ activeCase.status }}
+            {{ getStatus() }}
           </span>
         </div>
       </div>

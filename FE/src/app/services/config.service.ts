@@ -5,6 +5,7 @@ import { catchError, shareReplay } from 'rxjs/operators';
 
 export interface AppConfig {
   apiUrl: string;
+  wsUrl: string;
 }
 
 @Injectable({
@@ -21,7 +22,7 @@ export class ConfigService {
         shareReplay(1),
         catchError((error) => {
           console.error('Error loading config:', error);
-          return of({ apiUrl: 'http://localhost:8080' });
+          throw error;
         })
       );
     }

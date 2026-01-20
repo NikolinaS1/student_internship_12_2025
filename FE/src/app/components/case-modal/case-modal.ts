@@ -286,71 +286,92 @@ export class CaseModal implements OnChanges {
   }
 
   submitCase(caseDTO: CreateCaseDTO, fullDescription: string): void {
-    console.log('Sending case data to backend:', caseDTO);
-
     const request = this.editMode && this.existingCase
       ? this.caseService.updateRegularCase(this.existingCase.id, caseDTO)
       : this.caseService.createRegularCase(caseDTO);
 
     request.subscribe({
       next: (response) => {
-        console.log(this.editMode ? 'Case updated successfully:' : 'Case created successfully:', response);
         
-        const updatedCase: Case = {
-          id: response.id || this.existingCase?.id || `case-${Date.now()}`,
-          patientName: this.caseData.patientName,
-          birthYear: this.caseData.birthYear,
-          age: this.calculateAge(),
-          sex: this.caseData.sex,
-          description: fullDescription,
-          bpm: this.caseData.bpm,
-          systolicPressure: this.caseData.systolicPressure,
-          diastolicPressure: this.caseData.diastolicPressure,
-          resRate: this.caseData.resRate,
-          saturation: this.caseData.saturation,
-          temperature: this.caseData.temperature,
-          latitude: caseDTO.latitude,
-          longitude: caseDTO.longitude,
-          priority: response.priority || 'LOW', 
-          status: this.existingCase?.status || 'active',
-          createdAt: this.existingCase?.createdAt || new Date(),
-          createdBy: this.currentUser?.id || 'unknown',
-          isSOS: this.existingCase?.isSOS || false
-        };
-        
-        if (this.editMode) {
-          this.caseUpdated.emit(updatedCase);
-        } else {
-          this.caseCreated.emit(updatedCase);
-        }
-        
-        this.closeModal();
+        this.caseService.getCaseById(response.id).subscribe({
+          next: (fullCase) => {            
+            const caseToEmit: Case = this.mapBackendResponseToCase(fullCase);
+            
+            if (this.editMode) {
+              this.caseUpdated.emit(caseToEmit);
+            } else {
+              this.caseCreated.emit(caseToEmit);
+            }
+            
+            this.closeModal();
+          },
+          error: (error) => {
+            alert('Case created but failed to fetch details.');
+            this.closeModal();
+          }
+        });
       },
       error: (error) => {
-        console.error(this.editMode ? '❌ Error updating case:' : '❌ Error creating case:', error);
-        console.error('Status:', error.status);
-        console.error('Error body:', error.error);
-        
-        let errorMessage = (this.editMode ? 'Failed to update case. ' : 'Failed to create case. ');
-        
-        if (error.status === 0) {
-          errorMessage += 'Cannot connect to server. Is backend running?';
-        } else if (error.status === 401 || error.status === 403) {
-          errorMessage += 'Authentication required. Token missing or invalid.';
-        } else if (error.status === 400) {
-          errorMessage += 'Invalid data sent to server.\n';
-          if (error.error?.message) {
-            errorMessage += 'Details: ' + error.error.message;
-          }
-        } else if (error.status === 500) {
-          errorMessage += 'Server error. Check backend logs.';
-        } else {
-          errorMessage += error.error?.message || error.message || 'Unknown error';
-        }
-        
-        alert(errorMessage);
+        this.handleError(error);
       }
     });
+  }
+
+  private mapBackendResponseToCase(backendCase: any): Case {
+    return {
+      id: backendCase.id, 
+      patientName: backendCase.patientName,
+      birthYear: backendCase.birthYear,
+      age: new Date().getFullYear() - backendCase.birthYear,
+      sex: backendCase.sex,
+      description: backendCase.description,
+      bpm: backendCase.bpm,
+      systolicPressure: backendCase.systolicPressure,
+      diastolicPressure: backendCase.diastolicPressure,
+      resRate: backendCase.resRate,
+      saturation: backendCase.saturation,
+      temperature: backendCase.temperature,
+      latitude: backendCase.latitude,
+      longitude: backendCase.longitude,
+      priority: backendCase.priority,
+      
+      isSos: backendCase.isSos || false,
+      acknowledged: backendCase.acknowledged || false,
+      isActive: backendCase.isActive !== undefined ? backendCase.isActive : true,
+      createdAt: backendCase.createdAt,
+
+      createdById: backendCase.createdById,
+      
+      status: this.mapBackendStatus(backendCase),
+      eta: backendCase.eta
+    };
+  }
+
+  private mapBackendStatus(backendCase: any): 'active' | 'sent' | 'completed' {
+    if (!backendCase.isActive) return 'completed';
+    if (backendCase.acknowledged) return 'sent';
+    return 'active';
+  }
+
+  private handleError(error: any): void {
+    let errorMessage = (this.editMode ? 'Failed to update case. ' : 'Failed to create case. ');
+    
+    if (error.status === 0) {
+      errorMessage += 'Cannot connect to server. Is backend running?';
+    } else if (error.status === 401 || error.status === 403) {
+      errorMessage += 'Authentication required.';
+    } else if (error.status === 400) {
+      errorMessage += 'Invalid data.\n';
+      if (error.error?.message) {
+        errorMessage += 'Details: ' + error.error.message;
+      }
+    } else if (error.status === 500) {
+      errorMessage += 'Server error.';
+    } else {
+      errorMessage += error.error?.message || error.message || 'Unknown error';
+    }
+    
+    alert(errorMessage);
   }
 
   closeModal(): void {
