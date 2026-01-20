@@ -37,7 +37,7 @@ public class CaseResource {
 
     @GET
     @Path("/{id}")
-    @RolesAllowed({"ADMIN", "HOSPITAL"})
+    //@RolesAllowed({"ADMIN", "HOSPITAL"})
     public Response getCaseById(@PathParam("id") Long id) {
         Case caseEntity = caseService.getCaseById(id);
         return Response.ok(CaseResponse.fromEntity(caseEntity)).build();
@@ -45,7 +45,7 @@ public class CaseResource {
 
     @POST
     @Path("/sos")
-    @RolesAllowed({"VEHICLE"})
+    //@RolesAllowed({"VEHICLE"})
     public Response createSosCase(@Valid SosCaseCreateRequest request, @HeaderParam("userId") Long userId) {
         if (userId == null) {
             return Response.status(Response.Status.BAD_REQUEST)
@@ -64,7 +64,7 @@ public class CaseResource {
 
     @POST
     @Path("/regular")
-    @RolesAllowed({"VEHICLE"})
+    //@RolesAllowed({"VEHICLE"})
     public Response createRegularCase(@Valid RegularCaseCreateRequest request, @HeaderParam("userId") Long userId) {
         if (userId == null) {
             return Response.status(Response.Status.BAD_REQUEST)
@@ -83,7 +83,7 @@ public class CaseResource {
     
     @PUT
     @Path("/{id}/acknowledge")
-    @RolesAllowed({"HOSPITAL"})
+    //@RolesAllowed({"HOSPITAL"})
     public Response acknowledgeCase(@PathParam("id") Long id, @Valid AcknowledgeCaseRequest request) {
         Case caseEntity = caseService.acknowledgeCase(id, request);
 
@@ -94,7 +94,7 @@ public class CaseResource {
 
     @PUT
     @Path("/{id}/end")
-    @RolesAllowed({"VEHICLE", "ADMIN"})
+    //@RolesAllowed({"VEHICLE", "ADMIN"})
     public Response endCase(@PathParam("id") Long id, @Valid EndCaseRequest request) {
         Case caseEntity = caseService.endCase(id, request);
 
@@ -105,7 +105,7 @@ public class CaseResource {
 
     @PUT
     @Path("/{id}")
-    @RolesAllowed({"VEHICLE", "ADMIN"})
+    //@RolesAllowed({"VEHICLE", "ADMIN"})
     public Response updateCase(@PathParam("id") Long id, @Valid UpdateCaseRequest request) {
         Case caseEntity = caseService.updateCase(id, request);
 
@@ -116,7 +116,7 @@ public class CaseResource {
 
     @DELETE
     @Path("/{id}")
-    @RolesAllowed({"ADMIN"})
+    //@RolesAllowed({"ADMIN"})
     public Response deleteCase(@PathParam("id") Long id) {
         caseService.deleteCase(id);
         return Response.noContent().build();
