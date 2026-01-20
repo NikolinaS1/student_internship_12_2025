@@ -32,10 +32,17 @@ export interface Case {
 })
 export class CaseService {
 
+  private apiUrl = '';
+
   constructor(
     private http: HttpClient,
     private configService: ConfigService
-  ) {}
+  ) {
+    this.configService.getConfig().subscribe(config => {
+      this.apiUrl = `${config.Urls.apiUrl}/cases`;
+    });
+  }
+
 
   // ----- BASIC CRUD -----
   getAllCases(): Observable<Case[]> {

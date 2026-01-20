@@ -2,12 +2,23 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
+import { ConfigService } from './config.service';
+
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private readonly baseUrl = 'https://unpoliced-ray-cisted.ngrok-free.dev/';
+  private  baseUrl = '';
 
-  constructor(private router: Router, private http: HttpClient) { }
+  constructor(
+  private http: HttpClient,
+  private router: Router,
+  private configService: ConfigService
+) {
+  this.configService.getConfig().subscribe(config => {
+    this.baseUrl = config.Urls.apiUrl;
+  });
+}
+
 
   private decodeJWT(token: string): any {
     try {
@@ -27,7 +38,7 @@ export class AuthService {
       case 'hospital':
         return '/hospital';
       default:
-        return '/hospital';
+        return '/error';
     }
   }
 

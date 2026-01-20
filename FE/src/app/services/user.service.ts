@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { ConfigService } from './config.service';
+
 
 export type UserRole = 'VEHICLE' | 'HOSPITAL' | 'ADMIN';
 
@@ -15,16 +17,22 @@ export class UserService {
 
     private usersSubject = new BehaviorSubject<User[]>([]);
 
-    private readonly apiUrl =
-        'https://noncommiserative-marcela-suably.ngrok-free.dev/admin/users';
+    private apiUrl = '';
 
     private readonly ngrokHeaders = new HttpHeaders({
         'ngrok-skip-browser-warning': 'true'
     });
 
-    constructor(private http: HttpClient) {
-        this.loadUsers();
+    constructor(
+        private http: HttpClient,
+        private configService: ConfigService
+    ) {
+        this.configService.getConfig().subscribe(config => {
+            this.apiUrl = `${config.Urls.apiUrl}/admin/users`;
+            this.loadUsers();
+        });
     }
+
 
     private loadUsers(): void {
         this.http.get<User[]>(this.apiUrl, { headers: this.ngrokHeaders }).subscribe({

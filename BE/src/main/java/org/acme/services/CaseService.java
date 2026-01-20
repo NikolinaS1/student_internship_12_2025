@@ -72,14 +72,14 @@ public class CaseService {
         return caseEntity;
     }
 
-    //TO BE CHECKED
     @Transactional
     public Case endCase(Long caseId, EndCaseRequest request) {
-        Case caseEntity = getCaseOrThrow(caseId);
-
-        caseEntity.setIsActive(false);
+        Case caseEntity = Case.findById(caseId);
+        if (caseEntity == null) {
+            throw new NotFoundException("Case not found");
+        }
+        caseEntity.setIsActive(request.isActive());
         caseEntity.persist();
-
         return caseEntity;
     }
 
