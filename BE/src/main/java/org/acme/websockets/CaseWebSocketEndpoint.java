@@ -5,8 +5,8 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.websocket.*;
 import jakarta.websocket.server.ServerEndpoint;
-import org.acme.dtos.cases.CaseResponse;
-
+import org.acme.dtos.cases.LocationUpdateRequest;
+import org.acme.services.RoutingService;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -19,52 +19,55 @@ public class CaseWebSocketEndpoint {
     @Inject
     ObjectMapper objectMapper;
 
+    @Inject
+    RoutingService routingService;
+
     @OnOpen
     public void onOpen(Session session) {
         sessions.put(session.getId(), session);
-        System.out.println("WebSocket opened: " + session.getId());
     }
 
     @OnClose
     public void onClose(Session session) {
         sessions.remove(session.getId());
-        System.out.println("WebSocket closed: " + session.getId());
-    }
-
-    @OnError
-    public void onError(Session session, Throwable throwable) {
-        System.err.println("WebSocket error: " + throwable.getMessage());
-        sessions.remove(session.getId());
     }
 
     @OnMessage
-    public void onMessage(String message, Session session) {
-        System.out.println("Received message: " + message);
-        broadcast(message);
-    }
-
-    public void broadcastCaseUpdate(CaseResponse caseResponse, String eventType) {
+    public void onMessage(String message) {
         try {
-            String message = objectMapper.writeValueAsString(Map.of(
-                    "type", eventType,
-                    "data", caseResponse
-            ));
+            LocationUpdateRequest req = objectMapper.readValue(message, LocationUpdateRequest.class);
 
-            broadcast(message);
+            if ("LOCATION_UPDATE".equals(req.type())) {
+                double eta = routingService.calculateEtaInMinutes(req.latitude(), req.longitude());
+
+                String responsePayload = objectMapper.writeValueAsString(Map.of(
+                        "type", "LOCATION_UPDATE",
+                        "caseId", req.caseId(),
+                        "latitude", req.latitude(),
+                        "longitude", req.longitude(),
+                        "etaMinutes", eta
+                ));
+
+                broadcast(responsePayload);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private void broadcast(String message) {
+    public void broadcast(String message) {
         sessions.values().forEach(session -> {
-            if (session.isOpen()) {
-                try {
-                    session.getAsyncRemote().sendText(message);
-                } catch (Exception e) {
-                    System.err.println("Greška pri slanju sesiji " + session.getId() + ": " + e.getMessage());
-                }
+            try {
+                session.getAsyncRemote().sendText(message);
+            } catch (Exception e) {
+                System.err.println("Greška pri slanju sesiji " + session.getId() + ": " + e.getMessage());
             }
         });
+    }
+
+    public void broadcastCaseUpdate(Object data, String eventType) {
+        try {
+            broadcast(objectMapper.writeValueAsString(Map.of("type", eventType, "data", data)));
+        } catch (Exception e) { e.printStackTrace(); }
     }
 }
