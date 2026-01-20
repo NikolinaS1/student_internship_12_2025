@@ -21,7 +21,7 @@ export class WebSocketService implements OnDestroy {
 
   connect(): Observable<WebSocketMessage> {
     this.configService.getConfig().subscribe(config => {
-      this.establishConnection(config.wsUrl);
+      this.establishConnection(config.Urls.wsUrl);
     });
 
     return this.messageSubject.asObservable();
