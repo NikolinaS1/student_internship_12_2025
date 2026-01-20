@@ -1,1 +1,17 @@
-/* You can add global styles to this file, and also import other style files */
+@import './app/hospital-styles/theme.scss';
+@import './app/hospital-styles/base.scss';
+@import './app/hospital-styles/ui.scss';
+@import './app/hospital-styles/dashboard.scss';
+@import './app/hospital-styles/case_detail.scss';
+
+:root {
+  --border-color: #e9ecef;
+  --radius: 12px;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background-color: var(--bg-gray);
+  overflow: hidden;
+}

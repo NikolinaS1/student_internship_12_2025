@@ -28,7 +28,7 @@ export class UserService {
         private configService: ConfigService
     ) {
         this.configService.getConfig().subscribe(config => {
-            this.apiUrl = `${config.apiUrl}/admin/users`;
+            this.apiUrl = `${config.Urls.apiUrl}/admin/users`;
             this.loadUsers();
         });
     }

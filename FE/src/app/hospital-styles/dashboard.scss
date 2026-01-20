@@ -1,0 +1,671 @@
+.page {
+  min-height: 100vh;
+  background: var(--background);
+  color: var(--foreground);
+}
+
+/* NAVBAR veći */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  height: 86px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+}
+
+.topbar__inner {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.brand__title {
+  font-size: 1.28rem;
+  font-weight: var(--font-weight-medium);
+  letter-spacing: 0.2px;
+}
+
+.brand__subtitle {
+  margin-top: 0.2rem;
+  font-size: 0.88rem;
+  color: var(--muted-foreground);
+}
+
+.topbar__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+/* =========================
+   VIEW 1 (cases left + map right)
+   Cilj: bez scrollanja stranice,
+   mapa stane u visinu i uvijek jednako vidljiva
+   ========================= */
+
+.overview {
+  --topbar-h: 86px;
+  --pad-y: 1.75rem; /* smanji vertikalni padding da stane u viewport */
+  --pad-x: 3rem;
+  --gap-x: 3rem;
+
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--gap-x);
+  padding: var(--pad-y) var(--pad-x);
+  align-items: start;
+
+  /* KLJUČ: cijeli view 1 stane u ekran (nema page scrolla) */
+  height: calc(100vh - var(--topbar-h));
+  box-sizing: border-box;
+  overflow: hidden; /* spriječi da bilo što gura stranicu u scroll */
+}
+
+/* LIJEVA polovica: sadržaj ide u stupac (title + subtitle + caseovi ispod) */
+.overview__left {
+  grid-column: 1;
+  height: 100%;
+  min-height: 0;          /* bitno za overflow u gridu */
+  overflow: auto;         /* ako ikad bude puno caseova, scrolla samo lijevi dio */
+  padding-right: 0.35rem; /* malo prostora za scrollbar */
+
+  display: flex;
+  flex-direction: column; /* osigurava da su caseovi ispod opisa */
+  align-items: center;    /* centriraj blok unutar lijeve polovice */
+}
+
+/* Title/subtitle/cases imaju zajedničku širinu i centar */
+.overview__title,
+.overview__subtitle,
+.overview__cases {
+  width: 100%;
+  max-width: 1120px;
+}
+
+.heading_flex {
+  display: flex;
+  justify-content: left;
+  width: 100%;
+  margin-bottom: 1.25rem;
+}
+
+.overview__head {
+  margin-left: 1rem;
+}
+
+.overview__title {
+  font-size: 1.12rem;
+  font-weight: var(--font-weight-medium);
+}
+
+.overview__subtitle {
+  margin-top: 0.35rem;
+  font-size: 1rem;
+  color: var(--muted-foreground);
+}
+
+/* Case grid */
+.overview__cases {
+  margin-top: 1.35rem;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.35rem;
+}
+
+/* DESNA polovica: sticky blok koji u sebi ima map card visine ekrana */
+.overview__right {
+  grid-column: 2;
+  height: 100%;
+  min-height: 0;
+
+  position: sticky;
+  top: var(--topbar-h);
+  display: flex;
+  justify-content: center;
+  align-items: stretch; /* mapa se rastegne po visini desnog stupca */
+}
+
+/* Map card mora fillati desni stupac po visini */
+.map-card {
+  width: 100%;
+  max-width: 900px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Body raste, header ostaje gore */
+.map-card__body {
+  padding: 1rem;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.card__subtitle{
+  font-size: 1.2rem;
+}
+
+/* iframe fill (ovo je ključ da se mapa prilagodi visini bez overflowa) */
+.map-frame {
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  height: auto;
+
+  display: block;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+}
+
+/* Responsive */
+@media (max-width: 1100px) {
+  .overview {
+    grid-template-columns: 1fr;
+    --pad-y: 1.25rem;
+    --pad-x: 1.25rem;
+    --gap-x: 1.5rem;
+
+    height: auto;
+    overflow: visible;
+  }
+
+  .overview__left {
+    height: auto;
+    overflow: visible;
+    padding-right: 0;
+  }
+
+  .overview__cases {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .overview__right {
+    position: static;
+    top: auto;
+    height: auto;
+    align-items: flex-start;
+  }
+
+  .map-frame {
+    aspect-ratio: 1 / 1;
+    height: auto;
+  }
+}
+
+@media (max-width: 640px) {
+  .overview__cases {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* PRIORITY DOT */
+.priority-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  margin-top: 4px;
+}
+
+
+.dot-high { 
+  background: var(--high); 
+  box-shadow: 0 0 0 4px rgba(255, 0, 0, 0.649);
+}
+.dot-medium { 
+  background: var(--medium); 
+  box-shadow: 0 0 0 4px rgba(238, 255, 0, 0.722);
+}
+.dot-low { 
+  background: var(--low); 
+  box-shadow: 0 0 0 4px rgba(123, 241, 50, 0.512);
+}
+
+/* CASE CARD */
+.case-card {
+  width: 100%;
+  background: var(--card);
+  border: 4px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: 1.25rem;
+  text-align: left;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: transform 120ms ease, box-shadow 150ms ease, background 150ms ease, border-color 150ms ease;
+}
+
+.case-card:hover {
+  background: var(--accent);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.case-card--disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* OUTER BORDER BY PRIORITY (glavni zahtjev) */
+.case-card--critical { 
+  border-color: var(--destructive); 
+  border-width: 5px;
+}
+.case-card--urgent { 
+  border-color: var(--sos); 
+  border-width: 5px;
+}
+.case-card--high { 
+  border-color: var(--high); 
+  border-width: 5px;
+}
+.case-card--medium { 
+  border-color: var(--medium); 
+  border-width: 4px;
+}
+.case-card--low { 
+  border-color: var(--low); 
+  border-width: 4px;
+}
+
+.case-card__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.9rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 1rem;
+}
+.case-card__name {
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+
+.case-card__meta {
+  margin-top: 0.3rem;
+  font-size: 0.92rem;
+  color: var(--muted-foreground);
+  font-weight: 500;
+}
+
+.case-card__grid {
+  margin-top: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.9rem;
+}
+
+.case-mini {
+  border: 1px solid var(--border);
+  background: rgba(0, 0, 0, 0.025);
+  border-radius: var(--radius-lg);
+  padding: 1rem;
+  transition: background 150ms ease;
+}
+
+.case-card:hover .case-mini {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.case-mini__label {
+  font-size: 0.85rem;
+  color: var(--muted-foreground);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.case-mini__value {
+  margin-top: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.case-mini__value--strong {
+  font-weight: 800;
+  font-size: 1.05rem;
+  letter-spacing: 0.3px;
+}
+
+/* ETA block */
+.case-eta {
+  grid-column: 1 / -1;
+  background: var(--secondary);
+  color: var(--primary);
+  border-radius: var(--radius-lg);
+  padding: 1rem 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.case-eta div:first-child {
+  font-size: 0.95rem;
+  opacity: 0.9;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.case-eta div:last-child {
+  font-size: 1.25rem;
+  letter-spacing: 0.3px;
+}
+
+.case-eta--compact {
+  padding: 0.85rem 1rem;
+}
+
+.case-summary {
+  grid-column: 1 / -1;
+  font-size: 0.98rem;
+  color: var(--foreground);
+  line-height: 1.5;
+  padding: 0.75rem 0;
+  border-top: 1px solid var(--border);
+  margin-top: 0.5rem;
+}
+
+/* VIEW 2 layout (ostaje kako je bilo) */
+.dashboard {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 1.2rem;
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  gap: 1.2rem;
+}
+
+@media (max-width: 960px) {
+  .dashboard {
+    grid-template-columns: 1fr;
+  }
+}
+
+.right-col {
+  display: grid;
+  gap: 1.2rem;
+}
+
+
+/* DETAILS */
+.details__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.details__name {
+  font-size: 1.18rem;
+  font-weight: var(--font-weight-medium);
+}
+
+.details__meta {
+  margin-top: 0.25rem;
+  font-size: 0.92rem;
+}
+
+.details__summary {
+  margin-top: 0.55rem;
+  font-size: 1rem;
+}
+
+.details__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.details__info {
+  margin-top: 1.1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.pill {
+  border: 1px solid var(--border);
+  background: rgba(0, 0, 0, 0.02);
+  border-radius: var(--radius-lg);
+  padding: 0.85rem 1rem;
+  font-size: 0.98rem;
+}
+
+.pill__label {
+  color: var(--muted-foreground);
+  font-weight: 700;
+}
+
+.pill__value {
+  margin-left: 0.35rem;
+  font-weight: 700;
+}
+
+.details__cta {
+  margin-top: 1.1rem;
+}
+
+/* CHAT */
+.chat {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  background: var(--card);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.chat__header {
+  padding: 1.1rem 1.2rem;
+  border-bottom: 1px solid var(--border);
+  font-weight: var(--font-weight-medium);
+  font-size: 1.02rem;
+}
+
+.chat__messages {
+  padding: 1.2rem;
+  max-height: 56vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.msg {
+  display: flex;
+}
+
+.msg--self {
+  justify-content: flex-end;
+}
+
+.msg--other {
+  justify-content: flex-start;
+}
+
+.bubble {
+  max-width: 70%;
+  border-radius: 16px;
+  padding: 0.95rem 1.05rem;
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+.bubble__meta {
+  font-size: 0.82rem;
+  opacity: 0.85;
+}
+
+.bubble__text {
+  margin-top: 0.35rem;
+}
+
+.bubble--self {
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border: 1px solid transparent;
+}
+
+.bubble--other {
+  background: rgba(0, 0, 0, 0.03);
+  color: var(--foreground);
+  border: 1px solid var(--border);
+}
+
+.chat__composer {
+  border-top: 1px solid var(--border);
+  padding: 1rem;
+  display: flex;
+  gap: 0.7rem;
+  align-items: center;
+}
+
+
+
+//LEAFLET STILIZACIJA
+
+.leaflet-map {
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+  z-index: 1;
+}
+
+.map-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+  padding: 10px;
+  background: #f0f9ff;
+  border-radius: 6px;
+}
+
+.eta-display {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.eta-label {
+  color: #666;
+}
+
+.eta-value {
+  color: #ef4444;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.distance-value {
+  color: #0284c7;
+  font-size: 13px;
+}
+
+.map-card__body {
+  position: relative;
+  height: 500px;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+/* Leaflet popup stilizacija */
+.leaflet-popup-content {
+  font-family: inherit;
+  font-size: 13px;
+}
+
+.leaflet-popup-content b {
+  color: #333;
+  font-weight: 600;
+}
+
+//LOADING / ERROR STATES
+.loading-state,
+.error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  color: #666;
+}
+
+.error-state {
+  background: #fef2f2;
+  color: #dc2626;
+  border-radius: 8px;
+  margin: 20px;
+}
+
+.spinner {
+  border: 3px solid #f0f0f0;
+  border-top: 3px solid #3b82f6;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 10px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.no-cases {
+  text-align: center;
+  padding: 40px 20px;
+  color: #999;
+}
+
+.case-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.btn-acknowledge {
+  flex: 1;
+  padding: 0.85rem 1.1rem;
+  background: var(--success);
+  color: white;
+  border: none;
+  border-radius: var(--radius-lg);
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  box-shadow: 0 2px 6px rgba(22, 163, 74, 0.25);
+}
+
+.btn-acknowledge:hover {
+  background: #008810;
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.35);
+  transform: translateY(-1px);
+}
+
+.btn-acknowledge:active {
+  transform: translateY(0);
+}

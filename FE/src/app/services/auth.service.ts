@@ -15,7 +15,7 @@ export class AuthService {
   private configService: ConfigService
 ) {
   this.configService.getConfig().subscribe(config => {
-    this.baseUrl = config.apiUrl;
+    this.baseUrl = config.Urls.apiUrl;
   });
 }
 
@@ -81,7 +81,7 @@ export class AuthService {
     }
     localStorage.removeItem('auth_token');
     localStorage.removeItem('loggedIn');
-    this.router.navigate(['/']);
+    this.router.navigate(['/login']);
   }
 
   isLoggedIn(): boolean {
