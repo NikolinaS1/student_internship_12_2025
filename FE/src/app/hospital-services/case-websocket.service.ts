@@ -9,6 +9,7 @@ export interface WebSocketMessage {
   caseId?: number;
   latitude?: number;
   longitude?: number;
+  etaMinutes?: number;
 }
 
 @Injectable({ providedIn: 'root' })

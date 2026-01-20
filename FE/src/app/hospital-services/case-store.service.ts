@@ -60,7 +60,7 @@ export class CaseService {
 
         case 'LOCATION_UPDATE':
           if (message.caseId && message.latitude && message.longitude) {
-            this.handleLocationUpdate(message.caseId, message.latitude, message.longitude);
+            this.handleLocationUpdate(message.caseId, message.latitude, message.longitude, message.etaMinutes);
           }
           break;
       }
@@ -121,7 +121,7 @@ export class CaseService {
   /**
    * Handle location update for case
    */
-  private handleLocationUpdate(caseId: number, latitude: number, longitude: number) {
+  private handleLocationUpdate(caseId: number, latitude: number, longitude: number, etaMinutes?: number) {
     const idx = this.cases().findIndex(c => c.id === caseId);
 
     if (idx >= 0) {
@@ -130,7 +130,8 @@ export class CaseService {
         updated[idx] = {
           ...updated[idx],
           latitude,
-          longitude
+          longitude,
+          ...(etaMinutes != undefined && { etaMinutes }), // Only update if etaMinutes
         };
         return updated;
       });
@@ -141,7 +142,8 @@ export class CaseService {
         this.selectedCase.update(current => current ? {
           ...current,
           latitude,
-          longitude
+          longitude,
+          ...(etaMinutes != undefined && { etaMinutes }), 
         } : null);
       }
     }
