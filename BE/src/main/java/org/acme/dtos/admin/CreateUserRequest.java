@@ -19,3 +19,5 @@ public record CreateUserRequest(
         @NotNull(message = "Role is required")
         Role role
 ) {}
+
+

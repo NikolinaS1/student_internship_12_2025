@@ -31,7 +31,7 @@ public class PasswordService {
             throw new ValidationException("Password must contain a number");
         }
 
-        if (!password.matches(".*[@$!%*?&#].*")) {
+        if (!password.matches(".*[!@#$%^&*(),.?\":{}|<>].*")) {
             throw new ValidationException("Password must contain a special character");
         }
     }
