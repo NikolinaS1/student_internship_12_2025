@@ -74,10 +74,8 @@ public class CaseService {
 
     @Transactional
     public Case endCase(Long caseId, EndCaseRequest request) {
-        Case caseEntity = Case.findById(caseId);
-        if (caseEntity == null) {
-            throw new NotFoundException("Case not found");
-        }
+        Case caseEntity = getCaseOrThrow(caseId);
+
         caseEntity.setIsActive(request.isActive());
         caseEntity.persist();
         return caseEntity;
