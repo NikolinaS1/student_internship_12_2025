@@ -326,7 +326,7 @@ export class CaseModal implements OnChanges {
         
         this.closeModal();
       },
-      error: (error) => {
+      error: (error: any) => {
         console.error(this.editMode ? '❌ Error updating case:' : '❌ Error creating case:', error);
         console.error('Status:', error.status);
         console.error('Error body:', error.error);

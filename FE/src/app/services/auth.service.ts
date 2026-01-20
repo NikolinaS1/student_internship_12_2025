@@ -44,7 +44,7 @@ export class AuthService {
 
   async login(name: string, password: string): Promise<boolean> {
     try {
-      const url = `${this.baseUrl}user/login`;
+      const url = `${this.baseUrl}/user/login`;
       const body = { name, password };
       const resp: any = await firstValueFrom(
         this.http.post(url, body, { headers: new HttpHeaders({ 'Content-Type': 'application/json' }) })
@@ -72,7 +72,7 @@ export class AuthService {
   async logout(): Promise<void> {
     const token = localStorage.getItem('auth_token');
     if (token) {
-      const url = `${this.baseUrl}user/logout`;
+      const url = `${this.baseUrl}/user/logout`;
       const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
       try {
         await firstValueFrom(this.http.post(url, {}, { headers }));

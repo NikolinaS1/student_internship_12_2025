@@ -26,7 +26,7 @@ public class CaseResource {
     CaseWebSocketEndpoint webSocketEndpoint;
 
     @GET
-    @RolesAllowed({"ADMIN", "HOSPITAL"})
+    //@RolesAllowed({"ADMIN", "HOSPITAL"})
     public Response getAllCases() {
         List<Case> cases = caseService.getAllCases();
         List<CaseResponse> responses = cases.stream()
