@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
+import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
+import { Observable, throwError, switchMap } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { ConfigService } from './config.service';
+import { CreateCaseDTO } from '../models/case.model';
 
 export interface Case {
   id: number;
@@ -30,31 +32,86 @@ export interface Case {
 })
 export class CaseService {
 
-  private apiUrl = 'http://localhost:8080/cases';
+  constructor(
+    private http: HttpClient,
+    private configService: ConfigService
+  ) {}
 
-  constructor(private http: HttpClient) { }
-
+  // ----- BASIC CRUD -----
   getAllCases(): Observable<Case[]> {
-    return this.http.get<Case[]>(this.apiUrl).pipe(
-      catchError(this.handleError)
+    return this.configService.getConfig().pipe(
+      switchMap(config => {
+        const url = `${config.Urls.apiUrl}/cases`;
+        return this.http.get<Case[]>(url).pipe(
+          catchError(this.handleError)
+        );
+      })
     );
   }
 
   getCaseById(id: number): Observable<Case> {
-    return this.http.get<Case>(`${this.apiUrl}/${id}`).pipe(
-      catchError(this.handleError)
+    return this.configService.getConfig().pipe(
+      switchMap(config => {
+        const url = `${config.Urls.apiUrl}/cases/${id}`;
+        return this.http.get<Case>(url).pipe(
+          catchError(this.handleError)
+        );
+      })
     );
   }
 
   deleteCase(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`).pipe(
-      catchError(this.handleError)
+    return this.configService.getConfig().pipe(
+      switchMap(config => {
+        const url = `${config.Urls.apiUrl}/cases/${id}`;
+        return this.http.delete<void>(url).pipe(
+          catchError(this.handleError)
+        );
+      })
     );
+  }
+
+  // ----- REGULAR CASE -----
+  createRegularCase(caseData: CreateCaseDTO, token?: string): Observable<any> {
+    return this.configService.getConfig().pipe(
+      switchMap(config => {
+        const url = `${config.Urls.apiUrl}/cases/regular`;
+        const headers = this.createHeaders(token);
+        return this.http.post(url, caseData, { headers }).pipe(
+          catchError(this.handleError)
+        );
+      })
+    );
+  }
+
+  updateRegularCase(caseId: string, caseData: CreateCaseDTO, token?: string): Observable<any> {
+    return this.configService.getConfig().pipe(
+      switchMap(config => {
+        const url = `${config.Urls.apiUrl}/cases/${caseId}`;
+        const headers = this.createHeaders(token);
+        return this.http.put(url, caseData, { headers }).pipe(
+          catchError(this.handleError)
+        );
+      })
+    );
+  }
+
+  // ----- HELPERS -----
+  private createHeaders(token?: string): HttpHeaders {
+    let headers = new HttpHeaders()
+      .set('Content-Type', 'application/json')
+      .set('userId', '1'); // TODO: Replace with actual user ID from auth service
+
+    if (token) {
+      headers = headers.set('Authorization', `Bearer ${token}`);
+    }
+
+    return headers;
   }
 
   private handleError(error: HttpErrorResponse): Observable<never> {
     let errorMessage = 'An error occurred';
-    
+
     if (error.error instanceof ErrorEvent) {
       // Client-side error
       errorMessage = `Client error: ${error.error.message}`;
@@ -62,7 +119,7 @@ export class CaseService {
       // Server-side error
       errorMessage = `Server error: ${error.status} - ${error.message}`;
     }
-    
+
     console.error(errorMessage);
     return throwError(() => new Error(errorMessage));
   }
