@@ -7,6 +7,7 @@ import org.acme.dtos.cases.AcknowledgeCaseRequest;
 import org.acme.dtos.cases.RegularCaseCreateRequest;
 import org.acme.dtos.cases.SosCaseCreateRequest;
 import org.acme.dtos.cases.UpdateCaseRequest;
+import org.acme.dtos.cases.EndCaseRequest;
 import org.acme.enums.Priority;
 import org.acme.models.Case;
 import org.acme.models.User;
@@ -68,6 +69,17 @@ public class CaseService {
 
         caseEntity.setAcknowledged(request.acknowledged());
         caseEntity.persist();
+        return caseEntity;
+    }
+
+    //TO BE CHECKED
+    @Transactional
+    public Case endCase(Long caseId, EndCaseRequest request) {
+        Case caseEntity = getCaseOrThrow(caseId);
+
+        caseEntity.setIsActive(false);
+        caseEntity.persist();
+
         return caseEntity;
     }
 
