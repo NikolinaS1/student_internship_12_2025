@@ -133,7 +133,7 @@
         </div>
       </div>
 
-      <!-- Enhanced chat -->
+
       <div class="chat">
         <div class="chat__header">
           <span>Case Communication</span>
@@ -143,6 +143,7 @@
         </div>
 
         <div #chatScroll class="chat__messages">
+          <!-- System message -->
           <div class="msg msg--other">
             <div class="bubble bubble--other">
               <div class="bubble__meta">
@@ -152,12 +153,30 @@
             </div>
           </div>
 
+          <!-- Acknowledged message -->
           <div class="msg msg--self" *ngIf="isAcknowledged()">
             <div class="bubble bubble--self">
               <div class="bubble__meta">
                 Hospital Dispatch • {{ selectedCase.createdAt | date: 'HH:mm' }}
               </div>
               <div class="bubble__text">Case acknowledged and confirmed</div>
+            </div>
+          </div>
+
+          <!-- Real messages from WebSocket -->
+          <div 
+            *ngFor="let msg of messages" 
+            class="msg"
+            [ngClass]="isSelfMessage(msg) ? 'msg--self' : 'msg--other'"
+          >
+            <div 
+              class="bubble"
+              [ngClass]="isSelfMessage(msg) ? 'bubble--self' : 'bubble--other'"
+            >
+              <div class="bubble__meta">
+                {{ isSelfMessage(msg) ? 'You' : 'Vehicle' }} • {{ msg.createdAt | date: 'HH:mm' }}
+              </div>
+              <div class="bubble__text">{{ msg.content }}</div>
             </div>
           </div>
         </div>

@@ -4,7 +4,7 @@ import { NgClass } from '@angular/common';
 import * as L from 'leaflet';
 import { WebSocketLocationService, RemoteLocation } from '../../hospital-services/location-ws.service';
 import { CaseService } from '../../hospital-services/case-store.service';
-import { AuthService } from '../../hospital-services/auth-service';
+import { HospitalAuthService } from '../../hospital-services/auth-service';
 import { CaseModel } from '../../hospital-models/case-model';
 import { CaseWebSocketService } from '../../hospital-services/case-websocket.service';
 import { ConfigService } from '../../hospital-services/config-service';
@@ -21,7 +21,7 @@ export class CasesOverviewComponent implements OnInit, AfterViewInit, OnDestroy 
 
   private wsService = inject(WebSocketLocationService);
   private caseService = inject(CaseService);
-  private authService = inject(AuthService);
+  private authService = inject(HospitalAuthService);
   private caseWsService = inject(CaseWebSocketService);
   private configService = inject(ConfigService);
 
