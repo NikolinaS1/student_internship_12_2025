@@ -93,7 +93,8 @@
 
 .heading_flex {
   display: flex;
-  justify-content: left;
+  justify-content: space-between;
+  align-items: center;
   width: 100%;
   margin-bottom: 1.25rem;
 }
@@ -111,6 +112,16 @@
   margin-top: 0.35rem;
   font-size: 1rem;
   color: var(--muted-foreground);
+}
+
+
+.sort-dropdown {
+  margin-right: 1rem;
+}
+
+.sort-dropdown-sidebar {
+  margin-top: 0.75rem;
+  width: 100%;
 }
 
 /* Case grid */

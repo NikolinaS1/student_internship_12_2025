@@ -182,6 +182,17 @@
 }
 
 
+.sort-dropdown {
+  margin-left: auto;
+  margin-right: 1rem;
+}
+
+.sort-dropdown-sidebar {
+  margin-top: 0.75rem;
+  width: 100%;
+}
+
+
 /* ===== 2) Middle: sticky content (no scroll), only chat scrolls ===== */
 .case-detail__middle {
   height: 100%;
@@ -264,7 +275,7 @@
   flex-wrap: wrap;
 }
 
-/* CHANGED: New vital signs grid */
+
 .details__vitals {
   margin-bottom: 1.25rem;
 }

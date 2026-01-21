@@ -6,12 +6,18 @@
         <!-- English translation -->
         <div class="card__title">Active Cases</div>
         <div class="muted card__subtitle">Select another case to switch.</div>
+
+        <app-custom-sort-dropdown
+          [sortOptions]="sortOptions"
+          [selectedOption]="sortOption"
+          (sortChange)="onSortChange($event)"
+        ></app-custom-sort-dropdown>
       </div>
 
       <!-- Display all cases passed from parent -->
       <div class="sidebar__list">
+        @for (c of sortedCases; track c.id) {
         <button
-          *ngFor="let c of allCases"
           type="button"
           (click)="onCaseSelect(c)"
           class="sidebar-item"
@@ -56,7 +62,7 @@
               <span class="row__value--strong">{{ c.etaMinutes || '-' }} min</span>
             </div>
           </div>
-        </button>
+        </button>}
       </div>
     </div>
   </aside>
