@@ -61,18 +61,18 @@
     }
 
     .blue {
-        background: #eef2ff;
-        color: #3730a3;
+        background: #f0f9ff;
+        color: #0284c7;
     }
 
     .green {
-        background: #ecfdf5;
-        color: #047857;
+        background: #e0f2fe;
+        color: #0369a1;
     }
 
     .purple {
-        background: #faf5ff;
-        color: #6d28d9;
+        background: #e2e8f0;
+        color: #1e293b;
     }
 }
 
@@ -120,6 +120,9 @@
 
     .icon {
         font-size: 18px;
+        line-height: 1;
+        display: inline-flex;
+        align-items: center;
     }
 }
 
@@ -130,4 +133,26 @@
     border-radius: 18px;
     padding: 2rem;
     box-shadow: 0 20px 50px rgba(0, 0, 0, 0.06);
+    max-height: calc(100vh - 400px);
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    /* Custom scrollbar */
+    &::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: #f1f5f9;
+        border-radius: 10px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 10px;
+        
+        &:hover {
+            background: #94a3b8;
+        }
+    }
 }

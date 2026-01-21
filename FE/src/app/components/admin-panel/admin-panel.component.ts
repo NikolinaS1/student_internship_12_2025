@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
 import { UserService, User } from '../../services/user.service';
+import { CaseService } from '../../services/case.service';
 import { UserManagementComponent } from '../user-management/user-management.component';
 import { CaseManagementComponent } from '../case-management/case-management.component';
 import { Subscription } from 'rxjs';
@@ -23,16 +24,27 @@ export class AdminPanelComponent implements OnInit, OnDestroy {
   emsUsersCount = 0;
   hospitalUsersCount = 0;
   totalUsersCount = 0;
-  totalCasesCount = 0; // Placeholder, since case service is empty
+  totalCasesCount = 0;
 
   private subscription: Subscription = new Subscription();
 
-  constructor(public auth: AuthService, private userService: UserService) { }
+  constructor(
+    public auth: AuthService, 
+    private userService: UserService,
+    private caseService: CaseService
+  ) { }
 
   ngOnInit() {
     this.subscription.add(
       this.userService.users$.subscribe(users => {
         this.updateStats(users);
+      })
+    );
+
+    // Subscribe to cases count
+    this.subscription.add(
+      this.caseService.cases$.subscribe(cases => {
+        this.totalCasesCount = cases.length;
       })
     );
   }

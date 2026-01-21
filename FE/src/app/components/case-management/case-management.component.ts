@@ -1,39 +1,45 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { OverlayModalComponent } from '../overlay-modal/overlay-modal.component';
 import { CaseService } from '../../services/case.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-case-management',
   standalone: true,
-  imports: [CommonModule, OverlayModalComponent],
+  imports: [CommonModule, FormsModule, OverlayModalComponent],
   templateUrl: './case-management.component.html',
   styleUrl: './case-management.component.scss'
 })
-export class CaseManagementComponent implements OnInit {
+export class CaseManagementComponent implements OnInit, OnDestroy {
 
   selectedCase: any = null;
   showDeleteConfirmation: boolean = false;
   caseToDelete: any = null;
   cases: any[] = [];
+  filteredCases: any[] = [];
+
+  /** FILTERS */
+  searchTerm: string = '';
+  sosFilter: 'ALL' | 'SOS' | 'NON_SOS' = 'ALL';
 
   currentYear: number = new Date().getFullYear();
+  private subscription: Subscription = new Subscription();
 
   constructor(private caseService: CaseService) { }
 
   ngOnInit(): void {
-    this.loadCases();
+    this.subscription.add(
+      this.caseService.cases$.subscribe(cases => {
+        this.cases = cases;
+        this.applyFilters();
+      })
+    );
   }
 
-  loadCases(): void {
-    this.caseService.getAllCases().subscribe({
-      next: (data) => {
-        this.cases = data;
-      },
-      error: (error) => {
-        console.error('Error fetching cases:', error);
-      }
-    });
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
   }
 
   openCase(c: any) {
@@ -53,9 +59,9 @@ export class CaseManagementComponent implements OnInit {
     if (this.caseToDelete) {
       this.caseService.deleteCase(this.caseToDelete.id).subscribe({
         next: () => {
-          this.cases = this.cases.filter(c => c.id !== this.caseToDelete.id);
           this.caseToDelete = null;
           this.showDeleteConfirmation = false;
+          this.selectedCase = null;
         },
         error: (error) => {
           console.error('Error deleting case:', error);
@@ -83,5 +89,28 @@ export class CaseManagementComponent implements OnInit {
       default:
         return '';
     }
+  }
+
+  /* -------------------------
+     FILTERS
+  -------------------------- */
+
+  applyFilters(): void {
+    this.filteredCases = this.cases.filter(c => {
+      const matchesSearch = c.patientName.toLowerCase().includes(this.searchTerm.toLowerCase());
+      const matchesSos = 
+        this.sosFilter === 'ALL' || 
+        (this.sosFilter === 'SOS' && c.isSos) || 
+        (this.sosFilter === 'NON_SOS' && !c.isSos);
+      return matchesSearch && matchesSos;
+    });
+  }
+
+  onSearchChange(): void {
+    this.applyFilters();
+  }
+
+  onSosFilterChange(): void {
+    this.applyFilters();
   }
 }

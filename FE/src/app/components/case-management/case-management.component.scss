@@ -19,6 +19,55 @@
     }
 }
 
+/* FILTERS */
+.filters-container {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+
+    .search-input {
+        flex: 1;
+        
+        input {
+            width: 100%;
+            height: 42px;
+            padding: 0 16px;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 14px;
+            transition: border-color 0.15s ease;
+
+            &:focus {
+                outline: none;
+                border-color: #0f172a;
+            }
+
+            &::placeholder {
+                color: #9ca3af;
+            }
+        }
+    }
+
+    .sos-filter {
+        select {
+            height: 42px;
+            padding: 0 16px;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 14px;
+            background: white;
+            cursor: pointer;
+            transition: border-color 0.15s ease;
+            min-width: 180px;
+
+            &:focus {
+                outline: none;
+                border-color: #0f172a;
+            }
+        }
+    }
+}
+
 /* TABLE */
 .case-table {
     width: 100%;
