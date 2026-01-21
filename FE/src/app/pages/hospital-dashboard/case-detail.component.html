@@ -17,6 +17,7 @@
           class="sidebar-item"
           [ngClass]="[
             c.id === selectedCase.id ? 'sidebar-item--active' : '',
+            isSos(c) == true ? 'sidebar-item--sos' :
             c.priority === 'HIGH' ? 'sidebar-item--high' :
             c.priority === 'MEDIUM' ? 'sidebar-item--medium' : 'sidebar-item--low'
           ]"
@@ -27,6 +28,7 @@
               <div class="sidebar-item__meta">{{ 2025 - c.birthYear }} years • #{{ c.id }}</div>
             </div>
             <span class="priority-dot" [ngClass]="[
+              isSos(c) == true ? 'dot-sos' :
               c.priority === 'HIGH' ? 'dot-high' :
               c.priority === 'MEDIUM' ? 'dot-medium' : 'dot-low'
             ]"></span>

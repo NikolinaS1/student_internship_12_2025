@@ -63,6 +63,11 @@
 }
 
 /* CHANGED: Priority border colors for sidebar */
+.sidebar-item--sos{
+  border-color: var(--sos); 
+  border-width: 4px;
+}
+
 .sidebar-item--high { 
   border-color: var(--high); 
   border-width: 4px;

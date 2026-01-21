@@ -290,4 +290,8 @@ export class CasesOverviewComponent implements OnInit, AfterViewInit, OnDestroy 
   isActive(c: CaseModel): boolean {
     return c.isActive;
   }
+  
+  isSos(c: CaseModel): boolean{
+    return c.isSos;
+  }
 }

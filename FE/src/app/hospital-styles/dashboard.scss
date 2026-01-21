@@ -218,7 +218,10 @@
   margin-top: 4px;
 }
 
-
+.dot-sos { 
+  background: var(--sos); 
+  box-shadow: 0 0 0 4px rgba(255, 0, 0, 0.463);
+}
 .dot-high { 
   background: var(--high); 
   box-shadow: 0 0 0 4px rgba(255, 0, 0, 0.649);
@@ -257,17 +260,13 @@
 }
 
 /* OUTER BORDER BY PRIORITY (glavni zahtjev) */
-.case-card--critical { 
-  border-color: var(--destructive); 
-  border-width: 5px;
-}
-.case-card--urgent { 
+.case-card--sos { 
   border-color: var(--sos); 
   border-width: 5px;
 }
 .case-card--high { 
   border-color: var(--high); 
-  border-width: 5px;
+  border-width: 4px;
 }
 .case-card--medium { 
   border-color: var(--medium); 

@@ -182,6 +182,9 @@ export class CaseDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   isActive(): boolean {
     return this.selectedCase?.status !== 'CLOSED';
   }
+  isSos(c: CaseModel): boolean {
+    return c.isSos;
+  }
 
   isAcknowledged(): boolean {
     return this.selectedCase?.acknowledged ?? false;
