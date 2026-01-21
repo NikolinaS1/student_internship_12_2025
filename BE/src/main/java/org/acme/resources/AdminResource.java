@@ -5,9 +5,7 @@ import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import jakarta.annotation.security.RolesAllowed;
 
-import org.acme.exeptions.ConflictException;
 import org.acme.services.AdminService;
 import org.acme.dtos.admin.CreateUserRequest;
 import org.acme.dtos.admin.ChangePasswordRequest;
@@ -15,7 +13,7 @@ import org.acme.dtos.admin.UserResponse;
 import org.acme.dtos.admin.UpdateUserRequest;
 
 import java.util.List;
-import java.util.Map;
+
 
 @Path("/admin/users")
 @Consumes(MediaType.APPLICATION_JSON)
