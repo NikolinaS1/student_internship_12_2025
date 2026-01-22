@@ -5,7 +5,8 @@ import org.acme.enums.Role;
 public record UserResponse(
         String id,
         String username,
-        Role role
+        Role role,
+        Boolean isEnabled
 ) {
 
     public static UserResponse from(User user) {
@@ -13,7 +14,8 @@ public record UserResponse(
         return new UserResponse(
                 user.id.toString(),
                 user.getName(),
-                user.getRole()
+                user.getRole(),
+                user.getIsEnabled()
         );
     }
 

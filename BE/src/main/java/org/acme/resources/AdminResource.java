@@ -42,6 +42,7 @@ public class AdminResource {
 
     }
 
+    /*
     // DELETE /admin/users/{id}
     @DELETE
     @Path("/{id}")
@@ -51,6 +52,7 @@ public class AdminResource {
             return Response.noContent().build();
 
     }
+    */
 
     // PUT /admin/users/{id}/password
     @PUT
@@ -73,5 +75,10 @@ public class AdminResource {
             return Response.ok(updated).build();
     }
 
-
+    @PUT
+    @Path("/{id}/status")
+    public Response toggleUserStatus(@PathParam("id") Long id) {
+        adminService.toggleUserStatus(id);
+        return Response.noContent().build();
+    }
 }

@@ -45,13 +45,14 @@ import org.jboss.logging.Logger;
         user.setName(request.username());
         user.setPassword(passwordService.hash(request.password()));
         user.setRole(request.role());
+        user.setIsEnabled(true);
 
         user.persist();
         LOG.infof("User created successfully: id=%d, username=%s, role=%s", user.id, user.getName(), user.getRole());
         return UserResponse.from(user);
     }
 
-
+    /*
     @Transactional
     public void deleteUser(Long id) {
         LOG.infof("Attempting to delete user with id: %d", id);
@@ -61,6 +62,16 @@ import org.jboss.logging.Logger;
 
         }
         LOG.infof("User deleted successfully: id=%d", id);
+    }
+    */
+
+    @Transactional
+    public void toggleUserStatus(Long id) {
+        User user = User.findById(id);
+        if (user == null) {
+            throw new NotFoundException("User with ID " + id + " not found");
+        }
+        user.setIsEnabled(!user.getIsEnabled());
     }
 
     @Transactional
