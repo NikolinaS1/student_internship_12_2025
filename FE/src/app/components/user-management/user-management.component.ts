@@ -21,6 +21,11 @@ export class UserManagementComponent implements OnInit, OnDestroy {
 
   /** USERS */
   users: User[] = [];
+  filteredUsers: User[] = [];
+
+  /** FILTERS */
+  searchTerm: string = '';
+  selectedRole: UserRole | 'ALL' = 'ALL';
 
   /** CREATE FORM */
   newUser = {
@@ -43,12 +48,13 @@ export class UserManagementComponent implements OnInit, OnDestroy {
 
   private subscription: Subscription = new Subscription();
 
-  constructor(private userService: UserService) {}
+  constructor(private userService: UserService) { }
 
   ngOnInit() {
     this.subscription.add(
       this.userService.users$.subscribe(users => {
         this.users = users;
+        this.applyFilters();
       })
     );
   }
@@ -96,6 +102,12 @@ export class UserManagementComponent implements OnInit, OnDestroy {
       return;
     }
 
+    // Check for duplicate username
+    if (this.isUsernameTaken(this.newUser.username)) {
+      this.usernameError = 'There is already a user with this username';
+      return;
+    }
+
     if (!this.newUser.password) {
       this.passwordError = 'Password is required';
       return;
@@ -117,6 +129,12 @@ export class UserManagementComponent implements OnInit, OnDestroy {
 
     this.editUsernameError = this.validateUsername(this.editedUser.username);
     if (this.editUsernameError) {
+      return;
+    }
+
+    // Check for duplicate username (excluding the current user)
+    if (this.isUsernameTaken(this.editedUser.username, this.editedUser.id)) {
+      this.editUsernameError = 'There is already a user with this username';
       return;
     }
 
@@ -171,6 +189,33 @@ export class UserManagementComponent implements OnInit, OnDestroy {
       return 'Password must contain at least one special character';
     }
     return '';
+  }
+
+  isUsernameTaken(username: string, excludeUserId?: string): boolean {
+    return this.users.some(user => 
+      user.username.toLowerCase() === username.toLowerCase() && 
+      user.id !== excludeUserId
+    );
+  }
+
+  /* -------------------------
+     FILTERS
+  -------------------------- */
+
+  applyFilters(): void {
+    this.filteredUsers = this.users.filter(user => {
+      const matchesSearch = user.username.toLowerCase().includes(this.searchTerm.toLowerCase());
+      const matchesRole = this.selectedRole === 'ALL' || user.role === this.selectedRole;
+      return matchesSearch && matchesRole;
+    });
+  }
+
+  onSearchChange(): void {
+    this.applyFilters();
+  }
+
+  onRoleFilterChange(): void {
+    this.applyFilters();
   }
 
   /* -------------------------

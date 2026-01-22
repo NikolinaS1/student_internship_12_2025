@@ -87,4 +87,13 @@ export class AuthService {
   isLoggedIn(): boolean {
     return localStorage.getItem('auth_token') != null || localStorage.getItem('loggedIn') === 'true';
   }
+
+  getUserRole(): string | null {
+    const token = localStorage.getItem('auth_token');
+    if (!token) {
+      return null;
+    }
+    const decoded = this.decodeJWT(token);
+    return decoded?.group || decoded?.groups?.[0] || null;
+  }
 }

@@ -1,9 +1,29 @@
 <!-- HEADER -->
 <div class="users-header">
-    <h3>Users ({{ users.length }})</h3>
+    <h3>Users ({{ filteredUsers.length }})</h3>
     <button class="btn primary" (click)="openCreateUser()">
         + Create New User
     </button>
+</div>
+
+<!-- FILTERS -->
+<div class="filters-container">
+    <div class="search-input">
+        <input 
+            type="text" 
+            [(ngModel)]="searchTerm" 
+            (ngModelChange)="onSearchChange()" 
+            placeholder="Search by username..."
+        />
+    </div>
+    <div class="role-filter">
+        <select [(ngModel)]="selectedRole" (ngModelChange)="onRoleFilterChange()">
+            <option value="ALL">All Roles</option>
+            <option value="ADMIN">Admin</option>
+            <option value="HOSPITAL">Hospital Staff</option>
+            <option value="VEHICLE">Vehicle Personnel</option>
+        </select>
+    </div>
 </div>
 
 <!-- TABLE -->
@@ -18,10 +38,13 @@
     </thead>
 
     <tbody>
-        <tr *ngFor="let user of users">
+        <tr *ngFor="let user of filteredUsers">
             <td>{{ user.username }}</td>
             <td>
-                <span class="role-pill" [class.admin]="user.role === 'ADMIN'">
+                <span class="role-pill" 
+                      [class.admin]="user.role === 'ADMIN'" 
+                      [class.vehicle]="user.role === 'VEHICLE'" 
+                      [class.hospital]="user.role === 'HOSPITAL'">
                     {{ user.role }}
                 </span>
             </td>
