@@ -7,7 +7,7 @@ import { ConfigService } from './config.service';
 export type UserRole = 'VEHICLE' | 'HOSPITAL' | 'ADMIN';
 
 export interface User {
-    id: string;
+    id: number;
     role: UserRole;
     username: string;
 }
@@ -63,7 +63,7 @@ export class UserService {
                 console.error('Error creating user (backend not available):', error);
                 // Add locally for offline development
                 const mockUser: User = {
-                    id: Date.now().toString(),
+                    id: Date.now(),
                     username: userData.username,
                     role: userData.role
                 };
@@ -96,7 +96,7 @@ export class UserService {
         });
     }
 
-    delete(id: string): void {
+    delete(id: number): void {
         this.http.delete(`${this.apiUrl}/${id}`, { headers: this.ngrokHeaders }).subscribe({
             next: () => {
                 const users = this.usersSubject.value.filter(u => u.id !== id);

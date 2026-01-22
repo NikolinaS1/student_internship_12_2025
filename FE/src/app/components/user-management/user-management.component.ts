@@ -191,7 +191,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     return '';
   }
 
-  isUsernameTaken(username: string, excludeUserId?: string): boolean {
+  isUsernameTaken(username: string, excludeUserId?: number): boolean {
     return this.users.some(user => 
       user.username.toLowerCase() === username.toLowerCase() && 
       user.id !== excludeUserId

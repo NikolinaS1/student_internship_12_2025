@@ -54,11 +54,11 @@ export class AuthService {
         localStorage.setItem('auth_token', token);
         localStorage.setItem('loggedIn', 'true');
         
-        // Decode JWT and get role
+        
         const decoded = this.decodeJWT(token);
         const role = decoded?.group || decoded?.groups?.[0] || 'hospital';
         
-        // Redirect based on role
+        
         const redirectPath = this.getRedirectPath(role);
         this.router.navigate([redirectPath]);
         return true;

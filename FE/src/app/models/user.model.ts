@@ -1,5 +1,5 @@
 export interface User {
-  id: string;
+  id: number;
   name: string;
   role: 'ems-technician' | 'dispatcher' | 'admin';
   password: string; 
