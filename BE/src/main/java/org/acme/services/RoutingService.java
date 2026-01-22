@@ -7,6 +7,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.Locale;
 
 @ApplicationScoped
 public class RoutingService {
@@ -20,7 +21,7 @@ public class RoutingService {
 
     public double calculateEtaInMinutes(double startLat, double startLon) {
         try {
-            String url = String.format("http://router.project-osrm.org/route/v1/driving/%f,%f;%f,%f?overview=false",
+            String url = String.format(Locale.US, "http://router.project-osrm.org/route/v1/driving/%f,%f;%f,%f?overview=false",
                     startLon, startLat, HOSPITAL_LON, HOSPITAL_LAT);
 
             HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).GET().build();
