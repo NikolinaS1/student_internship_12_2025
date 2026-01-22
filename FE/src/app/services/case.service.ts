@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
+import { Observable, throwError, BehaviorSubject } from 'rxjs';
 import { catchError, switchMap } from 'rxjs/operators';
 import { ConfigService } from './config.service';
 import { CreateCaseDTO } from '../models/case.model';
@@ -34,6 +34,8 @@ export interface Case {
 export class CaseService {
 
   private apiUrl = '';
+  private casesSubject = new BehaviorSubject<Case[]>([]);
+  public cases$ = this.casesSubject.asObservable();
 
   constructor(
     private http: HttpClient,
@@ -41,6 +43,20 @@ export class CaseService {
   ) {
     this.configService.getConfig().subscribe(config => {
       this.apiUrl = `${config.Urls.apiUrl}/cases`;
+      this.loadCases();
+    });
+  }
+
+  private loadCases(): void {
+    this.http.get<Case[]>(this.apiUrl).pipe(
+      catchError(this.handleError)
+    ).subscribe({
+      next: (cases) => {
+        this.casesSubject.next(cases);
+      },
+      error: (error) => {
+        console.error('Error loading cases:', error);
+      }
     });
   }
 
@@ -58,9 +74,20 @@ export class CaseService {
   }
 
   deleteCase(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`).pipe(
-      catchError(this.handleError)
-    );
+    return new Observable(observer => {
+      this.http.delete<void>(`${this.apiUrl}/${id}`).pipe(
+        catchError(this.handleError)
+      ).subscribe({
+        next: () => {
+          this.loadCases(); // Refresh cases after deletion
+          observer.next();
+          observer.complete();
+        },
+        error: (error) => {
+          observer.error(error);
+        }
+      });
+    });
   }
 
     // ----- REGULAR CASE -----
@@ -76,7 +103,7 @@ export class CaseService {
     );
   }
 
-  updateRegularCase(caseId: string, caseData: CreateCaseDTO, token?: string): Observable<any> {
+  updateRegularCase(caseId: number, caseData: CreateCaseDTO, token?: string): Observable<any> {
     return this.configService.getConfig().pipe(
       switchMap(config => {
         const url = `${config.Urls.apiUrl}/cases/${caseId}`;
@@ -88,7 +115,7 @@ export class CaseService {
     );
   }
 
-    private createHeaders(token?: string): HttpHeaders {
+  private createHeaders(token?: string): HttpHeaders {
     let headers = new HttpHeaders()
       .set('Content-Type', 'application/json')
       .set('userId', '1'); // TODO: Replace with actual user ID from auth service

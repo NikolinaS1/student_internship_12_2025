@@ -6,17 +6,24 @@
         <!-- English translation -->
         <div class="card__title">Active Cases</div>
         <div class="muted card__subtitle">Select another case to switch.</div>
+
+        <app-custom-sort-dropdown
+          [sortOptions]="sortOptions"
+          [selectedOption]="sortOption"
+          (sortChange)="onSortChange($event)"
+        ></app-custom-sort-dropdown>
       </div>
 
       <!-- Display all cases passed from parent -->
       <div class="sidebar__list">
+        @for (c of sortedCases; track c.id) {
         <button
-          *ngFor="let c of allCases"
           type="button"
           (click)="onCaseSelect(c)"
           class="sidebar-item"
           [ngClass]="[
             c.id === selectedCase.id ? 'sidebar-item--active' : '',
+            isSos(c) == true ? 'sidebar-item--sos' :
             c.priority === 'HIGH' ? 'sidebar-item--high' :
             c.priority === 'MEDIUM' ? 'sidebar-item--medium' : 'sidebar-item--low'
           ]"
@@ -27,6 +34,7 @@
               <div class="sidebar-item__meta">{{ 2025 - c.birthYear }} years • #{{ c.id }}</div>
             </div>
             <span class="priority-dot" [ngClass]="[
+              isSos(c) == true ? 'dot-sos' :
               c.priority === 'HIGH' ? 'dot-high' :
               c.priority === 'MEDIUM' ? 'dot-medium' : 'dot-low'
             ]"></span>
@@ -54,7 +62,7 @@
               <span class="row__value--strong">{{ c.etaMinutes || '-' }} min</span>
             </div>
           </div>
-        </button>
+        </button>}
       </div>
     </div>
   </aside>

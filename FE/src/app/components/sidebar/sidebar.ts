@@ -17,18 +17,22 @@ export class Sidebar {
     this.newCaseClicked.emit();
   }
 
+  getStatus(): string {
+    if (!this.activeCase) return '';
+    
+    return this.activeCase.acknowledged ? 'ACTIVE' : 'SENT';
+  }
+
   getPriorityClass(): string {
     if (!this.activeCase) return '';
     return `priority-${this.activeCase.priority.toLowerCase()}`;
   }
 
   getStatusClass(): string {
-    if (!this.activeCase) return '';
-    return `status-${this.activeCase.status}`;
+    return `status-${this.getStatus().toLowerCase()}`;
   }
 
   getStatusBadgeClass(): string {
-    if (!this.activeCase) return '';
-    return `status-${this.activeCase.status}`;
+    return `status-${this.getStatus().toLowerCase()}`;
   }
 }

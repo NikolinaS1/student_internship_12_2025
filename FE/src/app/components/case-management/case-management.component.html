@@ -1,8 +1,27 @@
 <div class="case-wrapper">
 
     <div class="case-header">
-        <h2>All Cases ({{ cases.length }})</h2>
+        <h2>All Cases ({{ filteredCases.length }})</h2>
         <p>Monitor and manage all emergency cases</p>
+    </div>
+
+    <!-- FILTERS -->
+    <div class="filters-container">
+        <div class="search-input">
+            <input 
+                type="text" 
+                [(ngModel)]="searchTerm" 
+                (ngModelChange)="onSearchChange()" 
+                placeholder="Search by patient name..."
+            />
+        </div>
+        <div class="sos-filter">
+            <select [(ngModel)]="sosFilter" (ngModelChange)="onSosFilterChange()">
+                <option value="ALL">All Cases</option>
+                <option value="SOS">SOS Cases</option>
+                <option value="NON_SOS">Non-SOS Cases</option>
+            </select>
+        </div>
     </div>
 
     <table class="case-table">
@@ -19,7 +38,7 @@
         </thead>
 
         <tbody>
-            <tr *ngFor="let c of cases">
+            <tr *ngFor="let c of filteredCases">
                 <td>{{ c.patientName }}</td>
                 <td>{{ currentYear - c.birthYear }}</td>
 
@@ -171,7 +190,7 @@
         </div>
 
         <div class="modal-body">
-            <p>You are about to delete this case. Are you sure?</p>
+            <p>You are about to delete case <strong>{{ caseToDelete.patientName }}</strong>. Are you sure?</p>
         </div>
 
         <div class="modal-footer">

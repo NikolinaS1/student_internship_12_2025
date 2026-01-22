@@ -8,7 +8,14 @@
           <div class="overview__subtitle">Click on a case to open details and chat.</div>
         </div>
       </div>
+
+      <app-custom-sort-dropdown
+        [sortOptions]="sortOptions"
+        [selectedOption]="sortOption"
+        (sortChange)="onSortChange($event)"
+      ></app-custom-sort-dropdown>
     </div>
+
 
     <!-- Loading & Error States -->
     @if (loading()) {
@@ -27,13 +34,14 @@
     <!-- Cases List -->
     @if (!loading()) {
       <div class="overview__cases">
-        @for (c of cases; track c.id) {
+        @for (c of sortedCases; track c.id) {
           <button
             type="button"
             (click)="selectCaseHandler(c)"
             class="case-card"
             [ngClass]="[
               !isActive(c) ? 'case-card--disabled' : '',
+              isSos(c) == true ? 'case-card--sos' :
               c.priority === 'HIGH' ? 'case-card--high' :
               c.priority === 'MEDIUM' ? 'case-card--medium' : 'case-card--low'
             ]"
@@ -44,6 +52,7 @@
                 <div class="case-card__meta">{{ 2026 - c.birthYear }} years old • #{{ c.id }}</div>
               </div>
               <span class="priority-dot" [ngClass]="[
+                isSos(c) == true ? 'dot-sos' :
                 c.priority === 'HIGH' ? 'dot-high' :
                 c.priority === 'MEDIUM' ? 'dot-medium' : 'dot-low'
               ]"></span>
@@ -93,7 +102,7 @@
           </button>
         }
 
-        @if (cases.length === 0) {
+        @if (sortedCases.length === 0) {
           <div class="no-cases">
             <p>No active cases</p>
           </div>

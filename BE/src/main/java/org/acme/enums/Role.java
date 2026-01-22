@@ -5,3 +5,5 @@ public enum Role {
     VEHICLE,
     HOSPITAL
 }
+
+

@@ -89,7 +89,8 @@
 
 .heading_flex {
   display: flex;
-  justify-content: left;
+  justify-content: space-between;
+  align-items: center;
   width: 100%;
   margin-bottom: 1.25rem;
 }
@@ -107,6 +108,16 @@
   margin-top: 0.35rem;
   font-size: 1rem;
   color: var(--muted-foreground);
+}
+
+
+.sort-dropdown {
+  margin-right: 1rem;
+}
+
+.sort-dropdown-sidebar {
+  margin-top: 0.75rem;
+  width: 100%;
 }
 
 /* Case grid */
@@ -212,7 +223,10 @@
   margin-top: 4px;
 }
 
-
+.dot-sos { 
+  background: var(--sos); 
+  box-shadow: 0 0 0 4px rgba(255, 0, 0, 0.463);
+}
 .dot-high { 
   background: var(--high); 
   box-shadow: 0 0 0 4px rgba(255, 0, 0, 0.649);
@@ -250,18 +264,14 @@
   pointer-events: none;
 }
 
-/* OUTER BORDER BY PRIORITY */
-.case-card--critical { 
-  border-color: var(--destructive); 
-  border-width: 5px;
-}
-.case-card--urgent { 
+/* OUTER BORDER BY PRIORITY (glavni zahtjev) */
+.case-card--sos { 
   border-color: var(--sos); 
   border-width: 5px;
 }
 .case-card--high { 
   border-color: var(--high); 
-  border-width: 5px;
+  border-width: 4px;
 }
 .case-card--medium { 
   border-color: var(--medium); 

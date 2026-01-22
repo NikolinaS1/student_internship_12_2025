@@ -8,13 +8,15 @@ import { ConfigService } from '../../hospital-services/config-service';
 import { MessageWebSocketService, Message } from '../../hospital-services/message-ws.service';
 import { AuthService } from '../../services/auth.service';
 import { HospitalAuthService } from '../../hospital-services/auth-service'
+import { CaseSortService, SortOption } from '../../hospital-services/sorting-cases.service';
+import { CustomSortDropdownComponent } from '../../components/cases-sort/cases-sort.component';
 import * as L from 'leaflet';
 
 
 @Component({
   selector: 'app-case-detail',
   standalone: true,
-  imports: [CommonModule, NgIf, NgFor, NgClass, FormsModule, DatePipe],
+  imports: [CommonModule, NgIf, NgFor, NgClass, FormsModule, DatePipe, CustomSortDropdownComponent],
   templateUrl: './case-detail.component.html',
 })
 export class CaseDetailComponent implements OnInit, AfterViewInit, OnDestroy {
@@ -34,6 +36,7 @@ export class CaseDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   private messageWsService = inject(MessageWebSocketService);
   private authService = inject(AuthService);
   private hospitalAuthService = inject(HospitalAuthService);
+  private sortService = inject(CaseSortService);
 
   private detailMap?: L.Map;
   private caseMarker?: L.Marker;
@@ -44,6 +47,9 @@ export class CaseDetailComponent implements OnInit, AfterViewInit, OnDestroy {
 
   messages: Message[] = [];
   currentUserId: number = this.authService.getUserId();
+
+  sortOption: SortOption = 'priority-high-low';
+  sortOptions = this.sortService.getSortOptions();
 
   private get HOSPITAL_LAT() { return this.configService.hospitalLat; }
   private get HOSPITAL_LNG() { return this.configService.hospitalLng; }
@@ -219,6 +225,9 @@ export class CaseDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   isActive(): boolean {
     return this.selectedCase?.status !== 'CLOSED';
   }
+  isSos(c: CaseModel): boolean {
+    return c.isSos;
+  }
 
   isAcknowledged(): boolean {
     return this.selectedCase?.acknowledged ?? false;
@@ -242,6 +251,14 @@ export class CaseDetailComponent implements OnInit, AfterViewInit, OnDestroy {
     }).addTo(this.detailMap);
 
     this.createMarkers();
+  }
+
+  get sortedCases(): CaseModel[]{
+    return this.sortService.sortCases(this.allCases, this.sortOption);
+  }
+
+  onSortChange(option: SortOption){
+    this.sortOption = option;
   }
 
   private createMarkers() {
