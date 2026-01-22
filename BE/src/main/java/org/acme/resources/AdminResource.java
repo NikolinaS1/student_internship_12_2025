@@ -6,11 +6,8 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
+import org.acme.dtos.admin.*;
 import org.acme.services.AdminService;
-import org.acme.dtos.admin.CreateUserRequest;
-import org.acme.dtos.admin.ChangePasswordRequest;
-import org.acme.dtos.admin.UserResponse;
-import org.acme.dtos.admin.UpdateUserRequest;
 
 import java.util.List;
 
@@ -77,8 +74,8 @@ public class AdminResource {
 
     @PUT
     @Path("/{id}/status")
-    public Response toggleUserStatus(@PathParam("id") Long id) {
-        adminService.toggleUserStatus(id);
+    public Response toggleUserStatus(@PathParam("id") Long id, @Valid UpdateUserStatusRequest request) {
+        adminService.toggleUserStatus(id, request);
         return Response.noContent().build();
     }
 }

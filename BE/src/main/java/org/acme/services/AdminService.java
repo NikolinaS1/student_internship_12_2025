@@ -6,13 +6,10 @@ import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.acme.dtos.admin.*;
 import org.acme.exeptions.ConflictException;
 import org.acme.exeptions.NotFoundException;
 import org.acme.models.User;
-import org.acme.dtos.admin.UserResponse;
-import org.acme.dtos.admin.CreateUserRequest;
-import org.acme.dtos.admin.ChangePasswordRequest;
-import org.acme.dtos.admin.UpdateUserRequest;
 import org.jboss.logging.Logger;
 
 @ApplicationScoped
@@ -66,12 +63,13 @@ import org.jboss.logging.Logger;
     */
 
     @Transactional
-    public void toggleUserStatus(Long id) {
+    public void toggleUserStatus(Long id, UpdateUserStatusRequest request) {
         User user = User.findById(id);
         if (user == null) {
             throw new NotFoundException("User with ID " + id + " not found");
         }
-        user.setIsEnabled(!user.getIsEnabled());
+        user.setIsEnabled(request.isEnabled());
+        user.persist();
     }
 
     @Transactional
