@@ -56,7 +56,7 @@ export class UserService {
     create(userData: { username: string; password: string; role: UserRole }): void {
         this.http.post<User>(this.apiUrl, userData, { headers: this.ngrokHeaders }).subscribe({
             next: newUser => {
-                const users = [...this.usersSubject.value, newUser];
+                const users = [newUser,...this.usersSubject.value];
                 this.usersSubject.next(users);
             },
             error: error => {
@@ -67,7 +67,7 @@ export class UserService {
                     username: userData.username,
                     role: userData.role
                 };
-                const users = [...this.usersSubject.value, mockUser];
+                const users = [mockUser,...this.usersSubject.value];
                 this.usersSubject.next(users);
             }
         });
