@@ -7,6 +7,8 @@ export interface AppConfig {
   Urls: {
     apiUrl: string;
     wsUrl: string;
+    sendMsgUrl: string;
+    getMsgUrl: string;
   };
   MapSettings: {
     HOSPITAL_LAT: number;
@@ -34,7 +36,7 @@ export class ConfigService {
         catchError((error) => {
           console.error('Error loading config:', error);
           return of({ 
-            Urls: { apiUrl: 'http://localhost:8080', wsUrl: 'ws://localhost:8080/ws/cases' },
+            Urls: { apiUrl: 'http://localhost:8080', wsUrl: 'ws://localhost:8080/ws/cases', sendMsgUrl: 'ws://localhost:8080/chat', getMsgUrl: 'http://localhost:8080/messages/case' },
             MapSettings: { HOSPITAL_LAT: 45.558125, HOSPITAL_LNG: 18.713756 }
           });
         })

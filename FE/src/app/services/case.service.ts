@@ -3,30 +3,8 @@ import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http
 import { Observable, throwError, BehaviorSubject } from 'rxjs';
 import { catchError, switchMap } from 'rxjs/operators';
 import { ConfigService } from './config.service';
-import { CreateCaseDTO } from '../models/case.model';
+import { Case, CreateCaseDTO } from '../models/case.model';
 
-
-export interface Case {
-  id: number;
-  acknowledged: boolean;
-  birthYear: number;
-  bpm: number;
-  createdAt: string;
-  createdById: number;
-  description: string;
-  diastolicPressure: number;
-  isActive: boolean;
-  isSos: boolean;
-  patientName: string;
-  priority: string;
-  resRate: number;
-  saturation: number;
-  sex: string;
-  systolicPressure: number;
-  temperature: number;
-  latitude: number;
-  longitude: number;
-}
 
 @Injectable({
   providedIn: 'root'
@@ -60,15 +38,26 @@ export class CaseService {
     });
   }
 
+  private createHeaders(token?: string): HttpHeaders {
+    let headers = new HttpHeaders()
+      .set('Content-Type', 'application/json')
+      .set('userId', '1'); // TODO: Replace with actual user ID from auth service
 
-  getAllCases(): Observable<Case[]> {
-    return this.http.get<Case[]>(this.apiUrl).pipe(
+    if (token) {
+      headers = headers.set('Authorization', `Bearer ${token}`);
+    }
+
+    return headers;
+  }
+
+  getAllCases(): Observable<any[]> {
+    return this.http.get<any[]>(this.apiUrl).pipe(
       catchError(this.handleError)
     );
   }
 
-  getCaseById(id: number): Observable<Case> {
-    return this.http.get<Case>(`${this.apiUrl}/${id}`).pipe(
+  getCaseById(id: number): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/${id}`).pipe(
       catchError(this.handleError)
     );
   }
@@ -90,7 +79,6 @@ export class CaseService {
     });
   }
 
-    // ----- REGULAR CASE -----
   createRegularCase(caseData: CreateCaseDTO, token?: string): Observable<any> {
     return this.configService.getConfig().pipe(
       switchMap(config => {
@@ -115,16 +103,35 @@ export class CaseService {
     );
   }
 
-  private createHeaders(token?: string): HttpHeaders {
-    let headers = new HttpHeaders()
-      .set('Content-Type', 'application/json')
-      .set('userId', '1'); // TODO: Replace with actual user ID from auth service
+  createSosCase(sosCase: any, token?: string): Observable<any> {
+    return this.configService.getConfig().pipe(
+      switchMap(config => {
+        const url = `${config.Urls.apiUrl}/cases/sos`;
+        const headers = this.createHeaders(token);
+        return this.http.post(url, sosCase, { headers });
+      })
+    );
+  }
 
-    if (token) {
-      headers = headers.set('Authorization', `Bearer ${token}`);
-    }
+  updateSosCase(caseId: number, sosCase: any, token?: string): Observable<any> {
+    return this.configService.getConfig().pipe(
+      switchMap(config => {
+        const url = `${config.Urls.apiUrl}/cases/${caseId}`;
+        const headers = this.createHeaders(token);
+        return this.http.put(url, sosCase, { headers });
+      })
+    );
+  }
 
-    return headers;
+  endCase(caseId: number, token?: string): Observable<any> {
+    return this.configService.getConfig().pipe(
+      switchMap(config => {
+        const url = `${config.Urls.apiUrl}/cases/${caseId}/end`;
+        const headers = this.createHeaders(token);
+        const body = { isActive: false };
+        return this.http.put(url, body, { headers });
+      })
+    );
   }
 
   private handleError(error: HttpErrorResponse): Observable<never> {
