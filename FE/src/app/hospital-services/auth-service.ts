@@ -14,14 +14,7 @@ export class HospitalAuthService {
   }
 
   getUserId(): number {
-    const token = this.getToken();
-    if (!token) return 1; // fallback
-
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      return payload.id || 1;
-    } catch {
-      return 1;
-    }
+    const userId = localStorage.getItem('userId');
+    return userId ? parseInt(userId, 10) : 0;
   }
 }

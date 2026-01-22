@@ -66,7 +66,11 @@ export class CaseDetailComponent implements OnInit, AfterViewInit, OnDestroy {
       this.updateDetailMapMarkers();
 
       // Reconnect to new case messages
-      this.messageWsService.connect(this.selectedCase.id, this.currentUserId);
+      const previousCase = changes['selectedCase'].previousValue;
+      if (previousCase && previousCase.id !== this.selectedCase.id) {
+        this.messageWsService.disconnect();
+        this.messageWsService.connect(this.selectedCase.id, this.currentUserId);
+      }
     }
   }
 
