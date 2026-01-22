@@ -13,7 +13,6 @@ export class HospitalAuthService {
     return payload.role;
   }
 
-  // Dodaj u postojeći AuthService
   getUserId(): number {
     const token = this.getToken();
     if (!token) return 1; // fallback

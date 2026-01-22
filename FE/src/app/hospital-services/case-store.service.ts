@@ -27,9 +27,7 @@ export class CaseService {
     this.initWebSocket();
   }
 
-  /**
-   * Initialize WebSocket and listen for messages
-   */
+
   private initWebSocket() {
     this.wsService.connect();
 
@@ -67,9 +65,7 @@ export class CaseService {
     });
   }
 
-  /**
-   * Handle new case (CREATE)
-   */
+  
   private handleCaseCreate(caseData: CaseModel) {
     const processedCase = this.processCase(caseData);
 
@@ -80,9 +76,7 @@ export class CaseService {
     }
   }
 
-  /**
-   * Handle case update (UPDATE/ACKNOWLEDGE)
-   */
+ 
   private handleCaseUpdate(caseData: CaseModel) {
     const idx = this.cases().findIndex(c => c.id === caseData.id);
 
@@ -101,9 +95,7 @@ export class CaseService {
     }
   }
 
-  /**
-   * Handle case deletion (DELETE)
-   */
+
   private handleCaseDelete(caseId: number) {
     const filtered = this.cases().filter(c => c.id !== caseId);
 
@@ -118,9 +110,7 @@ export class CaseService {
     }
   }
 
-  /**
-   * Handle location update for case
-   */
+
   private handleLocationUpdate(caseId: number, latitude: number, longitude: number) {
     const idx = this.cases().findIndex(c => c.id === caseId);
 
@@ -147,9 +137,7 @@ export class CaseService {
     }
   }
 
-  /**
-   * Get all cases (GET /cases)
-   */
+
   getAllCases(): Observable<CaseModel[]> {
     this.loading.set(true);
     this.error.set(null);
@@ -178,9 +166,7 @@ export class CaseService {
     );
   }
 
-  /**
-   * Get specific case (GET /cases/{id})
-   */
+
   getCase(id: number): Observable<CaseModel> {
     this.loading.set(true);
     this.error.set(null);
@@ -200,9 +186,7 @@ export class CaseService {
     );
   }
 
-  /**
-   * Acknowledge case (PUT /cases/{id}/acknowledge)
-   */
+
   acknowledgeCase(id: number): Observable<CaseModel> {
     this.loading.set(true);
     this.error.set(null);
@@ -239,16 +223,11 @@ export class CaseService {
     );
   }
 
-  /**
-   * Manually refresh all cases
-   */
   refreshCases(): Observable<CaseModel[]> {
     return this.getAllCases();
   }
 
-  /**
-   * Process case data (transformation, mapping)
-   */
+
   private processCase(caseData: CaseModel): CaseModel {
     const age = new Date().getFullYear() - caseData.birthYear;
 
@@ -275,9 +254,8 @@ export class CaseService {
     };
   }
 
-  /**
-   * Prepare HTTP headers with JWT token
-   */
+  
+  // Prepare HTTP headers with JWT token
   private getAuthHeaders(): HttpHeaders {
     const token = this.authService.getToken();
     return new HttpHeaders({
@@ -286,23 +264,15 @@ export class CaseService {
     });
   }
 
-  /**
-   * Setter for selected case
-   */
+  
   selectCase(caseData: CaseModel | null) {
     this.selectedCase.set(caseData);
   }
 
-  /**
-   * Getter for current cases
-   */
   getCasesSync(): CaseModel[] {
     return this.cases();
   }
 
-  /**
-   * Getter for selected case
-   */
   getSelectedCaseSync(): CaseModel | null {
     return this.selectedCase();
   }

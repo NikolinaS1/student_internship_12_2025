@@ -198,9 +198,7 @@ export class CaseDetailComponent implements OnInit, AfterViewInit, OnDestroy {
     return vitals;
   }
 
-  /**
-   * Get ambulance icon URL based on priority and SOS status
-   */
+
   private getCaseIconUrl(caseData: CaseModel): string {
     if (caseData.isSos) {
       return 'assets/images/sos case.png';
@@ -308,9 +306,7 @@ export class CaseDetailComponent implements OnInit, AfterViewInit, OnDestroy {
     this.detailMap.fitBounds(bounds, { padding: [50, 50] });
   }
 
-  /**
-   * Update vehicle marker based on WebSocket location update
-   */
+
   private updateVehicleMarker(locations: RemoteLocation[]) {
     if (!this.detailMap || !this.selectedCase) return;
 

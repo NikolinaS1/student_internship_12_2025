@@ -139,16 +139,12 @@ export class CasesOverviewComponent implements OnInit, AfterViewInit, OnDestroy 
     }
   }
 
-  /**
-   * Find case by ID
-   */
+  
   private getCaseById(caseId: number): CaseModel | undefined {
     return this.cases.find(c => c.id === caseId);
   }
 
-  /**
-   * Get ambulance icon URL based on priority and SOS status
-   */
+
   private getCaseIconUrl(caseData: CaseModel): string {
     if (caseData.isSos) {
       return 'assets/images/sos case.png';
@@ -198,9 +194,6 @@ export class CasesOverviewComponent implements OnInit, AfterViewInit, OnDestroy 
     }
   }
 
-  /**
-   * Update marker location for specific case (real-time WebSocket update)
-   */
   private updateCaseMarkerLocation(caseId: number, latitude: number, longitude: number) {
     const marker = this.caseMarkers.get(caseId);
 

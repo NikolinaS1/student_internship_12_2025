@@ -88,9 +88,8 @@ export class CaseWebSocketService {
     this.connectedSubject.next(false);
   }
 
-  /**
-   * Send a location update for a specific case
-   */
+  
+  //  Send a location update for a specific case
   sendLocationUpdate(caseId: number, latitude: number, longitude: number) {
     if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
       console.warn('⚠️ WebSocket not connected, cannot send location update');
@@ -108,9 +107,6 @@ export class CaseWebSocketService {
     this.ws.send(JSON.stringify(message));
   }
 
-  /**
-   * Check if WebSocket is currently connected
-   */
   isConnected(): boolean {
     return this.ws?.readyState === WebSocket.OPEN;
   }

@@ -4,7 +4,6 @@
   color: var(--foreground);
 }
 
-/* NAVBAR veći */
 .topbar {
   position: sticky;
   top: 0;
@@ -48,13 +47,11 @@
 
 /* =========================
    VIEW 1 (cases left + map right)
-   Cilj: bez scrollanja stranice,
-   mapa stane u visinu i uvijek jednako vidljiva
    ========================= */
 
 .overview {
   --topbar-h: 86px;
-  --pad-y: 1.75rem; /* smanji vertikalni padding da stane u viewport */
+  --pad-y: 1.75rem; 
   --pad-x: 3rem;
   --gap-x: 3rem;
 
@@ -64,26 +61,25 @@
   padding: var(--pad-y) var(--pad-x);
   align-items: start;
 
-  /* KLJUČ: cijeli view 1 stane u ekran (nema page scrolla) */
+
   height: calc(100vh - var(--topbar-h));
   box-sizing: border-box;
-  overflow: hidden; /* spriječi da bilo što gura stranicu u scroll */
+  overflow: hidden; 
 }
 
-/* LIJEVA polovica: sadržaj ide u stupac (title + subtitle + caseovi ispod) */
+/* Left side - cases */
 .overview__left {
   grid-column: 1;
   height: 100%;
-  min-height: 0;          /* bitno za overflow u gridu */
-  overflow: auto;         /* ako ikad bude puno caseova, scrolla samo lijevi dio */
-  padding-right: 0.35rem; /* malo prostora za scrollbar */
-
+  min-height: 0;         
+  overflow: auto;        
+  padding-right: 0.35rem; 
   display: flex;
-  flex-direction: column; /* osigurava da su caseovi ispod opisa */
-  align-items: center;    /* centriraj blok unutar lijeve polovice */
+  flex-direction: column;
+  align-items: center;   
 }
 
-/* Title/subtitle/cases imaju zajedničku širinu i centar */
+
 .overview__title,
 .overview__subtitle,
 .overview__cases {
@@ -121,7 +117,7 @@
   gap: 1.35rem;
 }
 
-/* DESNA polovica: sticky blok koji u sebi ima map card visine ekrana */
+/* Right side - sticky block with map */
 .overview__right {
   grid-column: 2;
   height: 100%;
@@ -131,10 +127,10 @@
   top: var(--topbar-h);
   display: flex;
   justify-content: center;
-  align-items: stretch; /* mapa se rastegne po visini desnog stupca */
+  align-items: stretch; 
 }
 
-/* Map card mora fillati desni stupac po visini */
+
 .map-card {
   width: 100%;
   max-width: 900px;
@@ -143,7 +139,7 @@
   flex-direction: column;
 }
 
-/* Body raste, header ostaje gore */
+
 .map-card__body {
   padding: 1rem;
   flex: 1;
@@ -156,7 +152,7 @@
   font-size: 1.2rem;
 }
 
-/* iframe fill (ovo je ključ da se mapa prilagodi visini bez overflowa) */
+
 .map-frame {
   width: 100%;
   flex: 1;
@@ -169,7 +165,6 @@
   overflow: hidden;
 }
 
-/* Responsive */
 @media (max-width: 1100px) {
   .overview {
     grid-template-columns: 1fr;
@@ -210,7 +205,6 @@
   }
 }
 
-/* PRIORITY DOT */
 .priority-dot {
   width: 14px;
   height: 14px;
@@ -232,7 +226,7 @@
   box-shadow: 0 0 0 4px rgba(123, 241, 50, 0.512);
 }
 
-/* CASE CARD */
+
 .case-card {
   width: 100%;
   background: var(--card);
@@ -256,7 +250,7 @@
   pointer-events: none;
 }
 
-/* OUTER BORDER BY PRIORITY (glavni zahtjev) */
+/* OUTER BORDER BY PRIORITY */
 .case-card--critical { 
   border-color: var(--destructive); 
   border-width: 5px;
@@ -379,7 +373,7 @@
   margin-top: 0.5rem;
 }
 
-/* VIEW 2 layout (ostaje kako je bilo) */
+
 .dashboard {
   max-width: 1400px;
   margin: 0 auto;
@@ -461,7 +455,7 @@
   margin-top: 1.1rem;
 }
 
-/* CHAT */
+
 .chat {
   border: 1px solid var(--border);
   border-radius: var(--radius-xl);
@@ -536,9 +530,6 @@
 }
 
 
-
-//LEAFLET STILIZACIJA
-
 .leaflet-map {
   width: 100%;
   height: 100%;
@@ -586,7 +577,7 @@
   border-radius: 8px;
 }
 
-/* Leaflet popup stilizacija */
+
 .leaflet-popup-content {
   font-family: inherit;
   font-size: 13px;
@@ -597,7 +588,6 @@
   font-weight: 600;
 }
 
-//LOADING / ERROR STATES
 .loading-state,
 .error-state {
   display: flex;
