@@ -6,6 +6,7 @@ import { CaseService } from '../../hospital-services/case-store.service';
 import { CaseModel } from '../../hospital-models/case-model';
 import { CasesOverviewComponent } from './cases-overview.component';
 import { CaseDetailComponent } from './case-detail.component';
+import { AuthService } from '../../services/auth.service';
 
 type PriorityChip = { text: string; cls: string };
 type StatusChip = { text: string; cls: string };
@@ -18,6 +19,7 @@ type StatusChip = { text: string; cls: string };
 })
 export class HospitalDashboardComponent implements OnInit, OnDestroy {
   readonly store = inject(CaseService);
+  readonly auth = inject(AuthService);
   private sub?: Subscription;
 
   messageText = '';

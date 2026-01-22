@@ -5,13 +5,15 @@ import { FormsModule } from '@angular/forms';
 import { CaseModel } from '../../hospital-models/case-model';
 import { WebSocketLocationService, RemoteLocation } from '../../hospital-services/location-ws.service';
 import { ConfigService } from '../../hospital-services/config-service';
+import { CaseSortService, SortOption } from '../../hospital-services/sorting-cases.service';
+import { CustomSortDropdownComponent } from '../../components/cases-sort/cases-sort.component';
 import * as L from 'leaflet';
 
 
 @Component({
   selector: 'app-case-detail',
   standalone: true,
-  imports: [CommonModule, NgIf, NgFor, NgClass, FormsModule, DatePipe],
+  imports: [CommonModule, NgIf, NgFor, NgClass, FormsModule, DatePipe, CustomSortDropdownComponent],
   templateUrl: './case-detail.component.html',
 })
 export class CaseDetailComponent implements OnInit, AfterViewInit, OnDestroy {
@@ -29,12 +31,16 @@ export class CaseDetailComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private wsService = inject(WebSocketLocationService);
   private configService = inject(ConfigService);
+  private sortService = inject(CaseSortService);
+
   private detailMap?: L.Map;
   private caseMarker?: L.Marker;
-
-  private vehicleMarker?: L.Marker; // Vehicle movement marker
+  private vehicleMarker?: L.Marker; 
   private hospitalMarker?: L.Marker;
   private sub?: Subscription;
+
+  sortOption: SortOption = 'priority-high-low';
+  sortOptions = this.sortService.getSortOptions();
 
   private get HOSPITAL_LAT() { return this.configService.hospitalLat; }
   private get HOSPITAL_LNG() { return this.configService.hospitalLng; }
@@ -182,6 +188,9 @@ export class CaseDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   isActive(): boolean {
     return this.selectedCase?.status !== 'CLOSED';
   }
+  isSos(c: CaseModel): boolean {
+    return c.isSos;
+  }
 
   isAcknowledged(): boolean {
     return this.selectedCase?.acknowledged ?? false;
@@ -201,6 +210,14 @@ export class CaseDetailComponent implements OnInit, AfterViewInit, OnDestroy {
     }).addTo(this.detailMap);
 
     this.createMarkers();
+  }
+
+  get sortedCases(): CaseModel[]{
+    return this.sortService.sortCases(this.allCases, this.sortOption);
+  }
+
+  onSortChange(option: SortOption){
+    this.sortOption = option;
   }
 
   private createMarkers() {
