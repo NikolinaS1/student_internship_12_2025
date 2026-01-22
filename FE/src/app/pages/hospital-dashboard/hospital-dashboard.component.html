@@ -14,7 +14,7 @@
     </div>
   </header>
 
-  <!-- Pregled svih slučajeva -->
+  <!-- All cases overview -->
   @if (!store.selectedCase()) {
     <app-cases-overview 
       [cases]="store.cases()" 
@@ -22,7 +22,7 @@
     ></app-cases-overview>
   }
 
-  <!-- Detalji odabranog slučaja -->
+  <!-- Case details -->
   @if (store.selectedCase()) {
     <app-case-detail 
       [selectedCase]="store.selectedCase()!"
@@ -31,7 +31,6 @@
       (messageTextChange)="messageText = $event"
       (deselect)="deselect()"
       (acknowledge)="acknowledge($event)"
-      (send)="send($event)"
       (caseSelect)="selectCase($event)"
     ></app-case-detail>
   }

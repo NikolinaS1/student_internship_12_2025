@@ -5,6 +5,9 @@ import { FormsModule } from '@angular/forms';
 import { CaseModel } from '../../hospital-models/case-model';
 import { WebSocketLocationService, RemoteLocation } from '../../hospital-services/location-ws.service';
 import { ConfigService } from '../../hospital-services/config-service';
+import { MessageWebSocketService, Message } from '../../hospital-services/message-ws.service';
+import { AuthService } from '../../services/auth.service';
+import { HospitalAuthService } from '../../hospital-services/auth-service'
 import { CaseSortService, SortOption } from '../../hospital-services/sorting-cases.service';
 import { CustomSortDropdownComponent } from '../../components/cases-sort/cases-sort.component';
 import * as L from 'leaflet';
@@ -24,20 +27,26 @@ export class CaseDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   @Output() messageTextChange = new EventEmitter<string>();
   @Output() deselect = new EventEmitter<void>();
   @Output() acknowledge = new EventEmitter<number>();
-  @Output() send = new EventEmitter<number>();
   @Output() caseSelect = new EventEmitter<CaseModel>();
 
   @ViewChild('chatScroll') chatScroll?: ElementRef<HTMLDivElement>;
 
   private wsService = inject(WebSocketLocationService);
   private configService = inject(ConfigService);
+  private messageWsService = inject(MessageWebSocketService);
+  private authService = inject(AuthService);
+  private hospitalAuthService = inject(HospitalAuthService);
   private sortService = inject(CaseSortService);
 
   private detailMap?: L.Map;
   private caseMarker?: L.Marker;
   private vehicleMarker?: L.Marker; 
   private hospitalMarker?: L.Marker;
-  private sub?: Subscription;
+  private locationSub?: Subscription;
+  private messageSub?: Subscription;
+
+  messages: Message[] = [];
+  currentUserId: number = this.authService.getUserId();
 
   sortOption: SortOption = 'priority-high-low';
   sortOptions = this.sortService.getSortOptions();
@@ -55,18 +64,34 @@ export class CaseDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnChanges(changes: SimpleChanges) {
     if (changes['selectedCase'] && !changes['selectedCase'].firstChange) {
       this.updateDetailMapMarkers();
+
+      // Reconnect to new case messages
+      this.messageWsService.connect(this.selectedCase.id, this.currentUserId);
     }
   }
 
   ngOnInit() {
-    // Listen for vehicle remote locations
-    this.sub = this.wsService.remoteLocations$.subscribe((locations) => {
+    this.currentUserId = this.hospitalAuthService.getUserId();
+
+    // Subscribe to location updates
+    this.locationSub = this.wsService.remoteLocations$.subscribe((locations) => {
       this.updateVehicleMarker(locations);
     });
+
+    // Subscribe to messages
+    this.messageSub = this.messageWsService.messages$.subscribe((messages) => {
+      this.messages = messages;
+      setTimeout(() => this.scrollChatToBottom(), 100);
+    });
+
+    // Connect to message WebSocket for this case
+    this.messageWsService.connect(this.selectedCase.id, this.currentUserId);
   }
 
   ngOnDestroy() {
-    this.sub?.unsubscribe();
+    this.locationSub?.unsubscribe();
+    this.messageSub?.unsubscribe();
+    this.messageWsService.disconnect();
     this.detailMap?.remove();
   }
 
@@ -76,11 +101,25 @@ export class CaseDetailComponent implements OnInit, AfterViewInit, OnDestroy {
     el.scrollTop = el.scrollHeight;
   }
 
-  onSend() {
-    if (!this.selectedCase) return;
-    this.send.emit(this.selectedCase.id);
-    // scroll after parent adds the message
-    setTimeout(() => this.scrollChatToBottom(), 0);
+  async onSend() {
+    const text = this.messageText.trim();
+    if (!text || !this.selectedCase) return;
+
+    try {
+      await this.messageWsService.sendMessage(
+        this.selectedCase.id,
+        this.currentUserId,
+        text
+      );
+
+      // Clear input
+      this.messageTextChange.emit('');
+
+      // Scroll to bottom
+      setTimeout(() => this.scrollChatToBottom(), 100);
+    } catch (error) {
+      console.error('Failed to send message:', error);
+    }
   }
 
   onAcknowledge() {
@@ -165,9 +204,7 @@ export class CaseDetailComponent implements OnInit, AfterViewInit, OnDestroy {
     return vitals;
   }
 
-  /**
-   * Get ambulance icon URL based on priority and SOS status
-   */
+
   private getCaseIconUrl(caseData: CaseModel): string {
     if (caseData.isSos) {
       return 'assets/images/sos case.png';
@@ -196,6 +233,10 @@ export class CaseDetailComponent implements OnInit, AfterViewInit, OnDestroy {
     return this.selectedCase?.acknowledged ?? false;
   }
 
+  isSelfMessage(msg: Message): boolean {
+    return msg.senderId === this.currentUserId;
+  }
+
   private initDetailMap() {
     if (!this.selectedCase || !document.getElementById('detail-map')) return;
 
@@ -206,7 +247,7 @@ export class CaseDetailComponent implements OnInit, AfterViewInit, OnDestroy {
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; OpenStreetMap contributors',
-      maxZoom: 19,
+      maxZoom: 21,
     }).addTo(this.detailMap);
 
     this.createMarkers();
@@ -282,9 +323,7 @@ export class CaseDetailComponent implements OnInit, AfterViewInit, OnDestroy {
     this.detailMap.fitBounds(bounds, { padding: [50, 50] });
   }
 
-  /**
-   * Update vehicle marker based on WebSocket location update
-   */
+
   private updateVehicleMarker(locations: RemoteLocation[]) {
     if (!this.detailMap || !this.selectedCase) return;
 
