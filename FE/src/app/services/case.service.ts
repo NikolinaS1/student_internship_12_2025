@@ -103,7 +103,7 @@ export class CaseService {
     );
   }
 
-  updateRegularCase(caseId: string, caseData: CreateCaseDTO, token?: string): Observable<any> {
+  updateRegularCase(caseId: number, caseData: CreateCaseDTO, token?: string): Observable<any> {
     return this.configService.getConfig().pipe(
       switchMap(config => {
         const url = `${config.Urls.apiUrl}/cases/${caseId}`;
@@ -115,7 +115,7 @@ export class CaseService {
     );
   }
 
-    private createHeaders(token?: string): HttpHeaders {
+  private createHeaders(token?: string): HttpHeaders {
     let headers = new HttpHeaders()
       .set('Content-Type', 'application/json')
       .set('userId', '1'); // TODO: Replace with actual user ID from auth service

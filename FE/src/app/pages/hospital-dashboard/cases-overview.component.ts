@@ -1,6 +1,6 @@
 import { Component, AfterViewInit, OnDestroy, Output, EventEmitter, Input, inject, OnInit, SimpleChanges } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { NgClass } from '@angular/common';
+import { CommonModule, NgClass } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import * as L from 'leaflet';
 import { WebSocketLocationService, RemoteLocation } from '../../hospital-services/location-ws.service';
 import { CaseService } from '../../hospital-services/case-store.service';
@@ -8,11 +8,13 @@ import { AuthService } from '../../hospital-services/auth-service';
 import { CaseModel } from '../../hospital-models/case-model';
 import { CaseWebSocketService } from '../../hospital-services/case-websocket.service';
 import { ConfigService } from '../../hospital-services/config-service';
+import { CaseSortService, SortOption } from '../../hospital-services/sorting-cases.service';
+import { CustomSortDropdownComponent } from '../../components/cases-sort//cases-sort.component';
 
 @Component({
   selector: 'app-cases-overview',
   standalone: true,
-  imports: [CommonModule, NgClass],
+  imports: [CommonModule, NgClass, FormsModule, CustomSortDropdownComponent],
   templateUrl: './cases-overview.component.html',
 })
 export class CasesOverviewComponent implements OnInit, AfterViewInit, OnDestroy {
@@ -24,6 +26,7 @@ export class CasesOverviewComponent implements OnInit, AfterViewInit, OnDestroy 
   private authService = inject(AuthService);
   private caseWsService = inject(CaseWebSocketService);
   private configService = inject(ConfigService);
+  private sortService = inject(CaseSortService);
 
   // Service observables
   loading = this.caseService.loading;
@@ -38,6 +41,8 @@ export class CasesOverviewComponent implements OnInit, AfterViewInit, OnDestroy 
   private get HOSPITAL_LNG() { return this.configService.hospitalLng; }
 
   selectedCaseEta?: { minutes: number; km: number };
+  sortOption: SortOption = 'priority-high-low';
+  sortOptions = this.sortService.getSortOptions();
 
   ngOnInit() {
     // Connect WebSocket for vehicle locations
@@ -166,6 +171,14 @@ export class CasesOverviewComponent implements OnInit, AfterViewInit, OnDestroy 
     }
   }
 
+  get sortedCases(): CaseModel[]{
+    return this.sortService.sortCases(this.cases, this.sortOption);
+  }
+
+  onSortChange(option: SortOption){
+    this.sortOption = option;
+  }
+
   private updateCaseMarkers() {
     if (!this.map) return;
 
@@ -289,5 +302,9 @@ export class CasesOverviewComponent implements OnInit, AfterViewInit, OnDestroy 
 
   isActive(c: CaseModel): boolean {
     return c.isActive;
+  }
+  
+  isSos(c: CaseModel): boolean{
+    return c.isSos;
   }
 }

@@ -1,33 +1,36 @@
 export interface Case {
-  id: string;
+  id: number; // Changed from string
   patientName: string;
   birthYear: number;
-  age: number;
+  age?: number; 
   sex: 'M' | 'F';
-  quickSymptoms?: string[];
-  description: string; // symptoms + quickSymptoms
+  description: string;
   
-  bpm: number; 
+  // Vitals
+  bpm: number;
   systolicPressure: number;
   diastolicPressure: number;
-  resRate: number; 
-  saturation: number; 
+  resRate: number;
+  saturation: number;
   temperature: number;
   
   // Location
   latitude: number;
   longitude: number;
   
-  // Metadata
+  // Metadata - from backend
   priority: 'LOW' | 'MEDIUM' | 'HIGH';
-  status: 'active' | 'sent' | 'completed';
-  eta?: number; // in minutes
-  createdAt: Date;
-  createdBy: string; // user ID
-  isSOS: boolean;
+  isSos: boolean;
+  acknowledged: boolean;
+  isActive: boolean;
+  createdAt: string; // ISO date string
+  createdById: number;
+  
+  // Frontend-only fields (optional)
+  status?: 'active' | 'sent' | 'completed';
+  eta?: number;
 }
 
-// Data Transfer Object for creating a new case
 export interface CreateCaseDTO {
   patientName: string;
   birthYear: number;

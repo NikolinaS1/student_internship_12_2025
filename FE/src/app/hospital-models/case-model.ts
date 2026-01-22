@@ -4,7 +4,7 @@ export interface CaseModel {
   birthYear: number;
   sex: string;
   description: string;
-  priority: 'HIGH' | 'MEDIUM' | 'LOW';
+  priority: 'HIGH' | 'MEDIUM' | 'LOW' | 'SOS';
   isSos: boolean;
   isActive: boolean;
   acknowledged: boolean;
