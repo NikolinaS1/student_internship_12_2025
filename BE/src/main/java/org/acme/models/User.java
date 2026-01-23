@@ -13,6 +13,8 @@ public class User extends PanacheEntity {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    private Boolean isEnabled;
+
     public User() {}
 
     public String getName() { return name; }
@@ -21,4 +23,6 @@ public class User extends PanacheEntity {
     public void setPassword(String password) { this.password = password; }
     public Role getRole() { return role; }
     public void setRole(Role role) { this.role = role; }
+    public Boolean getIsEnabled() { return isEnabled; }
+    public void setIsEnabled(Boolean isEnabled) { this.isEnabled = isEnabled; }
 }
