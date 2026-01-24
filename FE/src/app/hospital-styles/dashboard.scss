@@ -225,19 +225,19 @@
 
 .dot-sos { 
   background: var(--sos); 
-  box-shadow: 0 0 0 4px rgba(255, 0, 0, 0.463);
+  box-shadow: 0 0 15px var(--sos) !important;
 }
 .dot-high { 
   background: var(--high); 
-  box-shadow: 0 0 0 4px rgba(255, 0, 0, 0.649);
+  box-shadow: 0 0 15px rgb(207, 66, 0) !important;
 }
 .dot-medium { 
   background: var(--medium); 
-  box-shadow: 0 0 0 4px rgba(238, 255, 0, 0.722);
+  box-shadow: 0 0 15px rgb(229, 206, 0) !important;
 }
 .dot-low { 
   background: var(--low); 
-  box-shadow: 0 0 0 4px rgba(123, 241, 50, 0.512);
+  box-shadow: 0 0 15px rgb(0, 106, 5) !important;
 }
 
 

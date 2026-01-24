@@ -57,24 +57,25 @@
 .sidebar-item--active {
   box-shadow: 0 0 0 3px var(--ring);
   background: var(--accent);
-  border-width: 4px;
+  border-width: 5px;
 }
 
-/* CHANGED: Priority border colors for sidebar */
-.sidebar-item--sos{
+.border--sos{
   border-color: var(--sos); 
   border-width: 4px;
 }
 
-.sidebar-item--high { 
+.border--high { 
   border-color: var(--high); 
   border-width: 4px;
 }
-.sidebar-item--medium { 
-  border-color: var(--medium); 
+.border--medium { 
+  border-color: var(--medium);
+  border-width: 4px;
 }
-.sidebar-item--low { 
+.border--low { 
   border-color: var(--low); 
+  border-width: 4px;
 }
 
 .sidebar-item__top {
@@ -367,11 +368,29 @@
   text-transform: uppercase;
   letter-spacing: 0.3px;
   box-shadow: 0 2px 8px rgba(22, 163, 74, 0.25);
+  transition: background 250ms ease, box-shadow 250ms ease, opacity 250ms ease;
 }
 
 .btn--success:hover {
   background: #15803d;
   box-shadow: 0 4px 12px rgba(22, 163, 74, 0.35);
+  opacity: 1;
+}
+
+.btn--ghost {
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border: none;
+  font-weight: 700;
+  padding: 0.85rem 1.25rem;
+  letter-spacing: 0.3px;
+  box-shadow: 0 2px 8px rgba(0, 8, 3, 0.25);
+  transition: background 250ms ease, box-shadow 250ms ease, opacity 250ms ease;
+}
+
+.btn--ghost:hover {
+  background: #232323;
+  box-shadow: 0 6px 12px rgba(41, 41, 41, 0.35);
   opacity: 1;
 }
 
@@ -391,7 +410,7 @@
 
 
 .chat {
-  border: 1px solid var(--border);
+  border: 3px solid rgba(43, 43, 43, 0.475);
   border-radius: var(--radius-xl);
   background: var(--card);
   overflow: hidden;

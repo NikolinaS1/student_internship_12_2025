@@ -23,9 +23,9 @@
           class="sidebar-item"
           [ngClass]="[
             c.id === selectedCase.id ? 'sidebar-item--active' : '',
-            isSos(c) == true ? 'sidebar-item--sos' :
-            c.priority === 'HIGH' ? 'sidebar-item--high' :
-            c.priority === 'MEDIUM' ? 'sidebar-item--medium' : 'sidebar-item--low'
+            isSos(c) == true ? 'border--sos' :
+            c.priority === 'HIGH' ? 'border--high' :
+            c.priority === 'MEDIUM' ? 'border--medium' : 'border--low'
           ]"
         >
           <div class="sidebar-item__top">
@@ -71,7 +71,13 @@
   <section class="case-detail__middle" *ngIf="selectedCase">
     <div class="case-detail__middle-inner">
       <!-- Enhanced details card -->
-      <div class="card">
+      <div class="card"
+        [ngClass]="[
+            isSos(selectedCase) == true ? 'border--sos' :
+            selectedCase.priority === 'HIGH' ? 'border--high' :
+            selectedCase.priority === 'MEDIUM' ? 'border--medium' : 'border--low'
+          ]"
+      >
         <div class="card__body">
           <div class="details__top">
             <div class="details__left">
@@ -155,7 +161,7 @@
           <div class="msg msg--other">
             <div class="bubble bubble--other">
               <div class="bubble__meta">
-                System • {{ selectedCase.createdAt | date: 'HH:mm' }}
+                EMS • {{ selectedCase.createdAt | date: 'HH:mm' }}
               </div>
               <div class="bubble__text">Case created and dispatched</div>
             </div>
@@ -165,7 +171,7 @@
           <div class="msg msg--self" *ngIf="isAcknowledged()">
             <div class="bubble bubble--self">
               <div class="bubble__meta">
-                Hospital Dispatch • {{ selectedCase.createdAt | date: 'HH:mm' }}
+                Hospital • {{ selectedCase.createdAt | date: 'HH:mm' }}
               </div>
               <div class="bubble__text">Case acknowledged and confirmed</div>
             </div>
@@ -182,7 +188,7 @@
               [ngClass]="isSelfMessage(msg) ? 'bubble--self' : 'bubble--other'"
             >
               <div class="bubble__meta">
-                {{ isSelfMessage(msg) ? 'You' : 'Vehicle' }} • {{ msg.createdAt | date: 'HH:mm' }}
+                {{ isSelfMessage(msg) ? 'Hospital' : 'EMS' }} • {{ msg.createdAt | date: 'HH:mm' }}
               </div>
               <div class="bubble__text">{{ msg.content }}</div>
             </div>
@@ -202,7 +208,7 @@
           <button
             type="button"
             (click)="onSend()"
-            class="btn btn--primary"
+            class="btn btn--ghost"
             [disabled]="!messageText.trim() || !isActive()"
           >
             Send

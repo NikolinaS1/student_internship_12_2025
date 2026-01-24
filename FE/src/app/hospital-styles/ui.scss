@@ -42,17 +42,17 @@
 /* buttons */
 .btn {
   border-radius: var(--radius-lg);
-  border: 1px solid var(--border);
-  background: var(--card);
-  color: var(--foreground);
+  border: 1px solid var(--primary );
+  background: var(--primary);
+  color: var(--primary-foreground);
   padding: 0.72rem 1.05rem;
   cursor: pointer;
-  transition: background 150ms ease, opacity 150ms ease, transform 80ms ease, box-shadow 150ms ease;
+  transition: background 150ms ease, opacity 150ms ease, transform 80ms ease, box-shadow 250ms ease-out;
   box-shadow: 0 1px 0 rgba(0, 0, 0, 0.03);
 }
 
 .btn:hover {
-  background: var(--accent);
+  box-shadow: 0 0 10px rgba(32, 32, 32, 0.905);
 }
 
 .btn:active {
@@ -65,13 +65,6 @@
   color: var(--primary-foreground);
 }
 
-.btn--primary:hover {
-  opacity: 0.92;
-}
-
-.btn--ghost {
-  background: transparent;
-}
 
 /* inputs */
 .input {
