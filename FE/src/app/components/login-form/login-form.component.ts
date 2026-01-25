@@ -13,6 +13,7 @@ import { AuthService } from '../../services/auth.service';
 export class LoginFormComponent {
   username = '';
   password = '';
+  showPassword = false;
   error = '';
   loading = false;
 

@@ -8,7 +8,12 @@
         <input type="text"  [(ngModel)]="username" />
 
         <label>Password</label>
-        <input type="password"  [(ngModel)]="password" />
+        <div class="password-input-wrapper">
+            <input [type]="showPassword ? 'text' : 'password'"  [(ngModel)]="password" />
+            <button type="button" class="toggle-password" (click)="showPassword = !showPassword">
+                {{ showPassword ? '👁️' : '👁️‍🗨️' }}
+            </button>
+        </div>
 
         <button (click)="submit()" [disabled]="loading">{{ loading ? 'Signing in...' : 'Sign In' }}</button>
 

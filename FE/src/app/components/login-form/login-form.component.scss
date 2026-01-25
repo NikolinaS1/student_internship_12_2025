@@ -29,7 +29,7 @@
         font-size: 14px;
         font-weight: 600;
     }
-
+    /* generic input styles (applies to all inputs) */
     input {
         width: 100%;
         margin-top: 6px;
@@ -38,6 +38,41 @@
         border: 1px solid #d1d5db;
         font-size: 14px;
         box-sizing: border-box;
+    }
+
+    .password-input-wrapper {
+        position: relative;
+        margin-top: 6px;
+
+        /* make space for the toggle on the right */
+        input {
+            padding-right: 44px;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: transparent;
+            border: none;
+            padding: 0;
+            width: 34px;
+            height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 18px;
+            line-height: 1;
+            color: #374151;
+            margin-top: 0; /* override generic button margin */
+            width: auto !important; /* ensure not overridden by generic button width */
+
+            &:focus {
+                outline: none;
+            }
+        }
     }
 
     button {
