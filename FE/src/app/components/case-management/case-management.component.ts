@@ -50,34 +50,34 @@ export class CaseManagementComponent implements OnInit, OnDestroy {
     this.selectedCase = null;
   }
 
-  deleteCase(c: any) {
-    this.caseToDelete = c;
-    this.showDeleteConfirmation = true;
-  }
-
-  confirmDelete() {
-    if (this.caseToDelete) {
-      this.caseService.deleteCase(this.caseToDelete.id).subscribe({
-        next: () => {
-          this.caseToDelete = null;
-          this.showDeleteConfirmation = false;
-          this.selectedCase = null;
-        },
-        error: (error) => {
-          console.error('Error deleting case:', error);
-          this.showDeleteConfirmation = false;
-        }
-      });
-    } else {
-      this.showDeleteConfirmation = false;
-    }
-  }
-
-  cancelDelete() {
-    this.caseToDelete = null;
-    this.showDeleteConfirmation = false;
-  }
-
+  /* deleteCase(c: any) {
+     this.caseToDelete = c;
+     this.showDeleteConfirmation = true;
+   }
+ 
+   confirmDelete() {
+     if (this.caseToDelete) {
+       this.caseService.deleteCase(this.caseToDelete.id).subscribe({
+         next: () => {
+           this.caseToDelete = null;
+           this.showDeleteConfirmation = false;
+           this.selectedCase = null;
+         },
+         error: (error) => {
+           console.error('Error deleting case:', error);
+           this.showDeleteConfirmation = false;
+         }
+       });
+     } else {
+       this.showDeleteConfirmation = false;
+     }
+   }
+ 
+   cancelDelete() {
+     this.caseToDelete = null;
+     this.showDeleteConfirmation = false;
+   }
+ */
   getPriorityClass(priority: string): string {
     switch (priority.toLowerCase()) {
       case 'high':
@@ -98,9 +98,9 @@ export class CaseManagementComponent implements OnInit, OnDestroy {
   applyFilters(): void {
     this.filteredCases = this.cases.filter(c => {
       const matchesSearch = c.patientName.toLowerCase().includes(this.searchTerm.toLowerCase());
-      const matchesSos = 
-        this.sosFilter === 'ALL' || 
-        (this.sosFilter === 'SOS' && c.isSos) || 
+      const matchesSos =
+        this.sosFilter === 'ALL' ||
+        (this.sosFilter === 'SOS' && c.isSos) ||
         (this.sosFilter === 'NON_SOS' && !c.isSos);
       return matchesSearch && matchesSos;
     });

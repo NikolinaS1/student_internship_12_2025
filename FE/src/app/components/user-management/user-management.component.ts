@@ -149,7 +149,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     this.closeModals();
   }
 
-  confirmDeleteUser(user: User): void {
+  /*confirmDeleteUser(user: User): void {
     this.userToDelete = user;
     this.showDeleteModal = true;
   }
@@ -160,7 +160,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
       this.closeModals();
     }
   }
-
+*/
   /* -------------------------
      VALIDATION
   -------------------------- */

@@ -96,7 +96,7 @@ export class UserService {
         });
     }
 
-    delete(id: number): void {
+   /* delete(id: number): void {
         this.http.delete(`${this.apiUrl}/${id}`, { headers: this.ngrokHeaders }).subscribe({
             next: () => {
                 const users = this.usersSubject.value.filter(u => u.id !== id);
@@ -110,5 +110,6 @@ export class UserService {
             }
         });
     }
+   */
 }
 
