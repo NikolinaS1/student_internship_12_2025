@@ -150,7 +150,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     this.closeModals();
   }
 
-  // Open confirmation modal before changing status
+  
   confirmStatusChange(user: User): void {
     if (!user || user.id === undefined || user.id === null) {
       console.error('Cannot change status: user id missing', user);
@@ -180,23 +180,23 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     const oldStatus = user.isEnabled;
     const newStatus = user.isEnabled === undefined ? true : !user.isEnabled;
 
-    // Optimistically update UI immediately
+    
     console.log('Optimistically updating local status for', user.id, 'to', newStatus);
     this.userService.updateLocalUserStatus(user.id, newStatus);
-    // Close the modal right away to reflect immediate UI change
+    
     this.cancelStatusChange();
 
-    // Operation continues in background; modal is already closed
+    
     this.isStatusChanging = false;
     this.userService.updateStatus(user.id, newStatus).subscribe({
       next: updatedUser => {
         console.log('Server confirmed status change for', updatedUser.id, 'isEnabled=', updatedUser.isEnabled);
-        // Ensure local state matches server authoritative response
+        
         this.userService.updateLocalUserStatus(updatedUser.id, updatedUser.isEnabled);
         this.isStatusChanging = false;
       },
       error: error => {
-        // Revert optimistic update on failure
+        
         console.error('Status change failed for', user.id, error);
         this.userService.updateLocalUserStatus(user.id, oldStatus);
         this.isStatusChanging = false;

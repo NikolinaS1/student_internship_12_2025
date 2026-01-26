@@ -85,15 +85,26 @@ export class UserService {
 
     update(user: User, password?: string): void {
         const updateData: any = { username: user.username, role: user.role };
-        if (password) {
-            updateData.password = password;
-        }
+
+    
         this.http.put<User>(`${this.apiUrl}/${user.id}`, updateData, { headers: this.ngrokHeaders }).subscribe({
             next: updatedUser => {
                 const users = this.usersSubject.value.map(u =>
                     u.id === user.id ? updatedUser : u
                 );
                 this.usersSubject.next(users);
+
+                if (password) {
+                    const passwordData = { newPassword: password };
+                    this.http.put(`${this.apiUrl}/${user.id}/password`, passwordData, { headers: this.ngrokHeaders }).subscribe({
+                        next: () => {
+                            console.log('Password updated successfully for user', user.id);
+                        },
+                        error: error => {
+                            console.error('Error updating password:', error);
+                        }
+                    });
+                }
             },
             error: error => {
                 console.error('Error updating user (backend not available):', error);

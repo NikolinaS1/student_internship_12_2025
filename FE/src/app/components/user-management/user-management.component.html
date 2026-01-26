@@ -52,7 +52,7 @@
                <!-- <button class="icon-btn danger" (click)="confirmDeleteUser(user)">Delete</button> -->
             </td>
             <td>
-                <button class="status-btn" [class.disabled]="user.isEnabled === false" [disabled]="user.isEnabled === undefined" (click)="confirmStatusChange(user)">
+                <button class="status-btn" [class.disabled]="user.isEnabled === false" [class.active]="user.isEnabled === true" [disabled]="user.isEnabled === undefined" (click)="confirmStatusChange(user)">
                     {{ user.isEnabled === undefined ? '?' : (user.isEnabled ? 'ACTIVE' : 'DISABLED') }}
                 </button>
             </td>

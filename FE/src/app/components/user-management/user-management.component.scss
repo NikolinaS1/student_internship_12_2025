@@ -106,6 +106,15 @@
         opacity: 0.5;
         cursor: not-allowed;
     }
+
+    &.active {
+        background: #86efac;
+        color: #166534;
+        
+        &:hover {
+            opacity: 0.9;
+        }
+    }
 }
 
 /* =========================
@@ -202,16 +211,21 @@
     }
 }
 
-/* Disabled status styling: red border and light red background */
+
 .status-btn.disabled {
     border-color: #dc2626;
     background: #fee2e2;
     color: #991b1b;
 }
 
-/* =========================
-   ROLE PILL
-========================= */
+
+.status-btn.active {
+    border-color: #16a34a;
+    background: #dcfce7;
+    color: #15803d;
+}
+
+
 .role-pill {
     padding: 6px 14px;
     border-radius: 999px;
