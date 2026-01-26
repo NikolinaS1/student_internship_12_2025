@@ -10,6 +10,7 @@ import org.acme.dtos.cases.*;
 import org.acme.models.Case;
 import org.acme.services.CaseService;
 import org.acme.websockets.CaseWebSocketEndpoint;
+import org.eclipse.microprofile.jwt.JsonWebToken;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,6 +25,9 @@ public class CaseResource {
 
     @Inject
     CaseWebSocketEndpoint webSocketEndpoint;
+
+    @Inject
+    JsonWebToken jwt;
 
     @GET
     //@RolesAllowed({"ADMIN", "HOSPITAL"})
@@ -46,12 +50,8 @@ public class CaseResource {
     @POST
     @Path("/sos")
     //@RolesAllowed({"VEHICLE"})
-    public Response createSosCase(@Valid SosCaseCreateRequest request, @HeaderParam("userId") Long userId) {
-        if (userId == null) {
-            return Response.status(Response.Status.BAD_REQUEST)
-                    .entity("userId header is required")
-                    .build();
-        }
+    public Response createSosCase(@Valid SosCaseCreateRequest request) {
+        Long userId = Long.parseLong(jwt.getSubject());
 
         Case createdCase = caseService.createSosCase(request, userId);
 
@@ -65,12 +65,8 @@ public class CaseResource {
     @POST
     @Path("/regular")
     //@RolesAllowed({"VEHICLE"})
-    public Response createRegularCase(@Valid RegularCaseCreateRequest request, @HeaderParam("userId") Long userId) {
-        if (userId == null) {
-            return Response.status(Response.Status.BAD_REQUEST)
-                    .entity("userId header is required")
-                    .build();
-        }
+    public Response createRegularCase(@Valid RegularCaseCreateRequest request) {
+        Long userId = Long.parseLong(jwt.getSubject());
 
         Case createdCase = caseService.createRegularCase(request, userId);
 
