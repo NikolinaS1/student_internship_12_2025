@@ -400,7 +400,8 @@ export class CaseModal implements OnChanges {
     this.originalCaseData = null;
   }
 
-  getHeartRateLabel(bpm: number): string {
+  getHeartRateLabel(bpm: number | undefined): string {
+    if (bpm === undefined) return 'normal';
     if (bpm < 40) return 'very-low';
     if (bpm < 60) return 'low';
     if (bpm <= 100) return 'normal';
@@ -408,7 +409,8 @@ export class CaseModal implements OnChanges {
     return 'very-high';
   }
 
-  getRespiratoryRateLabel(resRate: number): string {
+  getRespiratoryRateLabel(resRate: number | undefined): string {
+    if (resRate === undefined) return 'normal';
     if (resRate < 8) return 'very-low';
     if (resRate < 12) return 'low';
     if (resRate <= 20) return 'normal';
@@ -416,7 +418,8 @@ export class CaseModal implements OnChanges {
     return 'very-high';
   }
 
-  getOxygenSaturationLabel(saturation: number): string {
+  getOxygenSaturationLabel(saturation: number | undefined): string {
+    if (saturation === undefined) return 'normal';
     if (saturation < 90) return 'critical';
     if (saturation < 95) return 'low';
     return 'normal';

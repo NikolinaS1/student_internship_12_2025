@@ -3,7 +3,7 @@ import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http
 import { Observable, throwError, BehaviorSubject } from 'rxjs';
 import { catchError, switchMap } from 'rxjs/operators';
 import { ConfigService } from './config.service';
-import { Case, CreateCaseDTO } from '../models/case.model';
+import { Case, CreateCaseDTO, CreateSosCaseDTO, UpdateCaseDTO } from '../models/case.model';
 
 
 @Injectable({
@@ -50,14 +50,14 @@ export class CaseService {
     return headers;
   }
 
-  getAllCases(): Observable<any[]> {
-    return this.http.get<any[]>(this.apiUrl).pipe(
+  getAllCases(): Observable<Case[]> {
+    return this.http.get<Case[]>(this.apiUrl).pipe(
       catchError(this.handleError)
     );
   }
 
-  getCaseById(id: number): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/${id}`).pipe(
+  getCaseById(id: number): Observable<Case> {
+    return this.http.get<Case>(`${this.apiUrl}/${id}`).pipe(
       catchError(this.handleError)
     );
   }
@@ -79,57 +79,57 @@ export class CaseService {
     });
   }
 
-  createRegularCase(caseData: CreateCaseDTO, token?: string): Observable<any> {
+  createRegularCase(caseData: CreateCaseDTO, token?: string): Observable<Case> {
     return this.configService.getConfig().pipe(
       switchMap(config => {
         const url = `${config.Urls.apiUrl}/cases/regular`;
         const headers = this.createHeaders(token);
-        return this.http.post(url, caseData, { headers }).pipe(
+        return this.http.post<Case>(url, caseData, { headers }).pipe(
           catchError(this.handleError)
         );
       })
     );
   }
 
-  updateRegularCase(caseId: number, caseData: CreateCaseDTO, token?: string): Observable<any> {
+  updateRegularCase(caseId: number, caseData: UpdateCaseDTO, token?: string): Observable<Case> {
     return this.configService.getConfig().pipe(
       switchMap(config => {
         const url = `${config.Urls.apiUrl}/cases/${caseId}`;
         const headers = this.createHeaders(token);
-        return this.http.put(url, caseData, { headers }).pipe(
+        return this.http.put<Case>(url, caseData, { headers }).pipe(
           catchError(this.handleError)
         );
       })
     );
   }
 
-  createSosCase(sosCase: any, token?: string): Observable<any> {
+  createSosCase(sosCase: CreateSosCaseDTO, token?: string): Observable<Case> {
     return this.configService.getConfig().pipe(
       switchMap(config => {
         const url = `${config.Urls.apiUrl}/cases/sos`;
         const headers = this.createHeaders(token);
-        return this.http.post(url, sosCase, { headers });
+        return this.http.post<Case>(url, sosCase, { headers });
       })
     );
   }
 
-  updateSosCase(caseId: number, sosCase: any, token?: string): Observable<any> {
+  updateSosCase(caseId: number, sosCase: UpdateCaseDTO, token?: string): Observable<Case> {
     return this.configService.getConfig().pipe(
       switchMap(config => {
         const url = `${config.Urls.apiUrl}/cases/${caseId}`;
         const headers = this.createHeaders(token);
-        return this.http.put(url, sosCase, { headers });
+        return this.http.put<Case>(url, sosCase, { headers });
       })
     );
   }
 
-  endCase(caseId: number, token?: string): Observable<any> {
+  endCase(caseId: number, token?: string): Observable<Case> {
     return this.configService.getConfig().pipe(
       switchMap(config => {
         const url = `${config.Urls.apiUrl}/cases/${caseId}/end`;
         const headers = this.createHeaders(token);
         const body = { isActive: false };
-        return this.http.put(url, body, { headers });
+        return this.http.put<Case>(url, body, { headers });
       })
     );
   }
