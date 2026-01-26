@@ -4,8 +4,9 @@
   <app-sidebar 
     [activeCase]="activeCase"
     (newCaseClicked)="openCaseModal()"
+    (sosClicked)="openSosModal()"
   ></app-sidebar>
-  
+
   <main class="content-view">
     @if (!activeCase) {
       <div class="empty-state">
@@ -15,7 +16,7 @@
         </div>
       </div>
     } @else {
-      <div class="case-detail">
+      <div class="case-detail" [class.sos-detail]="activeCase.isSos">
         <div class="case-detail-header">
           <div class="header-left">
             <h1>{{ activeCase.patientName }}</h1>
@@ -40,50 +41,57 @@
               <p>{{ activeCase.description }}</p>
             </div>
           </div>
-
+          
           <div class="vitals-section">
             <div class="info-label">VITAL SIGNS</div>
-            <div class="vitals-row">
-              <div class="vital-item">
-                <span class="vital-emoji">❤️</span>
-                <div class="vital-info">
-                  <div class="vital-label">Heart Rate</div>
-                  <div class="vital-value">{{ activeCase.bpm }} bpm</div>
+            
+            @if (!activeCase.isSos) {
+              <div class="vitals-row">
+                <div class="vital-item">
+                  <span class="vital-emoji">❤️</span>
+                  <div class="vital-info">
+                    <div class="vital-label">Heart Rate</div>
+                    <div class="vital-value">{{ activeCase.bpm }} bpm</div>
+                  </div>
+                </div>
+                
+                <div class="vital-item">
+                  <span class="vital-emoji">🩺</span>
+                  <div class="vital-info">
+                    <div class="vital-label">Blood Pressure</div>
+                    <div class="vital-value">{{ activeCase.systolicPressure }}/{{ activeCase.diastolicPressure }}</div>
+                  </div>
+                </div>
+                
+                <div class="vital-item">
+                  <span class="vital-emoji">🫁</span>
+                  <div class="vital-info">
+                    <div class="vital-label">Resp. Rate</div>
+                    <div class="vital-value">{{ activeCase.resRate }} br/min</div>
+                  </div>
+                </div>
+                
+                <div class="vital-item">
+                  <span class="vital-emoji">💨</span>
+                  <div class="vital-info">
+                    <div class="vital-label">O2 Saturation</div>
+                    <div class="vital-value">{{ activeCase.saturation }}%</div>
+                  </div>
+                </div>
+                
+                <div class="vital-item">
+                  <span class="vital-emoji">🌡️</span>
+                  <div class="vital-info">
+                    <div class="vital-label">Temperature</div>
+                    <div class="vital-value">{{ activeCase.temperature }}°C</div>
+                  </div>
                 </div>
               </div>
-
-              <div class="vital-item">
-                <span class="vital-emoji">🩺</span>
-                <div class="vital-info">
-                  <div class="vital-label">Blood Pressure</div>
-                  <div class="vital-value">{{ activeCase.systolicPressure }}/{{ activeCase.diastolicPressure }}</div>
-                </div>
+            } @else {
+              <div class="vitals-na">
+                <p>⚠️ Vital signs not available for SOS emergency cases</p>
               </div>
-
-              <div class="vital-item">
-                <span class="vital-emoji">🫁</span>
-                <div class="vital-info">
-                  <div class="vital-label">Resp. Rate</div>
-                  <div class="vital-value">{{ activeCase.resRate }} br/min</div>
-                </div>
-              </div>
-
-              <div class="vital-item">
-                <span class="vital-emoji">💨</span>
-                <div class="vital-info">
-                  <div class="vital-label">O2 Saturation</div>
-                  <div class="vital-value">{{ activeCase.saturation }}%</div>
-                </div>
-              </div>
-
-              <div class="vital-item">
-                <span class="vital-emoji">🌡️</span>
-                <div class="vital-info">
-                  <div class="vital-label">Temperature</div>
-                  <div class="vital-value">{{ activeCase.temperature }}°C</div>
-                </div>
-              </div>
-            </div>
+            }
           </div>
         </div>
 
@@ -96,9 +104,7 @@
           </div>
           <div class="message-input-wrapper">
             <input type="text" placeholder="Type a message..." class="message-input" />
-            <button class="send-btn">
-              Send
-            </button>
+            <button class="send-btn">Send</button>
           </div>
         </div>
       </div>
@@ -115,3 +121,20 @@
   (caseCreated)="onCaseCreated($event)"
   (caseUpdated)="onCaseUpdated($event)"
 ></app-case-modal>
+
+<app-sos-modal
+  [isOpen]="isSosModalOpen"
+  [editMode]="isEditMode"
+  [existingCase]="activeCase"
+  (close)="closeSosModal()"
+  (caseCreated)="onCaseCreated($event)"
+  (caseUpdated)="onCaseUpdated($event)"
+></app-sos-modal>
+
+<app-end-case-modal
+  [isOpen]="isEndCaseModalOpen"
+  [caseName]="activeCase?.patientName || ''"
+  [isSos]="activeCase?.isSos || false"
+  (confirm)="confirmEndCase()"
+  (cancel)="cancelEndCase()"
+></app-end-case-modal>

@@ -4,14 +4,18 @@ import { Subscription } from 'rxjs';
 import { Header } from '../../components/header/header';
 import { Sidebar } from '../../components/sidebar/sidebar';
 import { CaseModal } from '../../components/case-modal/case-modal';
+import { SosModal } from '../../components/sos-modal/sos-modal';
+import { EndCaseModal } from '../../components/end-case-modal/end-case-modal';
 import { Case } from '../../models/case.model';
 import { MOCK_USER } from '../../models/mock-data';
 import { WebSocketService, LocationMessage } from '../../services/websocket.service';
+import { CaseService } from '../../services/case.service';
+import { GeolocationService } from '../../services/geolocation.service';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [Header, Sidebar, CaseModal, CommonModule],
+  imports: [Header, Sidebar, CaseModal, SosModal, EndCaseModal, CommonModule],
   templateUrl: './dashboard.html',
   styleUrls: ['./dashboard.scss']
 })
@@ -19,10 +23,17 @@ export class Dashboard implements OnInit, OnDestroy {
   currentUser = MOCK_USER;
   activeCase: Case | null = null;
   isModalOpen = false;
+  isSosModalOpen = false;
+  isEndCaseModalOpen = false;
   isEditMode = false;
+
   private wsSubscription: Subscription | null = null;
 
-  constructor(private webSocketService: WebSocketService) {}
+  constructor(
+    private webSocketService: WebSocketService,
+    private caseService: CaseService,
+    private geolocationService: GeolocationService
+  ) {}
 
   ngOnInit(): void {
     this.wsSubscription = this.webSocketService.connect().subscribe(
@@ -34,37 +45,48 @@ export class Dashboard implements OnInit, OnDestroy {
     if (this.wsSubscription) {
       this.wsSubscription.unsubscribe();
     }
+    this.geolocationService.stopTracking();
     this.webSocketService.disconnect();
   }
 
   private handleWebSocketMessage(message: LocationMessage): void {
-    console.log('WebSocket message received:', message);
-    
     const { type, data } = message;
 
-    // Update active case if IDs match
+    if (type === 'LOCATION_UPDATE') {
+      return;
+    }
+
     if (this.activeCase && data?.id === this.activeCase.id) {
       switch (type) {
         case 'CREATE':
           this.activeCase = data;
+          this.startLocationTracking();
           break;
         case 'ACKNOWLEDGE':
-          // Update acknowledged status
           this.activeCase = { ...this.activeCase, acknowledged: data.acknowledged };
           break;
         case 'UPDATE':
           this.activeCase = data;
           break;
         case 'END':
-          this.activeCase = { ...this.activeCase, isActive: data.isActive };
+          this.stopLocationTracking();
+          this.activeCase = null;
           break;
-        default:
-          console.log('Unknown message type:', type);
       }
     } else if (type === 'CREATE' && !this.activeCase) {
-      // If no active case, set newly created case as active
       this.activeCase = data;
+      this.startLocationTracking();
     }
+  }
+
+  private startLocationTracking(): void {
+    if (this.activeCase && !this.geolocationService.isTracking()) {
+      this.geolocationService.startTracking(this.activeCase.id);
+    }
+  }
+
+  private stopLocationTracking(): void {
+    this.geolocationService.stopTracking();
   }
 
   openCaseModal(): void {
@@ -72,9 +94,43 @@ export class Dashboard implements OnInit, OnDestroy {
     this.isModalOpen = true;
   }
 
+  openSosModal(): void {
+    this.isSosModalOpen = true;
+  }
+
   updateCase(): void {
-    this.isEditMode = true;
-    this.isModalOpen = true;
+    if (this.activeCase?.isSos) {
+      this.isEditMode = true;
+      this.isSosModalOpen = true;
+    } else {
+      this.isEditMode = true;
+      this.isModalOpen = true;
+    }
+  }
+
+  endCase(): void {
+    this.isEndCaseModalOpen = true;
+  }
+
+  confirmEndCase(): void {
+    if (!this.activeCase) return;
+
+    this.caseService.endCase(this.activeCase.id).subscribe({
+      next: () => {
+        this.stopLocationTracking();
+        this.activeCase = null;
+        this.isEndCaseModalOpen = false;
+      },
+      error: (error) => {
+        console.error('Error ending case:', error);
+        alert('Failed to end case. Please try again.');
+        this.isEndCaseModalOpen = false;
+      }
+    });
+  }
+
+  cancelEndCase(): void {
+    this.isEndCaseModalOpen = false;
   }
 
   closeCaseModal(): void {
@@ -82,34 +138,17 @@ export class Dashboard implements OnInit, OnDestroy {
     this.isEditMode = false;
   }
 
+  closeSosModal(): void {
+    this.isSosModalOpen = false;
+    this.isEditMode = false;
+  }
+
   onCaseCreated(newCase: Case): void {
     this.activeCase = newCase;
-    console.log('Case created:', newCase);
+    this.startLocationTracking();
   }
 
   onCaseUpdated(updatedCase: Case): void {
     this.activeCase = updatedCase;
-    console.log('Case updated:', updatedCase);
-  }
-
-  endCase(): void {
-    if (this.activeCase) {
-      this.activeCase = { ...this.activeCase, isActive: false };
-    }
-  }
-
-  getHeartRateDisplay(): string {
-    if (!this.activeCase) return '';
-    return `${this.activeCase.bpm} bpm`;
-  }
-
-  getRespiratoryRateDisplay(): string {
-    if (!this.activeCase) return '';
-    return `${this.activeCase.resRate} br/min`;
-  }
-
-  getO2Display(): string {
-    if (!this.activeCase) return '';
-    return `${this.activeCase.saturation}%`;
   }
 }
