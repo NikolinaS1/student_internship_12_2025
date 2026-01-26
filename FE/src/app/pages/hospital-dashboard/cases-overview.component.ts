@@ -92,10 +92,10 @@ export class CasesOverviewComponent implements OnInit, AfterViewInit, OnDestroy 
     const hospitalIcon = L.icon({
       iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
       shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-      iconSize: [25, 41],
-      iconAnchor: [12, 41],
-      popupAnchor: [1, -34],
-      shadowSize: [41, 41],
+      iconSize: [20, 33],
+      iconAnchor: [10, 33],
+      popupAnchor: [1, -28],
+      shadowSize: [33, 33],
     });
 
     L.marker([this.HOSPITAL_LAT, this.HOSPITAL_LNG], { icon: hospitalIcon })
@@ -189,9 +189,9 @@ export class CasesOverviewComponent implements OnInit, AfterViewInit, OnDestroy 
       if (caseData.isActive) {
         const caseIcon = L.icon({
           iconUrl: this.getCaseIconUrl(caseData),
-          iconSize: [32, 32],
-          iconAnchor: [16, 16],
-          popupAnchor: [0, -16],
+          iconSize: [26, 26],
+          iconAnchor: [13, 26],
+          popupAnchor: [0, -26],
         });
 
         const marker = L.marker([caseData.latitude, caseData.longitude], { icon: caseIcon })
@@ -220,9 +220,9 @@ export class CasesOverviewComponent implements OnInit, AfterViewInit, OnDestroy 
       if (caseData && caseData.isActive) {
         const caseIcon = L.icon({
           iconUrl: this.getCaseIconUrl(caseData),
-          iconSize: [32, 32],
-          iconAnchor: [16, 16],
-          popupAnchor: [0, -16],
+          iconSize: [26, 26],
+          iconAnchor: [13, 13],
+          popupAnchor: [0, -13],
         });
 
         const marker = L.marker([latitude, longitude], { icon: caseIcon })
