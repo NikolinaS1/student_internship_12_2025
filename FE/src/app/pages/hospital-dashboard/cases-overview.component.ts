@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import * as L from 'leaflet';
 import { WebSocketLocationService, RemoteLocation } from '../../hospital-services/location-ws.service';
 import { CaseService } from '../../hospital-services/case-store.service';
-import { AuthService } from '../../hospital-services/auth-service';
+import { HospitalAuthService } from '../../hospital-services/auth-service';
 import { CaseModel } from '../../hospital-models/case-model';
 import { CaseWebSocketService } from '../../hospital-services/case-websocket.service';
 import { ConfigService } from '../../hospital-services/config-service';
@@ -23,7 +23,7 @@ export class CasesOverviewComponent implements OnInit, AfterViewInit, OnDestroy 
 
   private wsService = inject(WebSocketLocationService);
   private caseService = inject(CaseService);
-  private authService = inject(AuthService);
+  private authService = inject(HospitalAuthService);
   private caseWsService = inject(CaseWebSocketService);
   private configService = inject(ConfigService);
   private sortService = inject(CaseSortService);
@@ -144,16 +144,12 @@ export class CasesOverviewComponent implements OnInit, AfterViewInit, OnDestroy 
     }
   }
 
-  /**
-   * Find case by ID
-   */
+  
   private getCaseById(caseId: number): CaseModel | undefined {
     return this.cases.find(c => c.id === caseId);
   }
 
-  /**
-   * Get ambulance icon URL based on priority and SOS status
-   */
+
   private getCaseIconUrl(caseData: CaseModel): string {
     if (caseData.isSos) {
       return 'assets/images/sos case.png';
@@ -211,9 +207,6 @@ export class CasesOverviewComponent implements OnInit, AfterViewInit, OnDestroy 
     }
   }
 
-  /**
-   * Update marker location for specific case (real-time WebSocket update)
-   */
   private updateCaseMarkerLocation(caseId: number, latitude: number, longitude: number) {
     const marker = this.caseMarkers.get(caseId);
 

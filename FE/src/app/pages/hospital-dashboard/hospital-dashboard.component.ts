@@ -19,7 +19,7 @@ type StatusChip = { text: string; cls: string };
 })
 export class HospitalDashboardComponent implements OnInit, OnDestroy {
   readonly store = inject(CaseService);
-  readonly auth = inject(AuthService);
+  readonly authService = inject(AuthService);
   private sub?: Subscription;
 
   messageText = '';

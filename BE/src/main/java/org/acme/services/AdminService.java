@@ -6,13 +6,10 @@ import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.acme.dtos.admin.*;
 import org.acme.exeptions.ConflictException;
 import org.acme.exeptions.NotFoundException;
 import org.acme.models.User;
-import org.acme.dtos.admin.UserResponse;
-import org.acme.dtos.admin.CreateUserRequest;
-import org.acme.dtos.admin.ChangePasswordRequest;
-import org.acme.dtos.admin.UpdateUserRequest;
 import org.jboss.logging.Logger;
 
 @ApplicationScoped
@@ -45,13 +42,14 @@ import org.jboss.logging.Logger;
         user.setName(request.username());
         user.setPassword(passwordService.hash(request.password()));
         user.setRole(request.role());
+        user.setIsEnabled(true);
 
         user.persist();
         LOG.infof("User created successfully: id=%d, username=%s, role=%s", user.id, user.getName(), user.getRole());
         return UserResponse.from(user);
     }
 
-
+    /*
     @Transactional
     public void deleteUser(Long id) {
         LOG.infof("Attempting to delete user with id: %d", id);
@@ -61,6 +59,17 @@ import org.jboss.logging.Logger;
 
         }
         LOG.infof("User deleted successfully: id=%d", id);
+    }
+    */
+
+    @Transactional
+    public void toggleUserStatus(Long id, UpdateUserStatusRequest request) {
+        User user = User.findById(id);
+        if (user == null) {
+            throw new NotFoundException("User with ID " + id + " not found");
+        }
+        user.setIsEnabled(request.isEnabled());
+        user.persist();
     }
 
     @Transactional

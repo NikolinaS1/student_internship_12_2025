@@ -57,6 +57,7 @@ export class AuthService {
         
         const decoded = this.decodeJWT(token);
         const role = decoded?.group || decoded?.groups?.[0] || 'hospital';
+        localStorage.setItem('userId', decoded?.sub || '');
         
         
         const redirectPath = this.getRedirectPath(role);
@@ -67,6 +68,11 @@ export class AuthService {
     } catch (err) {
       return false;
     }
+  }
+
+   getUserId(): number {
+    const userId = localStorage.getItem('userId');
+    return userId ? parseInt(userId, 10) : 0;
   }
 
   async logout(): Promise<void> {

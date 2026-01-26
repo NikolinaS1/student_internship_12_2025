@@ -6,11 +6,8 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
+import org.acme.dtos.admin.*;
 import org.acme.services.AdminService;
-import org.acme.dtos.admin.CreateUserRequest;
-import org.acme.dtos.admin.ChangePasswordRequest;
-import org.acme.dtos.admin.UserResponse;
-import org.acme.dtos.admin.UpdateUserRequest;
 
 import java.util.List;
 
@@ -42,6 +39,7 @@ public class AdminResource {
 
     }
 
+    /*
     // DELETE /admin/users/{id}
     @DELETE
     @Path("/{id}")
@@ -51,6 +49,7 @@ public class AdminResource {
             return Response.noContent().build();
 
     }
+    */
 
     // PUT /admin/users/{id}/password
     @PUT
@@ -73,5 +72,10 @@ public class AdminResource {
             return Response.ok(updated).build();
     }
 
-
+    @PUT
+    @Path("/{id}/status")
+    public Response toggleUserStatus(@PathParam("id") Long id, @Valid UpdateUserStatusRequest request) {
+        adminService.toggleUserStatus(id, request);
+        return Response.noContent().build();
+    }
 }

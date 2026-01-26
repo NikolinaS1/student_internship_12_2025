@@ -29,7 +29,6 @@
   padding-right: 0.25rem;
 }
 
-/* More compact to be "narrow" and not obtrusive */
 .case-detail__sidebar .sidebar__list {
   padding: 0.75rem;
   display: flex;
@@ -37,7 +36,6 @@
   gap: 0.75rem;
 }
 
-/* CHANGED: Enhanced sidebar items */
 .sidebar-item {
   background: var(--card);
   border: 3px solid var(--border);
@@ -212,7 +210,7 @@
   gap: 1.2rem;
 }
 
-/* Details card stays "normal", chat fills remaining space */
+
 .case-detail__middle-inner > .card {
   flex: 0 0 auto;
 }
@@ -222,7 +220,6 @@
   min-height: 0;
 }
 
-/* CHANGED: Enhanced details section */
 .details__top {
   display: flex;
   align-items: flex-start;
@@ -326,7 +323,6 @@
   letter-spacing: 0.2px;
 }
 
-/* CHANGED: Enhanced info pills */
 .details__info {
   display: flex;
   flex-wrap: wrap;
@@ -361,7 +357,7 @@
   font-weight: 700;
 }
 
-/* CHANGED: Success button styling */
+
 .btn--success {
   background: var(--success);
   color: var(--success-foreground);
@@ -379,7 +375,7 @@
   opacity: 1;
 }
 
-/* CHANGED: Enhanced chips */
+
 .chip--large {
   padding: 0.65rem 1.25rem;
   font-size: 0.95rem;
@@ -393,7 +389,7 @@
   font-size: 0.75rem;
 }
 
-/* CHANGED: Enhanced chat */
+
 .chat {
   border: 1px solid var(--border);
   border-radius: var(--radius-xl);
@@ -539,7 +535,6 @@
   gap: 0.9rem;
 }
 
-/* iframe/map fills available height */
 .case-detail__map .map-frame {
   width: 100%;
   flex: 1;
@@ -550,7 +545,6 @@
   display: block;
 }
 
-/* CHANGED: Enhanced map meta */
 .map-meta {
   border: 1px solid var(--border);
   border-radius: var(--radius-xl);
