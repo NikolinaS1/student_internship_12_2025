@@ -30,6 +30,7 @@ public class MessageResource {
                         msg.id,
                         msg.getCaseEntity().id,
                         msg.getSender().id,
+                        msg.getSender().getName(),
                         msg.getContent(),
                         msg.getCreatedAt()
                 ))
@@ -47,6 +48,7 @@ public class MessageResource {
                 savedMessage.id,
                 savedMessage.getCaseEntity().id,
                 savedMessage.getSender().id,
+                savedMessage.getSender().getName(),
                 savedMessage.getContent(),
                 savedMessage.getCreatedAt()
         );

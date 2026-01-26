@@ -47,6 +47,7 @@ export class CaseDetailComponent implements OnInit, AfterViewInit, OnDestroy {
 
   messages: Message[] = [];
   currentUserId: number = this.authService.getUserId();
+  currentUserName: string = "Unknown";
 
   sortOption: SortOption = 'priority-high-low';
   sortOptions = this.sortService.getSortOptions();
@@ -76,6 +77,7 @@ export class CaseDetailComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnInit() {
     this.currentUserId = this.hospitalAuthService.getUserId();
+    this.currentUserName = this.hospitalAuthService.getUserName();
 
     // Subscribe to location updates
     this.locationSub = this.wsService.remoteLocations$.subscribe((locations) => {
@@ -111,8 +113,6 @@ export class CaseDetailComponent implements OnInit, AfterViewInit, OnDestroy {
 
     try {
       await this.messageWsService.sendMessage(
-        this.selectedCase.id,
-        this.currentUserId,
         text
       );
 
@@ -239,6 +239,10 @@ export class CaseDetailComponent implements OnInit, AfterViewInit, OnDestroy {
 
   isSelfMessage(msg: Message): boolean {
     return msg.senderId === this.currentUserId;
+  }
+
+  getSenderName(msg: Message): string {
+    return msg.senderName || 'Unknown';
   }
 
   private initDetailMap() {

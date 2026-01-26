@@ -57,6 +57,8 @@ export class AuthService {
         // Decode JWT and get role
         const decoded = this.decodeJWT(token);
         const role = decoded?.group || decoded?.groups?.[0] || 'hospital';
+        const name = decoded?.name || "Unknown";
+        localStorage.setItem('userName', name);
         localStorage.setItem('userId', decoded?.sub || '');
         
         // Redirect based on role

@@ -7,6 +7,7 @@ export interface Message {
   id: number;
   caseId: number;
   senderId: number;
+  senderName: string;
   content: string;
   createdAt: string;
 }
@@ -51,7 +52,7 @@ export class MessageWebSocketService {
       this.ws.onmessage = (event) => {
         try {
           const data = JSON.parse(event.data);
-
+          console.log('WebSocket message received:', data);
           if (Array.isArray(data)) {
             const sorted = this.sortMessages(data);
             this.messagesSubject.next(sorted);
@@ -61,10 +62,12 @@ export class MessageWebSocketService {
               id: data.id || Date.now(),
               caseId: data.caseId || caseId, 
               senderId: data.senderId,
+              senderName: data.senderName || 'Unknown',
               content: data.content,
               createdAt: data.createdAt || new Date().toISOString()
             };
             this.appendMessage(fullMsg);
+            console.log('Received message via WebSocket:', fullMsg);
           }
         } catch (e) {
           console.error('Error parsing message:', e);
@@ -108,31 +111,11 @@ export class MessageWebSocketService {
     this.messagesSubject.next([]);
   }
 
-  async sendMessage(caseId: number, senderId: number, content: string): Promise<void> {
-    const url = `${this.configService.apiUrl}/messages/case/save`;
-    const payload = { caseId, senderId, content };
-
-    const optimisticMessage: Message = {
-      id: Date.now(),   // temporary ID
-      caseId,
-      senderId,
-      content,
-      createdAt: new Date().toISOString()
-    };
-
-    this.appendMessage(optimisticMessage);
-
-    try {
-      const response = await this.http.post<Message>(url, payload).toPromise();
-
-      if (response) {
-        this.replaceOptimisticMessage(optimisticMessage.id, response);
-      }
-    } catch (error) {
-      console.error('Error sending message:', error);
-
-      this.removeMessage(optimisticMessage.id);
-      throw error;
+  async sendMessage(content: string): Promise<void> {
+    if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
+      console.error('WebSocket is not connected. Cannot send message.');
+    } else {
+      this.ws?.send(content);
     }
   }
 
