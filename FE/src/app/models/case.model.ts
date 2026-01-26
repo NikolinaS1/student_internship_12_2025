@@ -1,30 +1,30 @@
 export interface Case {
-  id: number; // Changed from string
+  id: number;
   patientName: string;
   birthYear: number;
   age?: number; 
   sex: 'M' | 'F';
   description: string;
-  
-  // Vitals
-  bpm: number;
-  systolicPressure: number;
-  diastolicPressure: number;
-  resRate: number;
-  saturation: number;
-  temperature: number;
-  
+
   // Location
   latitude: number;
   longitude: number;
-  
+
   // Metadata - from backend
   priority: 'LOW' | 'MEDIUM' | 'HIGH';
   isSos: boolean;
   acknowledged: boolean;
   isActive: boolean;
-  createdAt: string; // ISO date string
+  createdAt: string;
   createdById: number;
+
+  // Vitals - OPTIONAL (only for regular cases, not for SOS)
+  bpm?: number;
+  systolicPressure?: number;
+  diastolicPressure?: number;
+  resRate?: number;
+  saturation?: number;
+  temperature?: number;
   
   // Frontend-only fields (optional)
   status?: 'active' | 'sent' | 'completed';
@@ -44,4 +44,32 @@ export interface CreateCaseDTO {
   temperature: number;
   latitude: number;
   longitude: number;
+}
+
+export interface CreateSosCaseDTO {
+  patientName: string;
+  birthYear: number;
+  sex: 'M' | 'F';
+  description: string;
+  latitude: number;
+  longitude: number;
+}
+
+export interface UpdateCaseDTO {
+  patientName?: string;
+  birthYear?: number;
+  sex?: 'M' | 'F';
+  description?: string;
+  bpm?: number;
+  systolicPressure?: number;
+  diastolicPressure?: number;
+  resRate?: number;
+  saturation?: number;
+  temperature?: number;
+  isSos?: boolean;
+  acknowledged?: boolean;
+  isActive?: boolean;
+  priority?: 'LOW' | 'MEDIUM' | 'HIGH';
+  latitude?: number;
+  longitude?: number;
 }

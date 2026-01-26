@@ -2,14 +2,14 @@
   @if (!activeCase) {
     <div class="action-stack">
       <button class="btn btn-primary" (click)="onNewCaseClick()">+ New Case</button>
-      <button class="btn btn-emergency">⚠ SOS Emergency</button>
+      <button class="btn btn-emergency" (click)="onSosClick()">⚠ SOS Emergency</button>    
     </div>
     <div class="status-info">
       <p>No active cases</p>
       <span>Create a new case to get started</span>
     </div>
   } @else {
-    <div class="case-card">
+    <div class="case-card" [class.sos-case]="activeCase.isSos">
       <div class="case-card-header">
         <h3>{{ activeCase.patientName }}</h3>
         <div class="status-indicator" [class]="getStatusClass()"></div>

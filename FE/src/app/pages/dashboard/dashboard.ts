@@ -6,7 +6,7 @@ import { Sidebar } from '../../components/sidebar/sidebar';
 import { CaseModal } from '../../components/case-modal/case-modal';
 import { Case } from '../../models/case.model';
 import { MOCK_USER } from '../../models/mock-data';
-import { WebSocketService, WebSocketMessage } from '../../services/websocket.service';
+import { WebSocketService, LocationMessage } from '../../services/websocket.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -26,7 +26,7 @@ export class Dashboard implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.wsSubscription = this.webSocketService.connect().subscribe(
-      (message: WebSocketMessage) => this.handleWebSocketMessage(message)
+      (message: LocationMessage) => this.handleWebSocketMessage(message)
     );
   }
 
@@ -37,7 +37,7 @@ export class Dashboard implements OnInit, OnDestroy {
     this.webSocketService.disconnect();
   }
 
-  private handleWebSocketMessage(message: WebSocketMessage): void {
+  private handleWebSocketMessage(message: LocationMessage): void {
     console.log('WebSocket message received:', message);
     
     const { type, data } = message;
