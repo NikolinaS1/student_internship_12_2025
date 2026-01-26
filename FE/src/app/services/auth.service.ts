@@ -42,6 +42,19 @@ export class AuthService {
     }
   }
 
+  async isUserDisabled(name: string): Promise<boolean> {
+    try {
+      const url = `${this.baseUrl}/admin/users`;
+      const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' });
+      const users: any[] = await firstValueFrom(this.http.get<any[]>(url, { headers }));
+      const match = users.find(u => (u.username || u.name || '').toLowerCase() === name.toLowerCase());
+      return match ? match.isEnabled === false : false;
+    } catch {
+      // If the pre-check fails, don't block login
+      return false;
+    }
+  }
+
   async login(name: string, password: string): Promise<boolean> {
     try {
       const url = `${this.baseUrl}/user/login`;

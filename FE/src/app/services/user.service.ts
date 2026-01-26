@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { ConfigService } from './config.service';
 
 
@@ -10,6 +11,7 @@ export interface User {
     id: number;
     role: UserRole;
     username: string;
+    isEnabled?: boolean;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -35,9 +37,16 @@ export class UserService {
 
 
     private loadUsers(): void {
-        this.http.get<User[]>(this.apiUrl, { headers: this.ngrokHeaders }).subscribe({
+        this.http.get<any[]>(this.apiUrl, { headers: this.ngrokHeaders }).subscribe({
             next: users => {
-                this.usersSubject.next(users);
+                const mappedUsers: User[] = users.map(u => ({
+                    id: typeof u.id === 'string' ? parseInt(u.id, 10) : u.id,
+                    role: u.role,
+                    username: u.username,
+                    isEnabled: u.isEnabled
+                }));
+                this.usersSubject.next(mappedUsers);
+                console.log('Loaded users:', mappedUsers);
             },
             error: error => {
                 console.error('Error fetching users:', error);
@@ -50,13 +59,14 @@ export class UserService {
     }
 
     getAll(): User[] {
+        console.log('Getting all users:', this.usersSubject.value);
         return this.usersSubject.value;
     }
 
     create(userData: { username: string; password: string; role: UserRole }): void {
         this.http.post<User>(this.apiUrl, userData, { headers: this.ngrokHeaders }).subscribe({
             next: newUser => {
-                const users = [newUser,...this.usersSubject.value];
+                const users = [newUser, ...this.usersSubject.value];
                 this.usersSubject.next(users);
             },
             error: error => {
@@ -67,7 +77,7 @@ export class UserService {
                     username: userData.username,
                     role: userData.role
                 };
-                const users = [mockUser,...this.usersSubject.value];
+                const users = [mockUser, ...this.usersSubject.value];
                 this.usersSubject.next(users);
             }
         });
@@ -96,20 +106,37 @@ export class UserService {
         });
     }
 
-   /* delete(id: number): void {
-        this.http.delete(`${this.apiUrl}/${id}`, { headers: this.ngrokHeaders }).subscribe({
-            next: () => {
-                const users = this.usersSubject.value.filter(u => u.id !== id);
-                this.usersSubject.next(users);
-            },
-            error: error => {
-                console.error('Error deleting user (backend not available):', error);
-                // Delete locally for offline development
-                const users = this.usersSubject.value.filter(u => u.id !== id);
-                this.usersSubject.next(users);
-            }
-        });
+    updateStatus(userId: number, isEnabled: boolean): Observable<User> {
+        const updateData: any = { isEnabled };
+        return this.http.put<User>(`${this.apiUrl}/${userId}/status`, updateData, { headers: this.ngrokHeaders }).pipe(
+            catchError(error => {
+                console.error('Error updating user status:', error);
+                return throwError(() => error);
+            })
+        );
     }
-   */
+
+    updateLocalUserStatus(userId: number, isEnabled: boolean | undefined): void {
+        const users = this.usersSubject.value.map(u =>
+            u.id === userId ? { ...u, isEnabled } : u
+        );
+        this.usersSubject.next(users);
+    }
+
+    /* delete(id: number): void {
+         this.http.delete(`${this.apiUrl}/${id}`, { headers: this.ngrokHeaders }).subscribe({
+             next: () => {
+                 const users = this.usersSubject.value.filter(u => u.id !== id);
+                 this.usersSubject.next(users);
+             },
+             error: error => {
+                 console.error('Error deleting user (backend not available):', error);
+                 // Delete locally for offline development
+                 const users = this.usersSubject.value.filter(u => u.id !== id);
+                 this.usersSubject.next(users);
+             }
+         });
+     }
+    */
 }
 

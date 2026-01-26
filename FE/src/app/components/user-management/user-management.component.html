@@ -30,6 +30,10 @@
             <th>Role</th>
             <th>User ID</th>
             <th>Actions</th>
+            <th>
+                Status
+                <div class="status-hint">(click on status to change it)</div>
+            </th>
         </tr>
     </thead>
 
@@ -47,9 +51,37 @@
                 <button class="icon-btn" (click)="openEditUser(user)">Edit</button>
                <!-- <button class="icon-btn danger" (click)="confirmDeleteUser(user)">Delete</button> -->
             </td>
+            <td>
+                <button class="status-btn" [class.disabled]="user.isEnabled === false" [disabled]="user.isEnabled === undefined" (click)="confirmStatusChange(user)">
+                    {{ user.isEnabled === undefined ? '?' : (user.isEnabled ? 'ACTIVE' : 'DISABLED') }}
+                </button>
+            </td>
         </tr>
     </tbody>
 </table>
+
+<!-- CONFIRM STATUS CHANGE MODAL -->
+<div *ngIf="showConfirmStatusModal && pendingStatusUser" class="overlay" (click)="cancelStatusChange()">
+    <div class="modal" (click)="$event.stopPropagation()">
+
+        <div class="modal-header">
+            <h2>Confirm Status Change</h2>
+            <button class="close-btn" (click)="cancelStatusChange()">✕</button>
+        </div>
+
+        <div class="modal-body">
+            <p>Are you sure you want to change <strong>{{ pendingStatusUser.username }}</strong> status?</p>
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn cancel" (click)="cancelStatusChange()" [disabled]="isStatusChanging">Cancel</button>
+            <button class="btn primary" (click)="performStatusChange()" [disabled]="isStatusChanging">
+                {{ isStatusChanging ? 'Confirming...' : 'Confirm' }}
+            </button>
+        </div>
+
+    </div>
+</div>
 
 <!-- CREATE USER MODAL -->
 <div *ngIf="showCreateModal" class="overlay" (click)="closeModals()">

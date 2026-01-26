@@ -18,27 +18,28 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   showEditModal = false;
   showDeleteModal = false;
   userToDelete: User | null = null;
+  showConfirmStatusModal = false;
+  pendingStatusUser: User | null = null;
+  isStatusChanging: boolean = false;
 
-  /** USERS */
+
   users: User[] = [];
   filteredUsers: User[] = [];
 
-  /** FILTERS */
   searchTerm: string = '';
   selectedRole: UserRole | 'ALL' = 'ALL';
 
-  /** CREATE FORM */
   newUser = {
     username: '',
     password: '',
     role: 'VEHICLE' as UserRole,
   };
 
-  /** EDIT FORM */
+  
   editedUser: User | null = null;
   editedPassword: string = '';
 
-  /** VALIDATION */
+  
   usernameError: string = '';
   editUsernameError: string = '';
   passwordError: string = '';
@@ -147,6 +148,62 @@ export class UserManagementComponent implements OnInit, OnDestroy {
 
     this.userService.update(this.editedUser, this.editedPassword || undefined);
     this.closeModals();
+  }
+
+  // Open confirmation modal before changing status
+  confirmStatusChange(user: User): void {
+    if (!user || user.id === undefined || user.id === null) {
+      console.error('Cannot change status: user id missing', user);
+      alert('Cannot change status for this user (missing id).');
+      return;
+    }
+    if (user.isEnabled === undefined) {
+      console.warn('Cannot change status: unknown isEnabled for user', user);
+      alert('Status is unknown (?). It cannot be changed until it is set.');
+      return;
+    }
+    console.log('Confirming status change for user:', user.id, user.username, 'current isEnabled=', user.isEnabled);
+    this.pendingStatusUser = user;
+    this.showConfirmStatusModal = true;
+  }
+
+  cancelStatusChange(): void {
+    this.pendingStatusUser = null;
+    this.showConfirmStatusModal = false;
+  }
+
+  performStatusChange(): void {
+    if (!this.pendingStatusUser) {
+      return;
+    }
+    const user = this.pendingStatusUser;
+    const oldStatus = user.isEnabled;
+    const newStatus = user.isEnabled === undefined ? true : !user.isEnabled;
+
+    // Optimistically update UI immediately
+    console.log('Optimistically updating local status for', user.id, 'to', newStatus);
+    this.userService.updateLocalUserStatus(user.id, newStatus);
+    // Close the modal right away to reflect immediate UI change
+    this.cancelStatusChange();
+
+    // Operation continues in background; modal is already closed
+    this.isStatusChanging = false;
+    this.userService.updateStatus(user.id, newStatus).subscribe({
+      next: updatedUser => {
+        console.log('Server confirmed status change for', updatedUser.id, 'isEnabled=', updatedUser.isEnabled);
+        // Ensure local state matches server authoritative response
+        this.userService.updateLocalUserStatus(updatedUser.id, updatedUser.isEnabled);
+        this.isStatusChanging = false;
+      },
+      error: error => {
+        // Revert optimistic update on failure
+        console.error('Status change failed for', user.id, error);
+        this.userService.updateLocalUserStatus(user.id, oldStatus);
+        this.isStatusChanging = false;
+        console.error('Status change failed:', error);
+        alert('Failed to change status. Changes were reverted.');
+      }
+    });
   }
 
   /*confirmDeleteUser(user: User): void {
