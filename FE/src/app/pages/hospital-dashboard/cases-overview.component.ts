@@ -205,6 +205,7 @@ export class CasesOverviewComponent implements OnInit, AfterViewInit, OnDestroy 
         this.caseMarkers.set(caseData.id, marker);
       }
     }
+    this.fitBoundsToAllCases();
   }
 
   private updateCaseMarkerLocation(caseId: number, latitude: number, longitude: number) {
@@ -275,6 +276,25 @@ export class CasesOverviewComponent implements OnInit, AfterViewInit, OnDestroy 
 
     } catch (e) {
       console.error('OSRM error:', e);
+    }
+  }
+
+  private fitBoundsToAllCases(): void {
+    if (!this.map) return;
+    
+    const points: L.LatLngExpression[] = [
+      [this.HOSPITAL_LAT, this.HOSPITAL_LNG]
+    ];
+    
+    for (const caseData of this.cases) {
+      if (caseData.isActive && caseData.latitude && caseData.longitude) {
+        points.push([caseData.latitude, caseData.longitude]);
+      }
+    }
+    
+    if (points.length > 1) {
+      const bounds = L.latLngBounds(points);
+      this.map.fitBounds(bounds, { padding: [50, 50] });
     }
   }
 
