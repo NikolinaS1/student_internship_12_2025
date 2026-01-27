@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { OverlayModalComponent } from '../overlay-modal/overlay-modal.component';
 import { CaseService } from '../../services/case.service';
 import { Subscription } from 'rxjs';
+import { ConfigService } from '../../services/config.service';
 
 @Component({
   selector: 'app-case-management',
@@ -27,7 +28,7 @@ export class CaseManagementComponent implements OnInit, OnDestroy {
   currentYear: number = new Date().getFullYear();
   private subscription: Subscription = new Subscription();
 
-  constructor(private caseService: CaseService) { }
+  constructor(private caseService: CaseService, private configService: ConfigService) { }
 
   ngOnInit(): void {
     this.subscription.add(
@@ -45,6 +46,13 @@ export class CaseManagementComponent implements OnInit, OnDestroy {
   openCase(c: any) {
     this.selectedCase = c;
   }
+
+  generatePdf(caseData: any): void {
+  this.configService.getConfig().subscribe(config => {
+    const pdfUrl = `${config.Urls.apiUrl}/cases/${caseData.id}/pdf`;
+    window.open(pdfUrl, '_blank');
+  });
+}
 
   closeCase() {
     this.selectedCase = null;
