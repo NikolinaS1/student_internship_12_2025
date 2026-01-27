@@ -34,4 +34,11 @@
       (caseSelect)="selectCase($event)"
     ></app-case-detail>
   }
+  <div class="notifications-container">
+    <div class="notification-popup" *ngFor="let msg of notifications">
+      <strong>{{msg.senderName}}</strong>
+      <span>{{msg.message}}</span>
+    </div>
+  </div>
+
 </div>
