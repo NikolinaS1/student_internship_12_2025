@@ -225,73 +225,151 @@
     }
   }
   
-  .case-communication {
-    flex: 1;
-    background: white;
-    border: 1px solid #e9ecef;
-    border-radius: 9px;
-    padding: 18px;
+  .chat {
+    border: 2px solid rgba(43, 43, 43, 0.475);
+    border-radius: 16px; 
+    background: white; 
+    overflow: hidden;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); 
     display: flex;
     flex-direction: column;
-    min-height: 0; 
-    
-    h2 {
-      font-size: 15px;
+    min-height: 0;
+    flex: 1; 
+
+    .chat__header {
+      padding: 0.74rem 0.8rem;
+      border-bottom: 1px solid #e5e7eb; 
       font-weight: 700;
-      margin: 0 0 15px 0;
-      flex-shrink: 0;
-    }
-    
-    .messages-container {
-      flex: 1;
-      overflow-y: auto;
-      margin-bottom: 15px;
-      min-height: 0;
-      
-      .messages-empty {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        height: 100%;
-        color: #adb5bd;
-        font-size: 11px;
-      }
-    }
-    
-    .message-input-wrapper {
+      font-size: 0.7rem;
       display: flex;
-      gap: 9px;
-      flex-shrink: 0;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(0, 0, 0, 0.015);
+    }
+
+    .chat__status {
+      font-size: 0.57rem;
+      font-weight: 600;
+      padding: 0.23rem 0.5rem;
+      border-radius: 999px;
+    }
+
+    .chat__status--active {
+      background: rgba(22, 163, 74, 0.15);
+      color: #16a34a; 
+    }
+
+    .chat__status--closed {
+      background: #f3f4f6; 
+      color: #6b7280; 
+    }
+
+    .chat__messages {
+      flex: 1;
+      min-height: 0;
+      padding: 0.8rem;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0.67rem;
+    }
+
+    .msg {
+      display: flex;
+      animation: slideIn 0.2s ease-out;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(7px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .msg--self {
+      justify-content: flex-end;
+    }
+
+    .msg--other {
+      justify-content: flex-start;
+    }
+
+    .bubble {
+      max-width: 70%;
+      border-radius: 11px;
+      padding: 0.64rem 0.74rem;
+      font-size: 0.67rem;
+      line-height: 1.5;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+    }
+
+    .bubble__meta {
+      font-size: 0.54rem;
+      opacity: 0.8;
+      font-weight: 600;
+      margin-bottom: 0.23rem;
+    }
+
+    .bubble__text {
+      font-weight: 500;
+    }
+
+    .bubble--self {
+      background: #000000; 
+      color: #ffffff; 
+      border: 1px solid transparent;
+    }
+
+    .bubble--other {
+      background: rgba(0, 0, 0, 0.04);
+      color: inherit;
+      border: 1px solid #e5e7eb; 
+    }
+
+    .chat__composer {
+      border-top: 1px solid #e5e7eb; 
+      padding: 0.67rem;
+      display: flex;
+      gap: 0.47rem;
+      align-items: center;
+      background: rgba(0, 0, 0, 0.01);
+      flex: 0 0 auto;
       
-      .message-input {
-        flex: 1;
-        padding: 9px 12px;
-        border: 2px solid #e9ecef;
-        border-radius: 6px;
-        font-size: 11px;
-        
-        &:focus {
+      .input {
+          width: 100%;
+          padding: 8px;
+          border: 1px solid #ccc;
+          border-radius: 4px;
           outline: none;
-          border-color: #2563eb;
-        }
       }
-      
-      .send-btn {
-        padding: 9px 15px;
-        background: #000;
-        color: white;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-        transition: all 0.2s;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        
-        &:hover {
-          background: #2d2d2d;
-        }
-      }
+    }
+
+    .btn--ghost {
+      background: #000;
+      color: white;
+      border: none;
+      font-weight: 700;
+      padding: 0.57rem 0.84rem;
+      letter-spacing: 0.2px;
+      box-shadow: 0 1px 5px rgba(0, 8, 3, 0.25);
+      transition: background 250ms ease, box-shadow 250ms ease, opacity 250ms ease;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .btn--ghost:hover {
+      background: #232323;
+      box-shadow: 0 4px 8px rgba(41, 41, 41, 0.35);
+      opacity: 1;
+    }
+    
+    .btn--ghost:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
     }
   }
 

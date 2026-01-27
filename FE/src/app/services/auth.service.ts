@@ -117,4 +117,8 @@ export class AuthService {
     const decoded = this.decodeJWT(token);
     return decoded?.group || decoded?.groups?.[0] || null;
   }
+
+  getUserName(): string | null {
+    return localStorage.getItem('userName') || "Unknown";
+  }
 }

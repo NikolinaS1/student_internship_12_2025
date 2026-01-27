@@ -95,16 +95,50 @@
           </div>
         </div>
 
-        <div class="case-communication">
-          <h2>Case Communication</h2>
-          <div class="messages-container">
-            <div class="messages-empty">
-              <p>No messages yet. Start the conversation!</p>
+        <div class="chat">
+          <div class="chat__header">
+            <span>Case Communication</span>
+            <span class="chat__status" [ngClass]="isActive() ? 'chat__status--active' : 'chat__status--closed'">
+              {{ isActive() ? '● Active' : '○ Closed' }}
+            </span>
+          </div>
+
+          <div #chatScroll class="chat__messages">
+          
+            <div 
+              *ngFor="let msg of messages" 
+              class="msg"
+              [ngClass]="isSelfMessage(msg) ? 'msg--self' : 'msg--other'"
+            >
+              <div 
+                class="bubble"
+                [ngClass]="isSelfMessage(msg) ? 'bubble--self' : 'bubble--other'"
+              >
+                <div class="bubble__meta">
+                  {{ getSenderName(msg) }} • {{ msg.createdAt | date: 'HH:mm' }}
+                </div>
+                <div class="bubble__text">{{ msg.content }}</div>
+              </div>
             </div>
           </div>
-          <div class="message-input-wrapper">
-            <input type="text" placeholder="Type a message..." class="message-input" />
-            <button class="send-btn">Send</button>
+
+          <div class="chat__composer">
+            <input
+              [(ngModel)]="messageText"
+              (keydown.enter)="$event.preventDefault(); onSend()"
+              type="text"
+              placeholder="Type a message..."
+              class="input"
+              [disabled]="!isActive()"
+            />
+            <button
+              type="button"
+              (click)="onSend()"
+              class="btn btn--ghost"
+              [disabled]="!messageText.trim() || !isActive()"
+            >
+              Send
+            </button>
           </div>
         </div>
       </div>

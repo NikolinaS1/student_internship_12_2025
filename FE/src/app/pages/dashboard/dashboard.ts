@@ -1,5 +1,6 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { Header } from '../../components/header/header';
 import { Sidebar } from '../../components/sidebar/sidebar';
@@ -11,21 +12,39 @@ import { MOCK_USER } from '../../models/mock-data';
 import { WebSocketService, LocationMessage } from '../../services/websocket.service';
 import { CaseService } from '../../services/case.service';
 import { GeolocationService } from '../../services/geolocation.service';
+import { Message, MessageWebSocketService } from '../../hospital-services/message-ws.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [Header, Sidebar, CaseModal, SosModal, EndCaseModal, CommonModule],
+  imports: [Header, Sidebar, CaseModal, SosModal, EndCaseModal, CommonModule, FormsModule],
   templateUrl: './dashboard.html',
   styleUrls: ['./dashboard.scss']
 })
 export class Dashboard implements OnInit, OnDestroy {
-  currentUser = MOCK_USER;
+  @ViewChild('chatScroll') chatScroll?: ElementRef<HTMLDivElement>;
+  
+  
   activeCase: Case | null = null;
+  messageText = '';
   isModalOpen = false;
   isSosModalOpen = false;
   isEndCaseModalOpen = false;
   isEditMode = false;
+  isLoading = true;
+
+  private authService = inject(AuthService);
+  private messageWsService: MessageWebSocketService = inject(MessageWebSocketService);
+  private messageSub?: Subscription;
+
+  messages: Message[] = [];
+  currentUserId: number = this.authService.getUserId();
+  currentUser = {
+    id: this.authService.getUserId(),
+    name: this.authService.getUserName(),
+    role: this.authService.getUserRole()
+  };
 
   private wsSubscription: Subscription | null = null;
 
@@ -35,10 +54,29 @@ export class Dashboard implements OnInit, OnDestroy {
     private geolocationService: GeolocationService
   ) {}
 
+
+
   ngOnInit(): void {
     this.wsSubscription = this.webSocketService.connect().subscribe(
       (message: LocationMessage) => this.handleWebSocketMessage(message)
     );
+    this.messageSub = this.messageWsService.messages$.subscribe((messages: Message[]) => {
+      this.messages = messages;
+       setTimeout(() => this.scrollChatToBottom(), 100);
+    });
+
+    this.caseService.getActiveCaseByUser(this.currentUserId).subscribe({
+      next: (response: any) => {
+        if (Array.isArray(response)) {
+          this.activeCase = response.length > 0 ? response[0] : null;
+        } else {
+          this.activeCase = response || null;
+        }
+        if (this.activeCase) {
+          this.messageWsService.connect(this.activeCase.id, this.currentUserId);
+        }
+      }
+    });
   }
 
   ngOnDestroy(): void {
@@ -150,5 +188,44 @@ export class Dashboard implements OnInit, OnDestroy {
 
   onCaseUpdated(updatedCase: Case): void {
     this.activeCase = updatedCase;
+  }
+  
+  isActive(): boolean {
+    return !!this.activeCase;
+  }
+
+  isAcknowledged(): boolean {
+    return this.activeCase?.acknowledged ?? false;
+  }
+  
+  isSelfMessage(message: Message): boolean {
+    return message.senderId === this.currentUserId;
+  }
+
+  getSenderName(msg: Message): string {
+    return msg.senderName || 'Unknown';
+  }
+
+  scrollChatToBottom() {
+    const el = this.chatScroll?.nativeElement;
+    if (!el) return;
+    el.scrollTop = el.scrollHeight;
+  }
+
+  async onSend() {
+    const text = this.messageText.trim();
+    if (!text || !this.activeCase) return;
+
+    try {
+      await this.messageWsService.sendMessage(
+        text
+      );
+
+      this.messageText = '';
+
+      setTimeout(() => this.scrollChatToBottom(), 100);
+    } catch (error) {
+      console.error('Failed to send message:', error);
+    }
   }
 }

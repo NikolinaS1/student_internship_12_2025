@@ -302,7 +302,7 @@ export class CaseModal implements OnChanges {
             } else {
               this.caseCreated.emit(caseToEmit);
             }
-            
+            localStorage.setItem('newCaseId', caseToEmit.id.toString());
             this.closeModal();
           },
           error: (error) => {
