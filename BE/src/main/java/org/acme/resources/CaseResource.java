@@ -1,5 +1,6 @@
 package org.acme.resources;
 
+import com.itextpdf.kernel.pdf.annot.Pdf3DAnnotation;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
@@ -9,6 +10,7 @@ import jakarta.ws.rs.core.Response;
 import org.acme.dtos.cases.*;
 import org.acme.models.Case;
 import org.acme.services.CaseService;
+import org.acme.services.PdfService;
 import org.acme.websockets.CaseWebSocketEndpoint;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 
@@ -29,6 +31,9 @@ public class CaseResource {
     @Inject
     JsonWebToken jwt;
 
+    @Inject
+    PdfService pdfService;
+
     @GET
     //@RolesAllowed({"ADMIN", "HOSPITAL"})
     public Response getAllCases() {
@@ -45,6 +50,18 @@ public class CaseResource {
     public Response getCaseById(@PathParam("id") Long id) {
         Case caseEntity = caseService.getCaseById(id);
         return Response.ok(CaseResponse.fromEntity(caseEntity)).build();
+    }
+
+    @GET
+    @Path("/{id}/pdf")
+    @Produces("application/pdf")
+    public Response getCasePdf(@PathParam("id") Long id) {
+        Case caseEntity = caseService.getCaseById(id);
+        byte[] pdfBytes = pdfService.generateCasePdf(caseEntity);
+
+        return Response.ok(pdfBytes)
+                .header("Content-Disposition", "inline; filename=case-" + id + ".pdf")
+                .build();
     }
 
     @POST
