@@ -13,6 +13,7 @@ import { AuthService } from '../../services/auth.service';
 export class LoginFormComponent {
   username = '';
   password = '';
+  showPassword = false;
   error = '';
   loading = false;
 
@@ -23,6 +24,12 @@ export class LoginFormComponent {
     this.loading = true;
 
     try {
+      const disabled = await this.authService.isUserDisabled(this.username);
+      if (disabled) {
+        this.error = 'Your account is disabled. Contact your system administrator';
+        return;
+      }
+
       const ok = await this.authService.login(this.username, this.password);
       if (!ok) {
         this.error = 'Invalid username or password';

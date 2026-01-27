@@ -29,14 +29,14 @@
     .logout {
         padding: 8px 16px;
         border-radius: 10px;
-        border: 1px solid #e5e7eb;
+        border: 2px solid #000000;
         background: white;
         cursor: pointer;
         font-weight: 600;
     }
 }
 
-/* STATS (ne diramo dizajn, samo spacing) */
+/* STATS CARDS */
 .stats {
     padding: 2rem 2.5rem;
     display: grid;
@@ -76,7 +76,7 @@
     }
 }
 
-/* TAB BAR – KLJUČNI DIO */
+
 .tab-wrapper {
     margin: 0 2.5rem;
     background: #ffffff;

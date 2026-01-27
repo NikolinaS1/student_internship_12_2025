@@ -9,12 +9,8 @@
 <!-- FILTERS -->
 <div class="filters-container">
     <div class="search-input">
-        <input 
-            type="text" 
-            [(ngModel)]="searchTerm" 
-            (ngModelChange)="onSearchChange()" 
-            placeholder="Search by username..."
-        />
+        <input type="text" [(ngModel)]="searchTerm" (ngModelChange)="onSearchChange()"
+            placeholder="Search by username..." />
     </div>
     <div class="role-filter">
         <select [(ngModel)]="selectedRole" (ngModelChange)="onRoleFilterChange()">
@@ -34,6 +30,10 @@
             <th>Role</th>
             <th>User ID</th>
             <th>Actions</th>
+            <th>
+                Status
+                <div class="status-hint">(click on status to change it)</div>
+            </th>
         </tr>
     </thead>
 
@@ -41,21 +41,47 @@
         <tr *ngFor="let user of filteredUsers">
             <td>{{ user.username }}</td>
             <td>
-                <span class="role-pill" 
-                      [class.admin]="user.role === 'ADMIN'" 
-                      [class.vehicle]="user.role === 'VEHICLE'" 
-                      [class.hospital]="user.role === 'HOSPITAL'">
+                <span class="role-pill" [class.admin]="user.role === 'ADMIN'" [class.vehicle]="user.role === 'VEHICLE'"
+                    [class.hospital]="user.role === 'HOSPITAL'">
                     {{ user.role }}
                 </span>
             </td>
             <td>{{ user.id }}</td>
             <td>
                 <button class="icon-btn" (click)="openEditUser(user)">Edit</button>
-                <button class="icon-btn danger" (click)="confirmDeleteUser(user)">Delete</button>
+               <!-- <button class="icon-btn danger" (click)="confirmDeleteUser(user)">Delete</button> -->
+            </td>
+            <td>
+                <button class="status-btn" [class.disabled]="user.isEnabled === false" [class.active]="user.isEnabled === true" [disabled]="user.isEnabled === undefined" (click)="confirmStatusChange(user)">
+                    {{ user.isEnabled === undefined ? '?' : (user.isEnabled ? 'ACTIVE' : 'DISABLED') }}
+                </button>
             </td>
         </tr>
     </tbody>
 </table>
+
+<!-- CONFIRM STATUS CHANGE MODAL -->
+<div *ngIf="showConfirmStatusModal && pendingStatusUser" class="overlay" (click)="cancelStatusChange()">
+    <div class="modal" (click)="$event.stopPropagation()">
+
+        <div class="modal-header">
+            <h2>Confirm Status Change</h2>
+            <button class="close-btn" (click)="cancelStatusChange()">✕</button>
+        </div>
+
+        <div class="modal-body">
+            <p>Are you sure you want to change <strong>{{ pendingStatusUser.username }}</strong> status?</p>
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn cancel" (click)="cancelStatusChange()" [disabled]="isStatusChanging">Cancel</button>
+            <button class="btn primary" (click)="performStatusChange()" [disabled]="isStatusChanging">
+                {{ isStatusChanging ? 'Confirming...' : 'Confirm' }}
+            </button>
+        </div>
+
+    </div>
+</div>
 
 <!-- CREATE USER MODAL -->
 <div *ngIf="showCreateModal" class="overlay" (click)="closeModals()">
@@ -153,7 +179,8 @@
             <div class="form-group">
                 <label>Role</label>
                 <div class="role-select">
-                    <button class="role" [class.active]="editedUser!.role === 'VEHICLE'" (click)="editedUser!.role = 'VEHICLE'">
+                    <button class="role" [class.active]="editedUser!.role === 'VEHICLE'"
+                        (click)="editedUser!.role = 'VEHICLE'">
                         EMS Personnel
                     </button>
                     <button class="role" [class.active]="editedUser!.role === 'HOSPITAL'"
@@ -178,7 +205,7 @@
     </div>
 </div>
 
-<!-- DELETE CONFIRMATION MODAL -->
+<!-- DELETE CONFIRMATION MODAL 
 <div *ngIf="showDeleteModal && userToDelete" class="overlay" (click)="closeModals()">
     <div class="modal" (click)="$event.stopPropagation()">
 
@@ -201,3 +228,4 @@
 
     </div>
 </div>
+-->

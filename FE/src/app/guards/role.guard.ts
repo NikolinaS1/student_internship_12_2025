@@ -18,7 +18,6 @@ export const roleGuard = (allowedRoles: string[]): CanActivateFn => {
       return true;
     }
 
-    // User is logged in but doesn't have the right role
     router.navigate(['/error']);
     return false;
   };

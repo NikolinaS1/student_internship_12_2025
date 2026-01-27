@@ -8,12 +8,8 @@
     <!-- FILTERS -->
     <div class="filters-container">
         <div class="search-input">
-            <input 
-                type="text" 
-                [(ngModel)]="searchTerm" 
-                (ngModelChange)="onSearchChange()" 
-                placeholder="Search by patient name..."
-            />
+            <input type="text" [(ngModel)]="searchTerm" (ngModelChange)="onSearchChange()"
+                placeholder="Search by patient name..." />
         </div>
         <div class="sos-filter">
             <select [(ngModel)]="sosFilter" (ngModelChange)="onSosFilterChange()">
@@ -59,7 +55,7 @@
 
                 <td class="actions">
                     <button class="btn view" (click)="openCase(c)">View</button>
-                    <button class="btn delete" (click)="deleteCase(c)">Delete</button>
+                    <!--<button class="btn delete" (click)="deleteCase(c)">Delete</button>-->
                 </td>
             </tr>
         </tbody>
@@ -174,13 +170,13 @@
         <!-- ACTION BUTTONS -->
         <div class="modal-actions">
             <button class="btn close-btn" (click)="closeCase()">Close</button>
-            <button class="btn delete-btn" (click)="deleteCase(selectedCase)">Delete</button>
+            <!--<button class="btn delete-btn" (click)="deleteCase(selectedCase)">Delete</button>-->
         </div>
 
     </div>
 </app-overlay-modal>
 
-<!-- DELETE CONFIRMATION MODAL -->
+<!-- DELETE CONFIRMATION MODAL 
 <app-overlay-modal *ngIf="showDeleteConfirmation" (close)="cancelDelete()">
 
     <div class="delete-confirmation-modal">
@@ -200,3 +196,4 @@
 
     </div>
 </app-overlay-modal>
+-->

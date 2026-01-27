@@ -42,6 +42,19 @@ export class AuthService {
     }
   }
 
+  async isUserDisabled(name: string): Promise<boolean> {
+    try {
+      const url = `${this.baseUrl}/admin/users`;
+      const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' });
+      const users: any[] = await firstValueFrom(this.http.get<any[]>(url, { headers }));
+      const match = users.find(u => (u.username || u.name || '').toLowerCase() === name.toLowerCase());
+      return match ? match.isEnabled === false : false;
+    } catch {
+      // If the pre-check fails, don't block login
+      return false;
+    }
+  }
+
   async login(name: string, password: string): Promise<boolean> {
     try {
       const url = `${this.baseUrl}/user/login`;
@@ -54,14 +67,14 @@ export class AuthService {
         localStorage.setItem('auth_token', token);
         localStorage.setItem('loggedIn', 'true');
         
-        // Decode JWT and get role
+        
         const decoded = this.decodeJWT(token);
         const role = decoded?.group || decoded?.groups?.[0] || 'hospital';
         const name = decoded?.name || "Unknown";
         localStorage.setItem('userName', name);
         localStorage.setItem('userId', decoded?.sub || '');
         
-        // Redirect based on role
+        
         const redirectPath = this.getRedirectPath(role);
         this.router.navigate([redirectPath]);
         return true;

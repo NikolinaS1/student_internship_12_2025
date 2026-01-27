@@ -232,9 +232,25 @@
     border-radius: 8px;
     font-size: 13px;
     font-weight: 600;
-    background: #f3f4f6;
-    color: #111827;
-    border: 1px solid #e5e7eb;
+    border: 2px solid transparent;
+    
+    &.priority-high {
+        background: var(--high);
+        color: #fff;
+        border-color: var(--high);
+    }
+    
+    &.priority-medium {
+        background: var(--medium);
+        color: #000;
+        border-color: var(--medium);
+    }
+    
+    &.priority-low {
+        background: var(--low);
+        color: #000;
+        border-color: var(--low);
+    }
 }
 
 /* SECTIONS */
