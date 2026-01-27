@@ -7,6 +7,8 @@ import { CaseModel } from '../../hospital-models/case-model';
 import { CasesOverviewComponent } from './cases-overview.component';
 import { CaseDetailComponent } from './case-detail.component';
 import { AuthService } from '../../services/auth.service';
+import { NotificationsWebSocketService } from '../../hospital-services/notifications-ws.service';
+import { Notification } from '../../hospital-models/notification-model';
 
 type PriorityChip = { text: string; cls: string };
 type StatusChip = { text: string; cls: string };
@@ -21,6 +23,9 @@ export class HospitalDashboardComponent implements OnInit, OnDestroy {
   readonly store = inject(CaseService);
   readonly authService = inject(AuthService);
   private sub?: Subscription;
+  public notifications: Notification[] = [];
+  private notificationsWsService = inject(NotificationsWebSocketService);
+  private notificationsSub?: Subscription;
 
   messageText = '';
 
@@ -28,6 +33,11 @@ export class HospitalDashboardComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.sub = this.store.getAllCases().subscribe();
+    this.notificationsWsService.connect(this.authService.getUserId());
+
+    this.notificationsSub = this.notificationsWsService.notifications$.subscribe((notifications) => {
+      this.notifications = notifications;
+    });
   }
 
   ngOnDestroy() {

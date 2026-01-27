@@ -8,6 +8,7 @@ export interface AppConfig {
         wsUrl: string;
         sendMsgUrl: string;
         getMsgUrl: string;
+        hospitalNotificationsUrl: string;
     };
     MapSettings: {
         HOSPITAL_LAT: number;
@@ -44,6 +45,10 @@ export class ConfigService {
 
     get getMsgUrl(): string {
         return this.config?.Urls.getMsgUrl || '';
+    }
+
+    get getNotificationsUrl(): string {
+        return this.config?.Urls.hospitalNotificationsUrl || '';
     }
 
     get hospitalLat(): number {
