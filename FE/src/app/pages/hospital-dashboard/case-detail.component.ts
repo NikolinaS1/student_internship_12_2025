@@ -47,6 +47,7 @@ export class CaseDetailComponent implements OnInit, AfterViewInit, OnDestroy {
 
   messages: Message[] = [];
   currentUserId: number = this.authService.getUserId();
+  currentUserName: string = "Unknown";
 
   sortOption: SortOption = 'priority-high-low';
   sortOptions = this.sortService.getSortOptions();
@@ -76,6 +77,7 @@ export class CaseDetailComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnInit() {
     this.currentUserId = this.hospitalAuthService.getUserId();
+    this.currentUserName = this.hospitalAuthService.getUserName();
 
     // Subscribe to location updates
     this.locationSub = this.wsService.remoteLocations$.subscribe((locations) => {
@@ -111,8 +113,6 @@ export class CaseDetailComponent implements OnInit, AfterViewInit, OnDestroy {
 
     try {
       await this.messageWsService.sendMessage(
-        this.selectedCase.id,
-        this.currentUserId,
         text
       );
 
@@ -241,6 +241,10 @@ export class CaseDetailComponent implements OnInit, AfterViewInit, OnDestroy {
     return msg.senderId === this.currentUserId;
   }
 
+  getSenderName(msg: Message): string {
+    return msg.senderName || 'Unknown';
+  }
+
   private initDetailMap() {
     if (!this.selectedCase || !document.getElementById('detail-map')) return;
 
@@ -269,10 +273,10 @@ export class CaseDetailComponent implements OnInit, AfterViewInit, OnDestroy {
     const hospitalIcon = L.icon({
       iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
       shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-      iconSize: [25, 41],
-      iconAnchor: [12, 41],
-      popupAnchor: [1, -34],
-      shadowSize: [41, 41],
+      iconSize: [20, 33],
+      iconAnchor: [10, 33],
+      popupAnchor: [1, -28],
+      shadowSize: [33, 33],
     });
 
     this.hospitalMarker = L.marker([this.HOSPITAL_LAT, this.HOSPITAL_LNG], { icon: hospitalIcon })
@@ -305,9 +309,9 @@ export class CaseDetailComponent implements OnInit, AfterViewInit, OnDestroy {
     // Create new marker for new case
     const caseIcon = L.icon({
       iconUrl: this.getCaseIconUrl(this.selectedCase),
-      iconSize: [32, 32],
-      iconAnchor: [16, 16],
-      popupAnchor: [0, -16],
+      iconSize: [26, 26],
+      iconAnchor: [13, 26],
+      popupAnchor: [0, -26],
     });
 
     this.caseMarker = L.marker([this.selectedCase.latitude, this.selectedCase.longitude], { icon: caseIcon })

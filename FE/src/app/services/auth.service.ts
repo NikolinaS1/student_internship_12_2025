@@ -70,6 +70,8 @@ export class AuthService {
         
         const decoded = this.decodeJWT(token);
         const role = decoded?.group || decoded?.groups?.[0] || 'hospital';
+        const name = decoded?.name || "Unknown";
+        localStorage.setItem('userName', name);
         localStorage.setItem('userId', decoded?.sub || '');
         
         

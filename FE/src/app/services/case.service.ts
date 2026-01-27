@@ -3,30 +3,8 @@ import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http
 import { Observable, throwError, BehaviorSubject } from 'rxjs';
 import { catchError, switchMap } from 'rxjs/operators';
 import { ConfigService } from './config.service';
-import { CreateCaseDTO } from '../models/case.model';
+import { Case, CreateCaseDTO, CreateSosCaseDTO, UpdateCaseDTO } from '../models/case.model';
 
-
-export interface Case {
-  id: number;
-  acknowledged: boolean;
-  birthYear: number;
-  bpm: number;
-  createdAt: string;
-  createdById: number;
-  description: string;
-  diastolicPressure: number;
-  isActive: boolean;
-  isSos: boolean;
-  patientName: string;
-  priority: string;
-  resRate: number;
-  saturation: number;
-  sex: string;
-  systolicPressure: number;
-  temperature: number;
-  latitude: number;
-  longitude: number;
-}
 
 @Injectable({
   providedIn: 'root'
@@ -60,6 +38,17 @@ export class CaseService {
     });
   }
 
+  private createHeaders(): HttpHeaders {
+    let headers = new HttpHeaders()
+      .set('Content-Type', 'application/json')
+
+    const token = localStorage.getItem('auth_token');
+    if (token) {
+      headers = headers.set('Authorization', `Bearer ${token}`);
+    }
+
+    return headers;
+  }
 
   getAllCases(): Observable<Case[]> {
     return this.http.get<Case[]>(this.apiUrl).pipe(
@@ -90,41 +79,59 @@ export class CaseService {
     });
   }
 
-    // ----- REGULAR CASE -----
-  createRegularCase(caseData: CreateCaseDTO, token?: string): Observable<any> {
+  createRegularCase(caseData: CreateCaseDTO, token?: string): Observable<Case> {
     return this.configService.getConfig().pipe(
       switchMap(config => {
         const url = `${config.Urls.apiUrl}/cases/regular`;
-        const headers = this.createHeaders(token);
-        return this.http.post(url, caseData, { headers }).pipe(
+        const headers = this.createHeaders();
+        return this.http.post<Case>(url, caseData, { headers }).pipe(
           catchError(this.handleError)
         );
       })
     );
   }
 
-  updateRegularCase(caseId: number, caseData: CreateCaseDTO, token?: string): Observable<any> {
+  updateRegularCase(caseId: number, caseData: UpdateCaseDTO, token?: string): Observable<Case> {
     return this.configService.getConfig().pipe(
       switchMap(config => {
         const url = `${config.Urls.apiUrl}/cases/${caseId}`;
-        const headers = this.createHeaders(token);
-        return this.http.put(url, caseData, { headers }).pipe(
+        const headers = this.createHeaders();
+        return this.http.put<Case>(url, caseData, { headers }).pipe(
           catchError(this.handleError)
         );
       })
     );
   }
 
-  private createHeaders(token?: string): HttpHeaders {
-    let headers = new HttpHeaders()
-      .set('Content-Type', 'application/json')
-      .set('userId', '1'); // TODO: Replace with actual user ID from auth service
+  createSosCase(sosCase: CreateSosCaseDTO, token?: string): Observable<Case> {
+    return this.configService.getConfig().pipe(
+      switchMap(config => {
+        const url = `${config.Urls.apiUrl}/cases/sos`;
+        const headers = this.createHeaders();
+        return this.http.post<Case>(url, sosCase, { headers });
+      })
+    );
+  }
 
-    if (token) {
-      headers = headers.set('Authorization', `Bearer ${token}`);
-    }
+  updateSosCase(caseId: number, sosCase: UpdateCaseDTO, token?: string): Observable<Case> {
+    return this.configService.getConfig().pipe(
+      switchMap(config => {
+        const url = `${config.Urls.apiUrl}/cases/${caseId}`;
+        const headers = this.createHeaders();
+        return this.http.put<Case>(url, sosCase, { headers });
+      })
+    );
+  }
 
-    return headers;
+  endCase(caseId: number, token?: string): Observable<Case> {
+    return this.configService.getConfig().pipe(
+      switchMap(config => {
+        const url = `${config.Urls.apiUrl}/cases/${caseId}/end`;
+        const headers = this.createHeaders();
+        const body = { isActive: false };
+        return this.http.put<Case>(url, body, { headers });
+      })
+    );
   }
 
   private handleError(error: HttpErrorResponse): Observable<never> {

@@ -41,8 +41,6 @@ public class ChatSocket {
     @OnMessage
     public void onMessage(String messageContent, @PathParam("caseId") Long caseId, @PathParam("userId") Long userId) {
         try {
-            String jsonResponse = String.format("{\"senderId\": %d, \"content\": \"%s\"}", userId, messageContent);
-            broadcast(caseId, jsonResponse);
             managedExecutor.runAsync(() -> {
                 try {
                     messageService.saveMessage(new MessageRequest(caseId, userId, messageContent));
@@ -55,7 +53,7 @@ public class ChatSocket {
         }
     }
 
-    private void broadcast(Long caseId, String message) {
+    public void broadcast(Long caseId, String message) {
         Map<Long, Session> caseSessions = sessions.get(caseId);
         if (caseSessions != null) {
             caseSessions.values().forEach(s -> {
