@@ -62,6 +62,10 @@ export class CasesOverviewComponent implements OnInit, AfterViewInit, OnDestroy 
       if (message.type === 'LOCATION_UPDATE' && message.caseId && message.latitude && message.longitude) {
         this.updateCaseMarkerLocation(message.caseId, message.latitude, message.longitude);
       }
+
+      if (message.type === 'END' && message.data?.id) {
+        this.removeCaseMarker(message.data.id);
+      }
     });
   }
 
@@ -286,6 +290,15 @@ export class CasesOverviewComponent implements OnInit, AfterViewInit, OnDestroy 
       },
       error: (err) => console.error('Error acknowledging case:', err),
     });
+  }
+
+  private removeCaseMarker(caseId: number): void {
+  const marker = this.caseMarkers.get(caseId);
+    if (marker) {
+      this.map.removeLayer(marker);
+      this.caseMarkers.delete(caseId);
+      console.log(`🗑️ Marker removed for ended case #${caseId}`);
+    }
   }
 
   selectCaseHandler(caseData: CaseModel) {
