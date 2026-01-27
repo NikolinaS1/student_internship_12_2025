@@ -4,7 +4,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { CaseModel } from '../hospital-models/case-model';
 
 export interface WebSocketMessage {
-  type: 'CREATE' | 'UPDATE' | 'ACKNOWLEDGE' | 'DELETE' | 'LOCATION_UPDATE';
+  type: 'CREATE' | 'UPDATE' | 'ACKNOWLEDGE' | 'DELETE' | 'LOCATION_UPDATE' | 'END';
   data?: CaseModel;
   caseId?: number;
   latitude?: number;
