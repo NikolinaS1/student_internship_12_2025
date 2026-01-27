@@ -188,7 +188,7 @@
               [ngClass]="isSelfMessage(msg) ? 'bubble--self' : 'bubble--other'"
             >
               <div class="bubble__meta">
-                {{ isSelfMessage(msg) ? 'Hospital' : 'EMS' }} • {{ msg.createdAt | date: 'HH:mm' }}
+                {{ getSenderName(msg) }} • {{ msg.createdAt | date: 'HH:mm' }}
               </div>
               <div class="bubble__text">{{ msg.content }}</div>
             </div>

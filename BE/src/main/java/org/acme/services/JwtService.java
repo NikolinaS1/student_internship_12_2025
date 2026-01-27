@@ -44,6 +44,7 @@ public class JwtService {
     public String generateToken(User user) {
         return Jwt.issuer("https://localhost:8080/")
                 .subject(user.id.toString())
+                .claim("name", user.getName())
                 .groups(Set.of(user.getRole().name()))
                 .expiresIn(Duration.ofHours(4))
                 .sign(privateKey);

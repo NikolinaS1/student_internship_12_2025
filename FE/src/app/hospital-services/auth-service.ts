@@ -17,4 +17,9 @@ export class HospitalAuthService {
     const userId = localStorage.getItem('userId');
     return userId ? parseInt(userId, 10) : 0;
   }
+
+  getUserName(): string {
+    const userName = localStorage.getItem('userName');
+    return userName || 'Unknown';
+  }
 }
