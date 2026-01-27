@@ -10,6 +10,8 @@ import { CaseWebSocketService } from '../../hospital-services/case-websocket.ser
 import { ConfigService } from '../../hospital-services/config-service';
 import { CaseSortService, SortOption } from '../../hospital-services/sorting-cases.service';
 import { CustomSortDropdownComponent } from '../../components/cases-sort//cases-sort.component';
+import { NotificationsWebSocketService } from '../../hospital-services/notifications-ws.service';
+import { Notification } from '../../hospital-models/notification-model';
 
 @Component({
   selector: 'app-cases-overview',
@@ -27,6 +29,7 @@ export class CasesOverviewComponent implements OnInit, AfterViewInit, OnDestroy 
   private caseWsService = inject(CaseWebSocketService);
   private configService = inject(ConfigService);
   private sortService = inject(CaseSortService);
+  private notificationsWsService = inject(NotificationsWebSocketService);
 
   // Service observables
   loading = this.caseService.loading;
@@ -36,6 +39,7 @@ export class CasesOverviewComponent implements OnInit, AfterViewInit, OnDestroy 
   private markers = new Map<number, L.Marker>();
   private caseMarkers = new Map<number, L.Marker>();
   private routeLayer?: L.GeoJSON;
+  private previousCases: Map<number, CaseModel> = new Map();
 
   private get HOSPITAL_LAT() { return this.configService.hospitalLat; }
   private get HOSPITAL_LNG() { return this.configService.hospitalLng; }
@@ -69,6 +73,29 @@ export class CasesOverviewComponent implements OnInit, AfterViewInit, OnDestroy 
     // Update all case locations on map
     if (changes['cases'] && !changes['cases'].firstChange) {
       this.updateCaseMarkers();
+      this.checkForEndedCases(changes['cases'].previousValue, changes['cases'].currentValue);
+    }
+  }
+
+  private checkForEndedCases(previousCases: CaseModel[], currentCases: CaseModel[]) {
+    if (!previousCases || !currentCases) return;
+
+    const prevMap = new Map(previousCases.map(c => [c.id, c]));
+    const currMap = new Map(currentCases.map(c => [c.id, c]));
+
+    // Check for cases that became inactive
+    for (const [id, prevCase] of prevMap.entries()) {
+      const currCase = currMap.get(id);
+      if (prevCase.isActive && currCase && !currCase.isActive) {
+        // Case ended!
+        console.log(`Case #${id} ended in overview`);
+        const notification: Notification = {
+          senderName: 'System',
+          message: `Case #${id} ended! You can find it in archive`,
+          createdAt: new Date().toISOString()
+        };
+        this.notificationsWsService.addLocalNotification(notification);
+      }
     }
   }
 

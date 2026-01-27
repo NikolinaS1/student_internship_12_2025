@@ -1,0 +1,187 @@
+<div class="page">
+  <!-- Top Header -->
+  <header class="topbar">
+    <div class="topbar__inner">
+      <div class="brand">
+        <div class="brand__title">MCX Hospital</div>
+        <div class="brand__subtitle">Archive</div>
+      </div>
+
+      <div class="topbar__actions">
+        <button type="button" class="btn" (click)="goBack()">Back to Dashboard</button>
+        <button type="button" class="btn btn--primary" (click)="authService.logout()">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Archive Content - Full width with 4-column grid -->
+  <div class="archive-container">
+    <div class="archive-content">
+      <!-- Header -->
+      <div class="heading_flex">
+        <div class="overview__head">
+          <h2 class="overview__title">Archived Cases</h2>
+          <p class="overview__subtitle">All completed and closed cases</p>
+        </div>
+
+        <app-custom-sort-dropdown
+          [sortOptions]="sortOptions"
+          (sortChange)="onSortChange($event)"
+          class="sort-dropdown"
+        ></app-custom-sort-dropdown>
+      </div>
+
+      <!-- Case Grid - 4 columns full width -->
+      <div class="archive-cases">
+        @if (archivedCases.length === 0) {
+          <div class="no-cases">
+            <p>No archived cases yet.</p>
+          </div>
+        }
+
+        @for (c of sortedCases; track c.id) {
+          <button
+            type="button"
+            (click)="viewCase(c)"
+            class="case-card case-card--archived"
+          >
+            <div class="case-card__top">
+              <div>
+                <div class="case-card__name">{{ c.patientName }}</div>
+                <div class="case-card__meta">{{ 2026 - c.birthYear }} years old • #{{ c.id }}</div>
+              </div>
+            </div>
+
+            <div class="case-card__grid">
+              <div class="case-mini">
+                <div class="case-mini__label">Priority</div>
+                <div class="case-mini__value case-mini__value--strong">{{ c.priority }}</div>
+              </div>
+              <div class="case-mini">
+                <div class="case-mini__label">Status</div>
+                <div class="case-mini__value">
+                  <span class="chip chip--closed">CLOSED</span>
+                </div>
+              </div>
+
+              <div class="case-eta case-eta--compact">
+                <div>Created</div>
+                <div>{{ c.createdAt | date:'short' }}</div>
+              </div>
+
+              <div class="case-summary">
+                {{ c.summary || c.description }}
+              </div>
+            </div>
+          </button>
+        }
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CASE DETAILS MODAL -->
+<app-overlay-modal *ngIf="selectedCase" (close)="closeCase()">
+  <div class="case-modal">
+    <!-- HEADER -->
+    <div class="modal-header-section">
+      <div class="header-left">
+        <h2 class="modal-title">Case #{{ selectedCase.id }}</h2>
+        <p class="case-date">{{ selectedCase.createdAt | date:'medium' }}</p>
+      </div>
+      <div class="header-badges">
+        <span *ngIf="selectedCase.isSos" class="badge-sos">🚨 SOS EMERGENCY</span>
+        <span class="badge-priority" [ngClass]="getPriorityClass(selectedCase.priority)">Priority: {{ selectedCase.priority }}</span>
+        <span class="badge-closed">CLOSED</span>
+      </div>
+    </div>
+
+    <!-- PATIENT INFO -->
+    <section class="section">
+      <div class="section-header">
+        <h3>Patient Information</h3>
+      </div>
+      <div class="info-grid">
+        <div class="info-item">
+          <label>Full Name</label>
+          <span>{{ selectedCase.patientName }}</span>
+        </div>
+        <div class="info-item">
+          <label>Age</label>
+          <span>{{ currentYear - selectedCase.birthYear }} years</span>
+        </div>
+        <div class="info-item">
+          <label>Sex</label>
+          <span>{{ selectedCase.sex === 'M' ? 'Male' : 'Female' }}</span>
+        </div>
+        <div class="info-item">
+          <label>Location</label>
+          <span>{{ selectedCase.latitude }}, {{ selectedCase.longitude }}</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONDITION -->
+    <section class="section">
+      <div class="section-header">
+        <h3>Condition Description</h3>
+      </div>
+      <p class="description-text">{{ selectedCase.description }}</p>
+    </section>
+
+    <!-- VITALS -->
+    <section class="section" *ngIf="selectedCase.bpm || selectedCase.systolicPressure || selectedCase.diastolicPressure || selectedCase.resRate || selectedCase.saturation || selectedCase.temperature">
+      <div class="section-header">
+        <h3>Vital Signs</h3>
+      </div>
+      <div class="vitals-grid">
+        <div class="vital-item" *ngIf="selectedCase.bpm">
+          <label>Heart Rate</label>
+          <span>{{ selectedCase.bpm }} <small>bpm</small></span>
+        </div>
+        <div class="vital-item" *ngIf="selectedCase.systolicPressure && selectedCase.diastolicPressure">
+          <label>Blood Pressure</label>
+          <span>{{ selectedCase.systolicPressure }}/{{ selectedCase.diastolicPressure }} <small>mmHg</small></span>
+        </div>
+        <div class="vital-item" *ngIf="selectedCase.resRate">
+          <label>Respiratory Rate</label>
+          <span>{{ selectedCase.resRate }} <small>breaths/min</small></span>
+        </div>
+        <div class="vital-item" *ngIf="selectedCase.saturation">
+          <label>O₂ Saturation</label>
+          <span>{{ selectedCase.saturation }} <small>%</small></span>
+        </div>
+        <div class="vital-item" *ngIf="selectedCase.temperature">
+          <label>Temperature</label>
+          <span>{{ selectedCase.temperature }} <small>°C</small></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- PERSONNEL -->
+    <section class="section">
+      <div class="section-header">
+        <h3>Case Details</h3>
+      </div>
+      <div class="info-grid">
+        <div class="info-item">
+          <label>EMS Personnel ID</label>
+          <span>{{ selectedCase.createdById }}</span>
+        </div>
+        <div class="info-item">
+          <label>Status</label>
+          <span class="status-badge acknowledged">Closed</span>
+        </div>
+        <div class="info-item">
+          <label>Active</label>
+          <span>{{ selectedCase.isActive ? 'Yes' : 'No' }}</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ACTION BUTTONS -->
+    <div class="modal-actions">
+      <button class="btn close-btn" (click)="closeCase()">Close</button>
+    </div>
+  </div>
+</app-overlay-modal>
