@@ -12,6 +12,11 @@ import { Case } from '../../models/case.model';
 export class Sidebar {
   @Input() activeCase: Case | null = null;
   @Output() newCaseClicked = new EventEmitter<void>();
+  @Output() sosClicked = new EventEmitter<void>();
+
+  onSosClick(): void {
+    this.sosClicked.emit();
+  }
 
   onNewCaseClick(): void {
     this.newCaseClicked.emit();

@@ -26,16 +26,16 @@ public class JwtService {
             if (is == null) {
                 throw new RuntimeException("privateKey.pem not found");
             }
-
+            
             String pem = new String(is.readAllBytes(), StandardCharsets.UTF_8)
                     .replace("-----BEGIN PRIVATE KEY-----", "")
                     .replace("-----END PRIVATE KEY-----", "")
                     .replaceAll("\\s+", "");
-
+            
             byte[] decoded = Base64.getDecoder().decode(pem);
             PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(decoded);
             this.privateKey = KeyFactory.getInstance("RSA").generatePrivate(spec);
-
+            
         } catch (Exception e) {
             throw new RuntimeException("Failed to load RSA private key", e);
         }
