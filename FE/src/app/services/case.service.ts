@@ -62,6 +62,16 @@ export class CaseService {
     );
   }
 
+  getActiveCaseByUser(userId: number): Observable<Case[]> {
+    return this.configService.getConfig().pipe(
+      switchMap(config => {
+        return this.http.get<Case[]>(`${config.Urls.apiUrl}/cases/active/${userId}`).pipe(
+          catchError(this.handleError)
+        );
+      })
+    );
+  }
+
   deleteCase(id: number): Observable<void> {
     return new Observable(observer => {
       this.http.delete<void>(`${this.apiUrl}/${id}`).pipe(

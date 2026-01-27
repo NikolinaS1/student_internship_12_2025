@@ -124,6 +124,14 @@ public class CaseService {
         caseEntity.delete();
     }
 
+    public Case getActiveCaseByUserId(Long userId) {
+        Case caseEntity = Case.find("createdBy.id = ?1 and isActive = true order by createdAt desc", userId).firstResult();
+        if (caseEntity == null) {
+            throw new NotFoundException("Active case not found for user");
+        }
+        return caseEntity;
+    }
+
     private User getUserOrThrow(Long userId) {
         User user = User.findById(userId);
         if (user == null) {
