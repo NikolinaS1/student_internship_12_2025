@@ -38,11 +38,11 @@ export class CaseService {
     });
   }
 
-  private createHeaders(token?: string): HttpHeaders {
+  private createHeaders(): HttpHeaders {
     let headers = new HttpHeaders()
       .set('Content-Type', 'application/json')
-      .set('userId', '1'); // TODO: Replace with actual user ID from auth service
 
+    const token = localStorage.getItem('auth_token');
     if (token) {
       headers = headers.set('Authorization', `Bearer ${token}`);
     }
@@ -83,7 +83,7 @@ export class CaseService {
     return this.configService.getConfig().pipe(
       switchMap(config => {
         const url = `${config.Urls.apiUrl}/cases/regular`;
-        const headers = this.createHeaders(token);
+        const headers = this.createHeaders();
         return this.http.post<Case>(url, caseData, { headers }).pipe(
           catchError(this.handleError)
         );
@@ -95,7 +95,7 @@ export class CaseService {
     return this.configService.getConfig().pipe(
       switchMap(config => {
         const url = `${config.Urls.apiUrl}/cases/${caseId}`;
-        const headers = this.createHeaders(token);
+        const headers = this.createHeaders();
         return this.http.put<Case>(url, caseData, { headers }).pipe(
           catchError(this.handleError)
         );
@@ -107,7 +107,7 @@ export class CaseService {
     return this.configService.getConfig().pipe(
       switchMap(config => {
         const url = `${config.Urls.apiUrl}/cases/sos`;
-        const headers = this.createHeaders(token);
+        const headers = this.createHeaders();
         return this.http.post<Case>(url, sosCase, { headers });
       })
     );
@@ -117,7 +117,7 @@ export class CaseService {
     return this.configService.getConfig().pipe(
       switchMap(config => {
         const url = `${config.Urls.apiUrl}/cases/${caseId}`;
-        const headers = this.createHeaders(token);
+        const headers = this.createHeaders();
         return this.http.put<Case>(url, sosCase, { headers });
       })
     );
@@ -127,7 +127,7 @@ export class CaseService {
     return this.configService.getConfig().pipe(
       switchMap(config => {
         const url = `${config.Urls.apiUrl}/cases/${caseId}/end`;
-        const headers = this.createHeaders(token);
+        const headers = this.createHeaders();
         const body = { isActive: false };
         return this.http.put<Case>(url, body, { headers });
       })
