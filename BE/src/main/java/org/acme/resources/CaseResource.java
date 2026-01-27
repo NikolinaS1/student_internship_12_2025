@@ -117,4 +117,11 @@ public class CaseResource {
         caseService.deleteCase(id);
         return Response.noContent().build();
     }
+
+    @GET
+    @Path("/active/{userId}")
+    public Response getActiveCaseByUserId(@PathParam("userId") Long userId) {
+        Case caseEntity = caseService.getActiveCaseByUserId(userId);
+        return Response.ok(CaseResponse.fromEntity(caseEntity)).build();
+    }
 }
