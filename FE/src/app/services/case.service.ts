@@ -63,9 +63,12 @@ export class CaseService {
   }
 
   getActiveCaseByUser(userId: number): Observable<Case[]> {
-    console.log('Fetching active cases for user ID:', `http://localhost:8080/cases/active/${userId}`);
-    return this.http.get<Case[]>(`http://localhost:8080/cases/active/${userId}`).pipe(
-      catchError(this.handleError)
+    return this.configService.getConfig().pipe(
+      switchMap(config => {
+        return this.http.get<Case[]>(`${config.Urls.apiUrl}/cases/active/${userId}`).pipe(
+          catchError(this.handleError)
+        );
+      })
     );
   }
 
