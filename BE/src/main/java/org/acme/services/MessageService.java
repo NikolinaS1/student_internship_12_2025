@@ -5,10 +5,12 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import org.acme.dtos.messages.MessageRequest;
+import org.acme.enums.Role;
 import org.acme.models.Case;
 import org.acme.models.Message;
 import org.acme.models.User;
 import org.acme.websockets.ChatSocket;
+import org.acme.websockets.HospitalNotificationSocket;
 
 import java.util.List;
 
@@ -16,6 +18,9 @@ import java.util.List;
 public class MessageService {
     @Inject
     ChatSocket chatSocket;
+
+    @Inject
+    HospitalNotificationSocket hospitalNotificationSocket;
 
     public List<Message> getMessagesByCase(Long caseId){
         return Message.list("caseEntity.id", Sort.by("createdAt", Sort.Direction.Ascending), caseId);
@@ -41,6 +46,14 @@ public class MessageService {
                 messageRequest.content())
         );
 
+        if(sender.getRole() != Role.HOSPITAL){
+            hospitalNotificationSocket.notifyHospital(652L,
+                    String.format("{\"message\": \"New message from %s in %s case\", \"senderName\": \"%s\"}",
+                            sender.getName(),
+                            caseEntity.getPatientName(),
+                            sender.getName())
+            );
+        }
 
         return message;
     }
