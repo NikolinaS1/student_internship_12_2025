@@ -48,7 +48,6 @@ export class CaseDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   private hospitalMarker?: L.Marker;
   private locationSub?: Subscription;
   private messageSub?: Subscription;
-  private caseEndTimeout?: any;
 
   messages: Message[] = [];
   currentUserId: number = this.authService.getUserId();
@@ -77,17 +76,6 @@ export class CaseDetailComponent implements OnInit, AfterViewInit, OnDestroy {
       if (previousCase && previousCase.id !== this.selectedCase.id) {
         this.messageWsService.disconnect();
         this.messageWsService.connect(this.selectedCase.id, this.currentUserId);
-        
-        // Clear any existing timeout
-        if (this.caseEndTimeout) {
-          clearTimeout(this.caseEndTimeout);
-          this.caseEndTimeout = undefined;
-        }
-      }
-
-      // Check if case became inactive
-      if (!this.selectedCase.isActive && previousCase?.isActive) {
-        this.handleCaseEnded();
       }
     }
   }
@@ -144,6 +132,7 @@ export class CaseDetailComponent implements OnInit, AfterViewInit, OnDestroy {
     }, 30000); // 30 seconds
   }
 
+ 
   scrollChatToBottom() {
     const el = this.chatScroll?.nativeElement;
     if (!el) return;
