@@ -3,6 +3,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -43,6 +44,7 @@ import org.jboss.logging.Logger;
         user.setPassword(passwordService.hash(request.password()));
         user.setRole(request.role());
         user.setIsEnabled(true);
+        user.setCreatedAt(Instant.now());
 
         user.persist();
         LOG.infof("User created successfully: id=%d, username=%s, role=%s", user.id, user.getName(), user.getRole());
@@ -69,6 +71,7 @@ import org.jboss.logging.Logger;
             throw new NotFoundException("User with ID " + id + " not found");
         }
         user.setIsEnabled(request.isEnabled());
+        user.setUpdatedAt(Instant.now());
         user.persist();
     }
 
@@ -84,6 +87,7 @@ import org.jboss.logging.Logger;
         }
 
         user.setPassword(passwordService.hash(request.newPassword()));
+        user.setUpdatedAt(Instant.now());
         LOG.infof("Password changed successfully for user id: %d", userId);
     }
 
@@ -97,6 +101,7 @@ import org.jboss.logging.Logger;
         }
         user.setName(request.username());
         user.setRole(request.role());
+        user.setUpdatedAt(Instant.now());
 
         LOG.infof("User updated successfully: id=%d, username=%s, role=%s", user.id, user.getName(), user.getRole());
 

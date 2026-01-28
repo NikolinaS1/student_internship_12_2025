@@ -15,6 +15,7 @@ import org.acme.models.Case;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import java.io.ByteArrayOutputStream;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
 @ApplicationScoped
@@ -114,7 +115,9 @@ public class PdfService {
         addInfoRow(document, "Created By",
                 caseEntity.getCreatedBy() != null ? caseEntity.getCreatedBy().getName() : "—");
         addInfoRow(document, "Created At",
-                caseEntity.getCreatedAt().format(DATE_FORMATTER));
+                caseEntity.getCreatedAt()
+                        .atZone(ZoneId.of("CET"))
+                        .format(DATE_FORMATTER));
         addInfoRow(document, "Priority",
                 caseEntity.getPriority() != null ? caseEntity.getPriority().toString() : "Not Set");
 

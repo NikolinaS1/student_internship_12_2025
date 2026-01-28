@@ -12,6 +12,7 @@ import org.acme.models.User;
 import org.acme.websockets.ChatSocket;
 import org.acme.websockets.HospitalNotificationSocket;
 
+import java.time.Instant;
 import java.util.List;
 
 @ApplicationScoped
@@ -35,7 +36,7 @@ public class MessageService {
         message.setCaseEntity(caseEntity);
         message.setSender(sender);
         message.setContent(messageRequest.content());
-        message.setCreatedAt(java.time.LocalDateTime.now());
+        message.setCreatedAt(Instant.now());
 
         message.persist();
 
