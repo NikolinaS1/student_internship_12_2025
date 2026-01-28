@@ -100,8 +100,7 @@ export class AuthService {
       } catch (err) {
       }
     }
-    localStorage.removeItem('auth_token');
-    localStorage.removeItem('loggedIn');
+    localStorage.clear();
     this.router.navigate(['/login']);
   }
 

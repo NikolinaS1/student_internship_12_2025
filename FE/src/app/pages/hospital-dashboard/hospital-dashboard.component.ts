@@ -34,7 +34,17 @@ export class HospitalDashboardComponent implements OnInit, OnDestroy {
   @ViewChild(CaseDetailComponent) detail?: CaseDetailComponent;
 
   ngOnInit() {
-    this.sub = this.store.getAllCases().subscribe();
+    this.sub = this.store.getAllCases().subscribe(cases => {
+      const savedId = localStorage.getItem('hospital_selectedCaseId');
+      if (savedId) {
+        const id = Number(savedId);
+        const found = cases.find(c => c.id === id);
+        if (found) {
+          this.store.selectCase(found);
+          setTimeout(() => this.detail?.scrollChatToBottom(), 100);
+        }
+      }    
+    });
     this.notificationsWsService.connect(this.authService.getUserId());
 
     this.notificationsSub = this.notificationsWsService.notifications$.subscribe((notifications) => {
@@ -44,6 +54,7 @@ export class HospitalDashboardComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.sub?.unsubscribe();
+    this.store.selectCase(null);
   }
 
   navigateToArchive() {
@@ -52,11 +63,13 @@ export class HospitalDashboardComponent implements OnInit, OnDestroy {
 
   selectCase(c: CaseModel) {
     this.store.selectCase(c);
+    localStorage.setItem('hospital_selectedCaseId', String(c.id));
     setTimeout(() => this.detail?.scrollChatToBottom(), 0);
   }
 
   deselect() {
     this.store.selectCase(null);
+    localStorage.removeItem('hospital_selectedCaseId');
   }
 
   acknowledge(caseId: number | string) {
