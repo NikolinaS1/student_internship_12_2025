@@ -22,9 +22,13 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1.5rem;
+  gap: 1rem
 }
 
 .overview__head {
+  flex: 1;
+  min-width: 0;
+
   .overview__title {
     font-size: 1.25rem;
     font-weight: 600;

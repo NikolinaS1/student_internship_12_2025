@@ -12,6 +12,7 @@ import { CaseSortService, SortOption } from '../../hospital-services/sorting-cas
 import { CustomSortDropdownComponent } from '../../components/cases-sort/cases-sort.component';
 import { NotificationsWebSocketService } from '../../hospital-services/notifications-ws.service';
 import { Notification } from '../../hospital-models/notification-model';
+import { formatCoordinate } from '../../utils/format-coordinate';
 import * as L from 'leaflet';
 
 
@@ -55,6 +56,7 @@ export class CaseDetailComponent implements OnInit, AfterViewInit, OnDestroy {
 
   sortOption: SortOption = 'priority-high-low';
   sortOptions = this.sortService.getSortOptions();
+  formatCoordinate = formatCoordinate;
 
   private get HOSPITAL_LAT() { return this.configService.hospitalLat; }
   private get HOSPITAL_LNG() { return this.configService.hospitalLng; }
