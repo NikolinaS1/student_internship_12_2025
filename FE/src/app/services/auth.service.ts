@@ -42,11 +42,21 @@ export class AuthService {
     }
   }
 
+private authHeaders(): HttpHeaders {
+  const token = localStorage.getItem('auth_token');
+  return new HttpHeaders({
+    'Content-Type': 'application/json',
+    'ngrok-skip-browser-warning': 'true',
+    Authorization: token ? `Bearer ${token}` : ''
+  });
+}
+
+
   async isUserDisabled(name: string): Promise<boolean> {
     try {
       const url = `${this.baseUrl}/admin/users`;
-      const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' });
-      const users: any[] = await firstValueFrom(this.http.get<any[]>(url, { headers }));
+      //const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' });
+      const users: any[] = await firstValueFrom(this.http.get<any[]>(url, { headers: this.authHeaders() }));
       const match = users.find(u => (u.username || u.name || '').toLowerCase() === name.toLowerCase());
       return match ? match.isEnabled === false : false;
     } catch {
@@ -66,15 +76,15 @@ export class AuthService {
       if (token) {
         localStorage.setItem('auth_token', token);
         localStorage.setItem('loggedIn', 'true');
-        
-        
+
+
         const decoded = this.decodeJWT(token);
         const role = decoded?.group || decoded?.groups?.[0] || 'hospital';
         const name = decoded?.name || "Unknown";
         localStorage.setItem('userName', name);
         localStorage.setItem('userId', decoded?.sub || '');
-        
-        
+
+
         const redirectPath = this.getRedirectPath(role);
         this.router.navigate([redirectPath]);
         return true;
