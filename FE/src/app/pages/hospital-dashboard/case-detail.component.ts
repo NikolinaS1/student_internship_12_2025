@@ -267,8 +267,12 @@ export class CaseDetailComponent implements OnInit, AfterViewInit, OnDestroy {
     this.createMarkers();
   }
 
+  get activeCases(): CaseModel[] {
+    return this.allCases.filter(c => c.isActive);
+  }
+
   get sortedCases(): CaseModel[]{
-    return this.sortService.sortCases(this.allCases, this.sortOption);
+    return this.sortService.sortCases(this.activeCases, this.sortOption);
   }
 
   onSortChange(option: SortOption){
