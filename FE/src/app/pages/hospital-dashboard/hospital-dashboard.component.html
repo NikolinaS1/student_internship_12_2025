@@ -35,9 +35,9 @@
     ></app-case-detail>
   }
   <div class="notifications-container">
-    <div class="notification-popup" *ngFor="let msg of notifications">
-      <strong>{{msg.senderName}}</strong>
-      <span>{{msg.message}}</span>
+    <div class="notification-popup" *ngFor="let notification of notifications" (click)="openCase(notification)">
+      <strong>{{notification.senderName}}</strong>
+      <span>{{notification.message}}</span>
     </div>
   </div>
 

@@ -48,10 +48,11 @@ public class MessageService {
 
         if(sender.getRole() != Role.HOSPITAL){
             hospitalNotificationSocket.notifyHospital(652L,
-                    String.format("{\"message\": \"New message from %s in %s case\", \"senderName\": \"%s\"}",
+                    String.format("{\"message\": \"%s\", \"senderName\": \"%s in case %s\", \"caseId\": \"%d\"}",
+                            messageRequest.content(),
                             sender.getName(),
                             caseEntity.getPatientName(),
-                            sender.getName())
+                            caseEntity.id)
             );
         }
 

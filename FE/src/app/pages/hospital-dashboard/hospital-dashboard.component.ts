@@ -119,4 +119,15 @@ export class HospitalDashboardComponent implements OnInit, OnDestroy {
         };
     }
   }
+  openCase(notification: Notification) {
+    const caseId = Number(notification.caseId);
+    const selectedCase = this.store.cases().find(c => c.id === caseId);
+    this.removeNotification(notification);
+    if (selectedCase) {
+      this.selectCase(selectedCase);
+    }
+  }
+  removeNotification(notification: Notification) {
+    this.notifications = this.notifications.filter(n => n !== notification);
+  }
 }
