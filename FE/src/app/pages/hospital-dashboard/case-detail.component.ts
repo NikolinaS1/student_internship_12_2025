@@ -129,6 +129,7 @@ export class CaseDetailComponent implements OnInit, AfterViewInit, OnDestroy {
     
     // Show notification
     const notification: Notification = {
+      caseId: this.selectedCase.id,
       senderName: 'System',
       message: `Case #${this.selectedCase.id} ended! You can find it in archive`,
       createdAt: new Date().toISOString(),

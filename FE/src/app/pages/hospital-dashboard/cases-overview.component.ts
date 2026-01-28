@@ -98,6 +98,7 @@ export class CasesOverviewComponent implements OnInit, AfterViewInit, OnDestroy 
         // Case ended!
         console.log(`Case #${id} ended.`);
         const notification: Notification = {
+          caseId: id,
           senderName: 'System',
           message: `Case #${id} (${currCase.patientName}) has been closed! You can find it in archive.`,
           createdAt: new Date().toISOString(),
