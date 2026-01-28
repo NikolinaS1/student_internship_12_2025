@@ -38,6 +38,7 @@ export class NotificationsWebSocketService {
         try {
           const data = JSON.parse(event.data);
           let newNotification: Notification = {
+            caseId: data.caseId,
             senderName: data.senderName,
             message: data.message,
             createdAt: new Date().toISOString()
