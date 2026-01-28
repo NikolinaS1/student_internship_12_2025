@@ -109,11 +109,14 @@ export class Dashboard implements OnInit, OnDestroy {
         case 'END':
           this.stopLocationTracking();
           this.activeCase = null;
+          this.messageWsService.disconnect();
+          this.messages = [];
           break;
       }
     } else if (type === 'CREATE' && !this.activeCase) {
       this.activeCase = data;
       this.startLocationTracking();
+      this.messageWsService.connect(data.id, this.currentUserId);
     }
   }
 
@@ -156,8 +159,10 @@ export class Dashboard implements OnInit, OnDestroy {
     this.caseService.endCase(this.activeCase.id).subscribe({
       next: () => {
         this.stopLocationTracking();
+        this.messageWsService.disconnect();
         this.activeCase = null;
         this.isEndCaseModalOpen = false;
+        this.messages = [];
       },
       error: (error) => {
         console.error('Error ending case:', error);
@@ -184,6 +189,7 @@ export class Dashboard implements OnInit, OnDestroy {
   onCaseCreated(newCase: Case): void {
     this.activeCase = newCase;
     this.startLocationTracking();
+    this.messageWsService.connect(newCase.id, this.currentUserId);
   }
 
   onCaseUpdated(updatedCase: Case): void {

@@ -104,7 +104,10 @@
           </div>
 
           <div #chatScroll class="chat__messages">
-          
+            <div *ngIf="messages.length === 0" class="no-messages">
+              <p>No messages yet. Start the conversation!</p>
+            </div>
+            
             <div 
               *ngFor="let msg of messages" 
               class="msg"

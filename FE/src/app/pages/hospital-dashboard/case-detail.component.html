@@ -157,26 +157,9 @@
         </div>
 
         <div #chatScroll class="chat__messages">
-          <!-- System message -->
-          <div class="msg msg--other">
-            <div class="bubble bubble--other">
-              <div class="bubble__meta">
-                EMS • {{ selectedCase.createdAt | date: 'HH:mm' }}
-              </div>
-              <div class="bubble__text">Case created and dispatched</div>
-            </div>
+          <div *ngIf="messages.length === 0" class="no-messages">
+            <p>No messages yet. Start the conversation!</p>
           </div>
-
-          <!-- Acknowledged message -->
-          <div class="msg msg--self" *ngIf="isAcknowledged()">
-            <div class="bubble bubble--self">
-              <div class="bubble__meta">
-                Hospital • {{ selectedCase.createdAt | date: 'HH:mm' }}
-              </div>
-              <div class="bubble__text">Case acknowledged and confirmed</div>
-            </div>
-          </div>
-
           <!-- Real messages from WebSocket -->
           <div 
             *ngFor="let msg of messages" 
