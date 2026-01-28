@@ -79,7 +79,7 @@
 
     <div class="modal-header-section">
       <div class="header-left">
-        <h2 class="modal-title">Case #{{ selectedCase.id }}</h2>
+        <h2 class="modal-title">{{ selectedCase.patientName }}</h2>
         <span class="badge-priority" [class]="'priority-' + (selectedCase.isSos ? 'sos' : selectedCase.priority.toLowerCase())">
           {{ selectedCase.isSos ? 'SOS' : selectedCase.priority }}
         </span>
