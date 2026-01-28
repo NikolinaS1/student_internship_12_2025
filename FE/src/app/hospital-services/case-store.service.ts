@@ -1,6 +1,6 @@
 import { Injectable, inject, signal, effect } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
+import { Observable, of, Subject } from 'rxjs';
 import { tap, catchError } from 'rxjs/operators';
 import { CaseModel } from '../hospital-models/case-model';
 import { HospitalAuthService } from '../hospital-services/auth-service';
@@ -22,6 +22,10 @@ export class CaseService {
   selectedCase = signal<CaseModel | null>(null);
   loading = signal<boolean>(false);
   error = signal<string | null>(null);
+
+  private caseEndedSubject = new Subject<CaseModel>();
+  public caseEnded$ = this.caseEndedSubject.asObservable();
+
 
   constructor() {
     this.initWebSocket();
@@ -53,6 +57,12 @@ export class CaseService {
         case 'DELETE':
           if (message.data?.id) {
             this.handleCaseDelete(message.data.id);
+          }
+          break;
+
+        case 'END':
+          if (message.data) {
+            this.handleCaseEnd(message.data);
           }
           break;
 
@@ -108,6 +118,41 @@ export class CaseService {
         this.selectedCase.set(null);
       }
     }
+  }
+
+  private handleCaseEnd(caseData: CaseModel) {
+    const processedCase = this.processCase(caseData);
+    
+    // Update the case to show it's ended (isActive: false)
+    const idx = this.cases().findIndex(c => c.id === caseData.id);
+    if (idx >= 0) {
+      this.cases.update(cases => {
+        const updated = [...cases];
+        updated[idx] = processedCase;
+        return updated;
+      });
+    }
+
+    // Update selected case if it matches
+    if (this.selectedCase()?.id === caseData.id) {
+      this.selectedCase.set(processedCase);
+    }
+
+    console.log('🏁 Case ended:', caseData.id);
+
+    // Emit event for components to show notification
+    this.caseEndedSubject.next(processedCase);
+
+    // Remove from active cases after 5 seconds
+    setTimeout(() => {
+      this.cases.update(cases => cases.filter(c => c.id !== caseData.id));
+      console.log('🗑️ Case removed from active list:', caseData.id);
+
+      // Deselect if this was the selected case
+      if (this.selectedCase()?.id === caseData.id) {
+        this.selectedCase.set(null);
+      }
+    }, 5000);
   }
 
   /**

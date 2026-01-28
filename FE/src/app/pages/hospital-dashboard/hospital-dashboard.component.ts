@@ -2,6 +2,7 @@ import { Component, ViewChild, inject, OnInit, computed, OnDestroy } from '@angu
 import { Subscription } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { CaseService } from '../../hospital-services/case-store.service';
 import { CaseModel } from '../../hospital-models/case-model';
 import { CasesOverviewComponent } from './cases-overview.component';
@@ -22,7 +23,9 @@ type StatusChip = { text: string; cls: string };
 export class HospitalDashboardComponent implements OnInit, OnDestroy {
   readonly store = inject(CaseService);
   readonly authService = inject(AuthService);
+  private router = inject(Router);
   private sub?: Subscription;
+  private caseEndedSub?: Subscription;
   public notifications: Notification[] = [];
   private notificationsWsService = inject(NotificationsWebSocketService);
   private notificationsSub?: Subscription;
@@ -48,10 +51,22 @@ export class HospitalDashboardComponent implements OnInit, OnDestroy {
     this.notificationsSub = this.notificationsWsService.notifications$.subscribe((notifications) => {
       this.notifications = notifications;
     });
+
+    this.caseEndedSub = this.store.caseEnded$.subscribe((endedCase) => {
+      const notification: Notification = {
+        senderName: 'System',
+        message: `Case #${endedCase.id} - ${endedCase.patientName} has been closed. View it in Archive.`,
+        createdAt: new Date().toISOString(),
+        caseId: endedCase.id
+      };
+      this.notificationsWsService.addLocalNotification(notification);
+    });
   }
 
   ngOnDestroy() {
     this.sub?.unsubscribe();
+    this.caseEndedSub?.unsubscribe();
+    this.notificationsSub?.unsubscribe();
     this.store.selectCase(null);
   }
 
@@ -133,9 +148,17 @@ export class HospitalDashboardComponent implements OnInit, OnDestroy {
     }
   }
   openCase(notification: Notification) {
+    this.removeNotification(notification);
+    
+    // Check if it's a system notification for closed case
+    if (notification.senderName === 'System' && notification.message.includes('has been closed')) {
+      this.router.navigate(['/archive']);
+      return;
+    }
+
+    // Otherwise open the active case
     const caseId = Number(notification.caseId);
     const selectedCase = this.store.cases().find(c => c.id === caseId);
-    this.removeNotification(notification);
     if (selectedCase) {
       this.selectCase(selectedCase);
     }

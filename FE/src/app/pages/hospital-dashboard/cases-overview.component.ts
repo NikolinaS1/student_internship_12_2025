@@ -32,7 +32,6 @@ export class CasesOverviewComponent implements OnInit, AfterViewInit, OnDestroy 
   private caseWsService = inject(CaseWebSocketService);
   private configService = inject(ConfigService);
   private sortService = inject(CaseSortService);
-  private notificationsWsService = inject(NotificationsWebSocketService);
 
   // Service observables
   loading = this.caseService.loading;
@@ -43,6 +42,8 @@ export class CasesOverviewComponent implements OnInit, AfterViewInit, OnDestroy 
   private caseMarkers = new Map<number, L.Marker>();
   private routeLayer?: L.GeoJSON;
   private previousCases: Map<number, CaseModel> = new Map();
+
+  private endingCaseIds = new Set<number>();
 
   private get HOSPITAL_LAT() { return this.configService.hospitalLat; }
   private get HOSPITAL_LNG() { return this.configService.hospitalLng; }
@@ -73,6 +74,7 @@ export class CasesOverviewComponent implements OnInit, AfterViewInit, OnDestroy 
 
       if (message.type === 'END' && message.data?.id) {
         this.removeCaseMarker(message.data.id);
+        this.handleCaseEnd(message.data.id);
       }
     });
   }
@@ -81,34 +83,24 @@ export class CasesOverviewComponent implements OnInit, AfterViewInit, OnDestroy 
     // Update all case locations on map
     if (changes['cases'] && !changes['cases'].firstChange) {
       this.updateCaseMarkers();
-      this.checkForEndedCases(changes['cases'].previousValue, changes['cases'].currentValue);
     }
   }
 
-  private checkForEndedCases(previousCases: CaseModel[], currentCases: CaseModel[]) {
-    if (!previousCases || !currentCases) return;
+  private handleCaseEnd(caseId: number) {
+    // Add to ending cases set
+    this.endingCaseIds.add(caseId);
 
-    const prevMap = new Map(previousCases.map(c => [c.id, c]));
-    const currMap = new Map(currentCases.map(c => [c.id, c]));
+    // Remove marker immediately
+    this.removeCaseMarker(caseId);
 
-    // Check for cases that became inactive
-    for (const [id, prevCase] of prevMap.entries()) {
-      const currCase = currMap.get(id);
-      if (prevCase.isActive && currCase && !currCase.isActive) {
-        // Case ended!
-        console.log(`Case #${id} ended.`);
-        const notification: Notification = {
-          senderName: 'System',
-          message: `Case #${id} (${currCase.patientName}) has been closed! You can find it in archive.`,
-          createdAt: new Date().toISOString()
-        };
-        this.notificationsWsService.addLocalNotification(notification);
-      }
-    }
+    // Remove from set after 5 seconds (when case will be removed from list)
+    setTimeout(() => {
+      this.endingCaseIds.delete(caseId);
+    }, 5000);
   }
 
   get activeCases(): CaseModel[] {
-    return this.cases.filter(c => c.isActive);
+    return this.cases.filter(c => c.isActive && !this.endingCaseIds.has(c.id));
   }
 
   get sortedCases(): CaseModel[]{
@@ -122,6 +114,7 @@ export class CasesOverviewComponent implements OnInit, AfterViewInit, OnDestroy 
   ngOnDestroy() {
     this.wsService.disconnect();
     this.map?.remove();
+    this.endingCaseIds.clear();
   }
 
   private initMap() {
