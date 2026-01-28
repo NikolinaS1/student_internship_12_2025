@@ -1,4 +1,5 @@
 import { Component, AfterViewInit, OnDestroy, Output, EventEmitter, Input, inject, OnInit, SimpleChanges } from '@angular/core';
+import { Router } from '@angular/router';
 import { CommonModule, NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import * as L from 'leaflet';
@@ -12,6 +13,7 @@ import { CaseSortService, SortOption } from '../../hospital-services/sorting-cas
 import { CustomSortDropdownComponent } from '../../components/cases-sort//cases-sort.component';
 import { NotificationsWebSocketService } from '../../hospital-services/notifications-ws.service';
 import { Notification } from '../../hospital-models/notification-model';
+import { formatCoordinate } from '../../utils/format-coordinate';
 
 @Component({
   selector: 'app-cases-overview',
@@ -26,6 +28,7 @@ export class CasesOverviewComponent implements OnInit, AfterViewInit, OnDestroy 
   private wsService = inject(WebSocketLocationService);
   private caseService = inject(CaseService);
   private authService = inject(HospitalAuthService);
+  private router = inject(Router);
   private caseWsService = inject(CaseWebSocketService);
   private configService = inject(ConfigService);
   private sortService = inject(CaseSortService);
@@ -47,6 +50,7 @@ export class CasesOverviewComponent implements OnInit, AfterViewInit, OnDestroy 
   selectedCaseEta?: { minutes: number; km: number };
   sortOption: SortOption = 'priority-high-low';
   sortOptions = this.sortService.getSortOptions();
+  formatCoordinate = formatCoordinate;
 
   ngOnInit() {
     // Connect WebSocket for vehicle locations
@@ -241,6 +245,10 @@ export class CasesOverviewComponent implements OnInit, AfterViewInit, OnDestroy 
       }
     }
     this.fitBoundsToAllCases();
+  }
+
+  navigateToArchive() {
+    this.router.navigate(['/archive']);
   }
 
   private updateCaseMarkerLocation(caseId: number, latitude: number, longitude: number) {

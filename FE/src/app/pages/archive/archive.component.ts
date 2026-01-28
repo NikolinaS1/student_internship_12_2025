@@ -7,6 +7,7 @@ import { CaseSortService, SortOption } from '../../hospital-services/sorting-cas
 import { CustomSortDropdownComponent } from '../../components/cases-sort/cases-sort.component';
 import { OverlayModalComponent } from '../../components/overlay-modal/overlay-modal.component';
 import { AuthService } from '../../services/auth.service';
+import { formatCoordinate } from '../../utils/format-coordinate';
 
 @Component({
   selector: 'app-archive',
@@ -26,6 +27,8 @@ export class ArchiveComponent implements OnInit {
   sortOptions = this.sortService.getSortOptions();
   selectedCase: CaseModel | null = null;
   currentYear: number = new Date().getFullYear();
+
+  formatCoordinate = formatCoordinate;
 
   ngOnInit() {
     this.loadArchivedCases();

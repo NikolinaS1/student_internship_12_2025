@@ -1,5 +1,4 @@
 import { Component, ViewChild, inject, OnInit, computed, OnDestroy } from '@angular/core';
-import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -23,7 +22,6 @@ type StatusChip = { text: string; cls: string };
 export class HospitalDashboardComponent implements OnInit, OnDestroy {
   readonly store = inject(CaseService);
   readonly authService = inject(AuthService);
-  private router = inject(Router);
   private sub?: Subscription;
   public notifications: Notification[] = [];
   private notificationsWsService = inject(NotificationsWebSocketService);
@@ -55,10 +53,6 @@ export class HospitalDashboardComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.sub?.unsubscribe();
     this.store.selectCase(null);
-  }
-
-  navigateToArchive() {
-    this.router.navigate(['/archive']);
   }
 
   selectCase(c: CaseModel) {

@@ -7,7 +7,6 @@
       </div>
 
       <div class="topbar__actions">
-        <button type="button" class="btn" (click)="goBack()">Back to Dashboard</button>
         <button type="button" class="btn btn--primary" (click)="authService.logout()">Logout</button>
       </div>
     </div>
@@ -22,6 +21,8 @@
           <h2 class="overview__title">Archived Cases</h2>
           <p class="overview__subtitle">All completed and closed cases</p>
         </div>
+
+        <button type="button" class="btn" (click)="goBack()">Back to Dashboard</button>
 
         <app-custom-sort-dropdown
           [sortOptions]="sortOptions"
@@ -78,7 +79,7 @@
 
     <div class="modal-header-section">
       <div class="header-left">
-        <h2 class="modal-title">Case #{{ selectedCase.id }}</h2>
+        <h2 class="modal-title">{{ selectedCase.patientName }}</h2>
         <span class="badge-priority" [class]="'priority-' + (selectedCase.isSos ? 'sos' : selectedCase.priority.toLowerCase())">
           {{ selectedCase.isSos ? 'SOS' : selectedCase.priority }}
         </span>
@@ -111,7 +112,7 @@
               </div>
               <div class="info-item">
                 <label>Pickup location</label>
-                <span>{{ selectedCase.latitude }}, {{ selectedCase.longitude }}</span>
+                <span>{{ formatCoordinate(selectedCase.latitude) }}, {{ formatCoordinate(selectedCase.longitude) }}</span>
               </div>
             </div>
           </div>

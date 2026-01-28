@@ -93,10 +93,13 @@
   align-items: center;
   width: 100%;
   margin-bottom: 0.84rem;
+  gap: 1rem;
 }
 
 .overview__head {
   margin-left: 0.67rem;
+  flex: 1;
+  min-width: 0;
 }
 
 .overview__title {
