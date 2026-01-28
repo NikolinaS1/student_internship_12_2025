@@ -8,7 +8,6 @@ import { CaseModal } from '../../components/case-modal/case-modal';
 import { SosModal } from '../../components/sos-modal/sos-modal';
 import { EndCaseModal } from '../../components/end-case-modal/end-case-modal';
 import { Case } from '../../models/case.model';
-import { MOCK_USER } from '../../models/mock-data';
 import { WebSocketService, LocationMessage } from '../../services/websocket.service';
 import { CaseService } from '../../services/case.service';
 import { GeolocationService } from '../../services/geolocation.service';

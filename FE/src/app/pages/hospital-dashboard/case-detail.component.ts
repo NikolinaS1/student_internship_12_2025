@@ -131,7 +131,8 @@ export class CaseDetailComponent implements OnInit, AfterViewInit, OnDestroy {
     const notification: Notification = {
       senderName: 'System',
       message: `Case #${this.selectedCase.id} ended! You can find it in archive`,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
+      caseId: this.selectedCase.id
     };
     this.notificationsWsService.addLocalNotification(notification);
     
