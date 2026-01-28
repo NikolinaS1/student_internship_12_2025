@@ -261,6 +261,13 @@ export class CaseModal implements OnChanges {
       longitude: 0  // Placeholder, will be set after geolocation
     };
 
+    if (this.editMode && this.existingCase) {
+      caseDTO.latitude = this.existingCase.latitude;
+      caseDTO.longitude = this.existingCase.longitude;
+      this.submitCase(caseDTO, fullDescription);
+      return;
+    }
+
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
