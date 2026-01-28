@@ -100,7 +100,8 @@ export class CasesOverviewComponent implements OnInit, AfterViewInit, OnDestroy 
         const notification: Notification = {
           senderName: 'System',
           message: `Case #${id} (${currCase.patientName}) has been closed! You can find it in archive.`,
-          createdAt: new Date().toISOString()
+          createdAt: new Date().toISOString(),
+          caseId: currCase.id
         };
         this.notificationsWsService.addLocalNotification(notification);
       }
