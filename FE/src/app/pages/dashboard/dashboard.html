@@ -1,4 +1,4 @@
-<app-header [currentUser]="currentUser"></app-header>
+<app-header portalType="EMS Portal" userRole="VEHICLE"></app-header>
 
 <div class="layout-wrapper">
   <app-sidebar 
@@ -148,7 +148,6 @@
 
 <app-case-modal
   [isOpen]="isModalOpen"
-  [currentUser]="currentUser"
   [editMode]="isEditMode"
   [existingCase]="activeCase"
   (close)="closeCaseModal()"

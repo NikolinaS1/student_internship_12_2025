@@ -9,6 +9,7 @@ import { CaseDetailComponent } from './case-detail.component';
 import { AuthService } from '../../services/auth.service';
 import { NotificationsWebSocketService } from '../../hospital-services/notifications-ws.service';
 import { Notification } from '../../hospital-models/notification-model';
+import { Header } from '../../components/header/header';
 
 type PriorityChip = { text: string; cls: string };
 type StatusChip = { text: string; cls: string };
@@ -16,7 +17,7 @@ type StatusChip = { text: string; cls: string };
 @Component({
   selector: 'app-hospital-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule, CasesOverviewComponent, CaseDetailComponent],
+  imports: [CommonModule, FormsModule, CasesOverviewComponent, CaseDetailComponent, Header],
   templateUrl: './hospital-dashboard.component.html',
 })
 export class HospitalDashboardComponent implements OnInit, OnDestroy {
