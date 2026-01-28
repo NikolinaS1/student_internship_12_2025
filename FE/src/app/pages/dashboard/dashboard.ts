@@ -73,6 +73,7 @@ export class Dashboard implements OnInit, OnDestroy {
         }
         if (this.activeCase) {
           this.messageWsService.connect(this.activeCase.id, this.currentUserId);
+          this.startLocationTracking();
         }
       }
     });
