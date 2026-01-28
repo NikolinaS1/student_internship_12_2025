@@ -97,6 +97,29 @@ export class CasesOverviewComponent implements OnInit, AfterViewInit, OnDestroy 
     setTimeout(() => {
       this.endingCaseIds.delete(caseId);
     }, 5000);
+    
+  private checkForEndedCases(previousCases: CaseModel[], currentCases: CaseModel[]) {
+    if (!previousCases || !currentCases) return;
+
+    const prevMap = new Map(previousCases.map(c => [c.id, c]));
+    const currMap = new Map(currentCases.map(c => [c.id, c]));
+
+    // Check for cases that became inactive
+    for (const [id, prevCase] of prevMap.entries()) {
+      const currCase = currMap.get(id);
+      if (prevCase.isActive && currCase && !currCase.isActive) {
+        // Case ended!
+        console.log(`Case #${id} ended.`);
+        const notification: Notification = {
+          caseId: id,
+          senderName: 'System',
+          message: `Case #${id} (${currCase.patientName}) has been closed! You can find it in archive.`,
+          createdAt: new Date().toISOString(),
+          caseId: currCase.id
+        };
+        this.notificationsWsService.addLocalNotification(notification);
+      }
+    }
   }
 
   get activeCases(): CaseModel[] {

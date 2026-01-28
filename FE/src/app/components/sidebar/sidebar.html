@@ -16,7 +16,7 @@
       </div>
       <p class="case-age">{{ activeCase.age }} years old</p>
       
-      <div class="patient-info-section">
+      <div class="patient-info-section" [class.sos-case]="activeCase.isSos">
         <div class="info-label">PATIENT INFO</div>
         <div class="info-row">
           <span class="info-key">Sex:</span>
@@ -49,7 +49,7 @@
         </div>
       }
 
-      <div class="case-timestamp">
+      <div class="case-timestamp" [class.sos-case]="activeCase.isSos">
         Created: {{ activeCase.createdAt | date:'MMM d, HH:mm' }}
       </div>
     </div>

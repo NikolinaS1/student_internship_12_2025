@@ -10,7 +10,7 @@
 <div class="filters-container">
     <div class="search-input">
         <input type="text" [(ngModel)]="searchTerm" (ngModelChange)="onSearchChange()"
-            placeholder="Search by username..." />
+            placeholder="Search by username..."  autocomplete="off"/>
     </div>
     <div class="role-filter">
         <select [(ngModel)]="selectedRole" (ngModelChange)="onRoleFilterChange()">
@@ -205,7 +205,7 @@
     </div>
 </div>
 
-<!-- DELETE CONFIRMATION MODAL 
+<!-- DELETE CONFIRMATION MODAL
 <div *ngIf="showDeleteModal && userToDelete" class="overlay" (click)="closeModals()">
     <div class="modal" (click)="$event.stopPropagation()">
 

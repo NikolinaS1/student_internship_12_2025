@@ -8,7 +8,6 @@ import { CaseModal } from '../../components/case-modal/case-modal';
 import { SosModal } from '../../components/sos-modal/sos-modal';
 import { EndCaseModal } from '../../components/end-case-modal/end-case-modal';
 import { Case } from '../../models/case.model';
-import { MOCK_USER } from '../../models/mock-data';
 import { WebSocketService, LocationMessage } from '../../services/websocket.service';
 import { CaseService } from '../../services/case.service';
 import { GeolocationService } from '../../services/geolocation.service';
@@ -109,11 +108,14 @@ export class Dashboard implements OnInit, OnDestroy {
         case 'END':
           this.stopLocationTracking();
           this.activeCase = null;
+          this.messageWsService.disconnect();
+          this.messages = [];
           break;
       }
     } else if (type === 'CREATE' && !this.activeCase) {
       this.activeCase = data;
       this.startLocationTracking();
+      this.messageWsService.connect(data.id, this.currentUserId);
     }
   }
 
@@ -156,8 +158,10 @@ export class Dashboard implements OnInit, OnDestroy {
     this.caseService.endCase(this.activeCase.id).subscribe({
       next: () => {
         this.stopLocationTracking();
+        this.messageWsService.disconnect();
         this.activeCase = null;
         this.isEndCaseModalOpen = false;
+        this.messages = [];
       },
       error: (error) => {
         console.error('Error ending case:', error);
@@ -184,6 +188,7 @@ export class Dashboard implements OnInit, OnDestroy {
   onCaseCreated(newCase: Case): void {
     this.activeCase = newCase;
     this.startLocationTracking();
+    this.messageWsService.connect(newCase.id, this.currentUserId);
   }
 
   onCaseUpdated(updatedCase: Case): void {

@@ -1,5 +1,6 @@
 package org.acme.dtos.messages;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 public record MessageResponse(
@@ -8,6 +9,6 @@ public record MessageResponse(
     Long senderId,
     String senderName,
     String content,
-    LocalDateTime createdAt
+    Instant createdAt
 ) {
 }

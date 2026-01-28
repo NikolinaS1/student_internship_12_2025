@@ -104,6 +104,32 @@ export class CaseDetailComponent implements OnInit, AfterViewInit, OnDestroy {
     this.messageSub?.unsubscribe();
     this.messageWsService.disconnect();
     this.detailMap?.remove();
+    
+    // Clear timeout if exists
+    if (this.caseEndTimeout) {
+      clearTimeout(this.caseEndTimeout);
+      this.caseEndTimeout = undefined;
+    }
+  }
+
+  handleCaseEnded() {
+    console.log(`Case #${this.selectedCase.id} has ended. Waiting 30 seconds before closing...`);
+    
+    // Show notification
+    const notification: Notification = {
+      caseId: this.selectedCase.id,
+      senderName: 'System',
+      message: `Case #${this.selectedCase.id} ended! You can find it in archive`,
+      createdAt: new Date().toISOString(),
+      caseId: this.selectedCase.id
+    };
+    this.notificationsWsService.addLocalNotification(notification);
+    
+    // Wait 30 seconds then close detail view
+    this.caseEndTimeout = setTimeout(() => {
+      console.log(`Closing case #${this.selectedCase.id} detail view`);
+      this.deselect.emit();
+    }, 30000); // 30 seconds
   }
 
  

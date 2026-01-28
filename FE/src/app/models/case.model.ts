@@ -11,7 +11,7 @@ export interface Case {
   longitude: number;
 
   // Metadata - from backend
-  priority: 'LOW' | 'MEDIUM' | 'HIGH';
+  priority: 'LOW' | 'MEDIUM' | 'HIGH' | 'SOS';
   isSos: boolean;
   acknowledged: boolean;
   isActive: boolean;
@@ -69,7 +69,7 @@ export interface UpdateCaseDTO {
   isSos?: boolean;
   acknowledged?: boolean;
   isActive?: boolean;
-  priority?: 'LOW' | 'MEDIUM' | 'HIGH';
+  priority?: 'LOW' | 'MEDIUM' | 'HIGH' | 'SOS';
   latitude?: number;
   longitude?: number;
 }

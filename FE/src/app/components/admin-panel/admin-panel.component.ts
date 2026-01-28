@@ -6,6 +6,7 @@ import { CaseService } from '../../services/case.service';
 import { UserManagementComponent } from '../user-management/user-management.component';
 import { CaseManagementComponent } from '../case-management/case-management.component';
 import { Subscription } from 'rxjs';
+import { Header } from '../../components/header/header';
 
 @Component({
   selector: 'app-admin-panel',
@@ -13,7 +14,8 @@ import { Subscription } from 'rxjs';
   imports: [
     CommonModule,
     UserManagementComponent,
-    CaseManagementComponent
+    CaseManagementComponent,
+    Header
   ],
   templateUrl: './admin-panel.component.html',
   styleUrls: ['./admin-panel.component.scss']
@@ -29,12 +31,14 @@ export class AdminPanelComponent implements OnInit, OnDestroy {
   private subscription: Subscription = new Subscription();
 
   constructor(
-    public auth: AuthService, 
+    public auth: AuthService,
     private userService: UserService,
     private caseService: CaseService
   ) { }
 
   ngOnInit() {
+    //+++++++++this.userService.loadUsers();
+
     this.subscription.add(
       this.userService.users$.subscribe(users => {
         this.updateStats(users);
