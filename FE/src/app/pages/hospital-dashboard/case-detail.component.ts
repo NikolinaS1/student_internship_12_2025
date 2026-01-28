@@ -10,6 +10,8 @@ import { AuthService } from '../../services/auth.service';
 import { HospitalAuthService } from '../../hospital-services/auth-service'
 import { CaseSortService, SortOption } from '../../hospital-services/sorting-cases.service';
 import { CustomSortDropdownComponent } from '../../components/cases-sort/cases-sort.component';
+import { NotificationsWebSocketService } from '../../hospital-services/notifications-ws.service';
+import { Notification } from '../../hospital-models/notification-model';
 import * as L from 'leaflet';
 
 
@@ -37,6 +39,7 @@ export class CaseDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   private authService = inject(AuthService);
   private hospitalAuthService = inject(HospitalAuthService);
   private sortService = inject(CaseSortService);
+  private notificationsWsService = inject(NotificationsWebSocketService);
 
   private detailMap?: L.Map;
   private caseMarker?: L.Marker;
@@ -44,6 +47,7 @@ export class CaseDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   private hospitalMarker?: L.Marker;
   private locationSub?: Subscription;
   private messageSub?: Subscription;
+  private caseEndTimeout?: any;
 
   messages: Message[] = [];
   currentUserId: number = this.authService.getUserId();
@@ -71,6 +75,17 @@ export class CaseDetailComponent implements OnInit, AfterViewInit, OnDestroy {
       if (previousCase && previousCase.id !== this.selectedCase.id) {
         this.messageWsService.disconnect();
         this.messageWsService.connect(this.selectedCase.id, this.currentUserId);
+        
+        // Clear any existing timeout
+        if (this.caseEndTimeout) {
+          clearTimeout(this.caseEndTimeout);
+          this.caseEndTimeout = undefined;
+        }
+      }
+
+      // Check if case became inactive
+      if (!this.selectedCase.isActive && previousCase?.isActive) {
+        this.handleCaseEnded();
       }
     }
   }
@@ -99,6 +114,30 @@ export class CaseDetailComponent implements OnInit, AfterViewInit, OnDestroy {
     this.messageSub?.unsubscribe();
     this.messageWsService.disconnect();
     this.detailMap?.remove();
+    
+    // Clear timeout if exists
+    if (this.caseEndTimeout) {
+      clearTimeout(this.caseEndTimeout);
+      this.caseEndTimeout = undefined;
+    }
+  }
+
+  handleCaseEnded() {
+    console.log(`Case #${this.selectedCase.id} has ended. Waiting 30 seconds before closing...`);
+    
+    // Show notification
+    const notification: Notification = {
+      senderName: 'System',
+      message: `Case #${this.selectedCase.id} ended! You can find it in archive`,
+      createdAt: new Date().toISOString()
+    };
+    this.notificationsWsService.addLocalNotification(notification);
+    
+    // Wait 30 seconds then close detail view
+    this.caseEndTimeout = setTimeout(() => {
+      console.log(`Closing case #${this.selectedCase.id} detail view`);
+      this.deselect.emit();
+    }, 30000); // 30 seconds
   }
 
   scrollChatToBottom() {

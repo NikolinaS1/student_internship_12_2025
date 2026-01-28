@@ -40,7 +40,6 @@
             (click)="selectCaseHandler(c)"
             class="case-card"
             [ngClass]="[
-              !isActive(c) ? 'case-card--disabled' : '',
               isSos(c) == true ? 'case-card--sos' :
               c.priority === 'HIGH' ? 'case-card--high' :
               c.priority === 'MEDIUM' ? 'case-card--medium' : 'case-card--low'

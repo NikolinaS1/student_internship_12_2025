@@ -84,5 +84,15 @@ export class NotificationsWebSocketService {
     this.connectedSubject.next(false);
   }
 
+  addLocalNotification(notification: Notification) {
+    const currentNotifications = this.notifications.getValue();
+    this.notifications.next([notification, ...currentNotifications]);
+
+    setTimeout(() => {
+      const updatedNotifications = this.notifications.getValue().filter(n => n !== notification);
+      this.notifications.next(updatedNotifications);
+    }, 5000);
+  }
+
 
 }
