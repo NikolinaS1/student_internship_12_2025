@@ -88,15 +88,23 @@ export class CasesOverviewComponent implements OnInit, AfterViewInit, OnDestroy 
       const currCase = currMap.get(id);
       if (prevCase.isActive && currCase && !currCase.isActive) {
         // Case ended!
-        console.log(`Case #${id} ended in overview`);
+        console.log(`Case #${id} ended.`);
         const notification: Notification = {
           senderName: 'System',
-          message: `Case #${id} ended! You can find it in archive`,
+          message: `Case #${id} (${currCase.patientName}) has been closed! You can find it in archive.`,
           createdAt: new Date().toISOString()
         };
         this.notificationsWsService.addLocalNotification(notification);
       }
     }
+  }
+
+  get activeCases(): CaseModel[] {
+    return this.cases.filter(c => c.isActive);
+  }
+
+  get sortedCases(): CaseModel[]{
+    return this.sortService.sortCases(this.activeCases, this.sortOption);
   }
 
   ngAfterViewInit() {
@@ -192,10 +200,6 @@ export class CasesOverviewComponent implements OnInit, AfterViewInit, OnDestroy 
       default:
         return 'assets/images/low priority case.png';
     }
-  }
-
-  get sortedCases(): CaseModel[]{
-    return this.sortService.sortCases(this.cases, this.sortOption);
   }
 
   onSortChange(option: SortOption){
