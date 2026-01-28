@@ -31,13 +31,28 @@ export class UserService {
     ) {
         this.configService.getConfig().subscribe(config => {
             this.apiUrl = `${config.Urls.apiUrl}/admin/users`;
-            this.loadUsers();
+
+
+          this.loadUsers();
         });
     }
 
+    private authHeaders(): HttpHeaders {
+      const token = localStorage.getItem('auth_token');
+
+      return new HttpHeaders({
+        'Content-Type': 'application/json',
+        'ngrok-skip-browser-warning': 'true',
+        Authorization: `Bearer ${token}`
+      });
+    }
+
+
 
     private loadUsers(): void {
-        this.http.get<any[]>(this.apiUrl, { headers: this.ngrokHeaders }).subscribe({
+
+
+        this.http.get<any[]>(this.apiUrl, { headers: this.authHeaders() }).subscribe({
             next: users => {
                 const mappedUsers: User[] = users.map(u => ({
                     id: typeof u.id === 'string' ? parseInt(u.id, 10) : u.id,
@@ -64,7 +79,7 @@ export class UserService {
     }
 
     create(userData: { username: string; password: string; role: UserRole }): void {
-        this.http.post<User>(this.apiUrl, userData, { headers: this.ngrokHeaders }).subscribe({
+        this.http.post<User>(this.apiUrl, userData, { headers: this.authHeaders() }).subscribe({
             next: newUser => {
                 const users = [newUser, ...this.usersSubject.value];
                 this.usersSubject.next(users);
@@ -86,8 +101,8 @@ export class UserService {
     update(user: User, password?: string): void {
         const updateData: any = { username: user.username, role: user.role };
 
-    
-        this.http.put<User>(`${this.apiUrl}/${user.id}`, updateData, { headers: this.ngrokHeaders }).subscribe({
+
+        this.http.put<User>(`${this.apiUrl}/${user.id}`, updateData, { headers: this.authHeaders() }).subscribe({
             next: updatedUser => {
                 const users = this.usersSubject.value.map(u =>
                     u.id === user.id ? updatedUser : u
@@ -96,7 +111,7 @@ export class UserService {
 
                 if (password) {
                     const passwordData = { newPassword: password };
-                    this.http.put(`${this.apiUrl}/${user.id}/password`, passwordData, { headers: this.ngrokHeaders }).subscribe({
+                    this.http.put(`${this.apiUrl}/${user.id}/password`, passwordData, { headers: this.authHeaders() }).subscribe({
                         next: () => {
                             console.log('Password updated successfully for user', user.id);
                         },
@@ -119,7 +134,7 @@ export class UserService {
 
     updateStatus(userId: number, isEnabled: boolean): Observable<User> {
         const updateData: any = { isEnabled };
-        return this.http.put<User>(`${this.apiUrl}/${userId}/status`, updateData, { headers: this.ngrokHeaders }).pipe(
+        return this.http.put<User>(`${this.apiUrl}/${userId}/status`, updateData, { headers: this.authHeaders() }).pipe(
             catchError(error => {
                 console.error('Error updating user status:', error);
                 return throwError(() => error);
@@ -135,7 +150,7 @@ export class UserService {
     }
 
     /* delete(id: number): void {
-         this.http.delete(`${this.apiUrl}/${id}`, { headers: this.ngrokHeaders }).subscribe({
+         this.http.delete(`${this.apiUrl}/${id}`, { headers: this.authHeaders() }).subscribe({
              next: () => {
                  const users = this.usersSubject.value.filter(u => u.id !== id);
                  this.usersSubject.next(users);

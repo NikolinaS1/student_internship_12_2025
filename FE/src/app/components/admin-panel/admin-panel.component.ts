@@ -31,12 +31,14 @@ export class AdminPanelComponent implements OnInit, OnDestroy {
   private subscription: Subscription = new Subscription();
 
   constructor(
-    public auth: AuthService, 
+    public auth: AuthService,
     private userService: UserService,
     private caseService: CaseService
   ) { }
 
   ngOnInit() {
+    //+++++++++this.userService.loadUsers();
+
     this.subscription.add(
       this.userService.users$.subscribe(users => {
         this.updateStats(users);
