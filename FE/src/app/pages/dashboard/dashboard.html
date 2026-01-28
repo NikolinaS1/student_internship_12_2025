@@ -98,8 +98,8 @@
         <div class="chat">
           <div class="chat__header">
             <span>Case Communication</span>
-            <span class="chat__status" [ngClass]="isActive() ? 'chat__status--active' : 'chat__status--closed'">
-              {{ isActive() ? '● Active' : '○ Closed' }}
+            <span class="chat__status" [ngClass]="isAcknowledged() ? 'chat__status--active' : 'chat__status--sent'">
+              {{ isAcknowledged() ? '● Active' : 'Sent' }}
             </span>
           </div>
 
@@ -132,13 +132,13 @@
               type="text"
               placeholder="Type a message..."
               class="input"
-              [disabled]="!isActive()"
+              [disabled]="!isAcknowledged()"
             />
             <button
               type="button"
               (click)="onSend()"
               class="btn btn--ghost"
-              [disabled]="!messageText.trim() || !isActive()"
+              [disabled]="!messageText.trim() || !isAcknowledged()"
             >
               Send
             </button>
