@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import org.acme.enums.Priority;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Entity
 @Table(name = "cases")
@@ -14,7 +14,8 @@ public class Case extends PanacheEntity {
     @ManyToOne
     private User createdBy;
 
-    private LocalDateTime createdAt = LocalDateTime.now();
+    @Column(columnDefinition = "TIMESTAMP WITH TIME ZONE")
+    private Instant createdAt;
 
     @NotNull
     private Boolean isSos;
@@ -57,8 +58,8 @@ public class Case extends PanacheEntity {
     public User getCreatedBy() { return createdBy; }
     public void setCreatedBy(User createdBy) { this.createdBy = createdBy; }
 
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public Instant getCreatedAt() { return createdAt; }
+    public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }
 
     public Boolean getIsSos() { return isSos; }
     public void setIsSos(Boolean isSos) { this.isSos = isSos; }

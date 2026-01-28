@@ -3,12 +3,13 @@ package org.acme.dtos.cases;
 import org.acme.enums.Priority;
 import org.acme.models.Case;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
+
 
 public record CaseResponse(
     Long id,
     Long createdById,
-    LocalDateTime createdAt,
+    Instant createdAt,
     Boolean isSos,
     String description,
     String patientName,

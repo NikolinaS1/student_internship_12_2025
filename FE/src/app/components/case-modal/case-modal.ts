@@ -13,7 +13,6 @@ import { CaseService } from '../../services/case.service';
 })
 export class CaseModal implements OnChanges {
   @Input() isOpen = false;
-  @Input() currentUser: any;
   @Input() editMode = false;
   @Input() existingCase: Case | null = null;
   @Output() close = new EventEmitter<void>();

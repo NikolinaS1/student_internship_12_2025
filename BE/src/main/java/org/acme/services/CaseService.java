@@ -12,7 +12,7 @@ import org.acme.enums.Priority;
 import org.acme.models.Case;
 import org.acme.models.User;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 
 @ApplicationScoped
@@ -152,7 +152,7 @@ public class CaseService {
                                       Integer birthYear, String sex, String description,
                                       Double latitude, Double longitude) {
         caseEntity.setCreatedBy(user);
-        caseEntity.setCreatedAt(LocalDateTime.now().withNano(0));
+        caseEntity.setCreatedAt(Instant.now());
         caseEntity.setPatientName(patientName);
         caseEntity.setBirthYear(birthYear);
         caseEntity.setSex(sex);

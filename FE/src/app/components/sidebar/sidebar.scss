@@ -3,7 +3,7 @@
   padding: 24px 18px; 
   background: white;
   border-right: 1px solid var(--border-color);
-  height: calc(100vh - 75px); 
+  height: calc(100vh - 60px); 
 
   .action-stack {
     display: flex;
@@ -87,6 +87,10 @@
     margin-bottom: 15px;
     padding-bottom: 12px;
     border-bottom: 1px solid #e9ecef;
+
+    &.sos-case {
+      border-bottom: 1px solid #ef4444;
+    }
     
     .info-label {
       font-size: 9px;
@@ -150,11 +154,17 @@
         
         &.priority-medium {
           background: #fff7ed;
-          border-color: #f97316;
-          color: #ea580c;
+          border-color: #f9db16;
+          color: #eac10c;
         }
         
         &.priority-high {
+          background: #fef2f2;
+          border-color: #f97316;
+          color: #ea580c;
+        }
+
+        &.priority-sos {
           background: #fef2f2;
           border-color: #ef4444;
           color: #dc2626;
@@ -207,6 +217,10 @@
     color: #adb5bd;
     padding-top: 9px;
     border-top: 1px solid #e9ecef;
+
+    &.sos-case {
+      border-top: 1px solid #ef4444;
+    }
   }
 }
 

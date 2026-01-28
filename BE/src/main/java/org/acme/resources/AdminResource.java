@@ -5,6 +5,7 @@ import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import jakarta.annotation.security.RolesAllowed;
 
 import org.acme.dtos.admin.*;
 import org.acme.services.AdminService;
@@ -15,7 +16,7 @@ import java.util.List;
 @Path("/admin/users")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-//@RolesAllowed("ADMIN")
+@RolesAllowed("ADMIN")
 
 public class AdminResource {
 

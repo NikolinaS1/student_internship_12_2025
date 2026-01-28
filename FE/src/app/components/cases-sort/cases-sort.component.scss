@@ -12,11 +12,11 @@
   border-radius: var(--radius);
   background: var(--background);
   color: var(--foreground);
-  font-size: 0.59rem;
+  font-size: 0.75rem;
   font-weight: 500;
   cursor: pointer;
   transition: all 150ms ease;
-  min-width: 120px;
+  min-width: 130px;
   justify-content: space-between;
 
   &:hover {
