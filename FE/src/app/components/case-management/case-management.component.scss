@@ -102,7 +102,7 @@
         &:nth-child(3) { width: 15%; } /* Status */
         &:nth-child(4) { width: 12%; } /* EMS */
         &:nth-child(5) { width: 18%; } /* Created */
-        &:nth-child(6) { width: 12%; } /* Priority */
+        &:nth-child(6) { width: 12%; overflow: visible; } /* Priority */
         &:nth-child(7) { width: 15%; } /* Actions */
     }
 
@@ -130,20 +130,36 @@
     color: #1e40af;
 }
 
+@keyframes glow-sos {
+    0%, 100% {
+        filter: drop-shadow(0 0 8px rgba(220, 38, 38, 0.6));
+    }
+    50% {
+        filter: drop-shadow(0 0 16px rgba(220, 38, 38, 0.9));
+    }
+}
+
 /* PRIORITY WEIGHTS */
+.priority-sos {
+    color: #dc2626;
+    font-weight: 800;
+    filter: drop-shadow(0 0 8px rgba(220, 38, 38, 0.6));
+    animation: glow-sos 2s ease-in-out infinite;
+}
+
 .priority-high {
     color: #000;
-    font-weight: 800;
+    font-weight: 900;
 }
 
 .priority-medium {
     color: #000;
-    font-weight: 400;
+    font-weight: 520;
 }
 
 .priority-low {
     color: #000;
-    font-weight: 100;
+    font-weight: 400;
 }
 
 /* BUTTONS */
