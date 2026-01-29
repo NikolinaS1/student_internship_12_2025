@@ -1,7 +1,6 @@
 .case-wrapper {
     background: #fff;
     border-radius: 18px;
-    padding: 32px;
 }
 
 .case-header {
@@ -27,7 +26,7 @@
 
     .search-input {
         flex: 1;
-        
+
         input {
             width: 100%;
             height: 42px;
@@ -80,13 +79,41 @@
         font-weight: 600;
         padding: 0 10px 16px 0;
 
-        &:nth-child(1) { width: 20%; } /* Patient */
-        &:nth-child(2) { width: 8%; }  /* Age */
-        &:nth-child(3) { width: 15%; } /* Status */
-        &:nth-child(4) { width: 12%; } /* EMS */
-        &:nth-child(5) { width: 18%; } /* Created */
-        &:nth-child(6) { width: 12%; } /* Priority */
-        &:nth-child(7) { width: 15%; } /* Actions */
+        &:nth-child(1) {
+            width: 20%;
+        }
+
+        /* Patient */
+        &:nth-child(2) {
+            width: 8%;
+        }
+
+        /* Age */
+        &:nth-child(3) {
+            width: 15%;
+        }
+
+        /* Status */
+        &:nth-child(4) {
+            width: 12%;
+        }
+
+        /* EMS */
+        &:nth-child(5) {
+            width: 18%;
+        }
+
+        /* Created */
+        &:nth-child(6) {
+            width: 12%;
+        }
+
+        /* Priority */
+        &:nth-child(7) {
+            width: 15%;
+        }
+
+        /* Actions */
     }
 
     td {
@@ -97,13 +124,42 @@
         text-overflow: ellipsis;
         white-space: nowrap;
 
-        &:nth-child(1) { width: 20%; } /* Patient */
-        &:nth-child(2) { width: 8%; }  /* Age */
-        &:nth-child(3) { width: 15%; } /* Status */
-        &:nth-child(4) { width: 12%; } /* EMS */
-        &:nth-child(5) { width: 18%; } /* Created */
-        &:nth-child(6) { width: 12%; overflow: visible; } /* Priority */
-        &:nth-child(7) { width: 15%; } /* Actions */
+        &:nth-child(1) {
+            width: 20%;
+        }
+
+        /* Patient */
+        &:nth-child(2) {
+            width: 8%;
+        }
+
+        /* Age */
+        &:nth-child(3) {
+            width: 15%;
+        }
+
+        /* Status */
+        &:nth-child(4) {
+            width: 12%;
+        }
+
+        /* EMS */
+        &:nth-child(5) {
+            width: 18%;
+        }
+
+        /* Created */
+        &:nth-child(6) {
+            width: 12%;
+            overflow: visible;
+        }
+
+        /* Priority */
+        &:nth-child(7) {
+            width: 15%;
+        }
+
+        /* Actions */
     }
 
     .actions {
@@ -131,9 +187,12 @@
 }
 
 @keyframes glow-sos {
-    0%, 100% {
+
+    0%,
+    100% {
         filter: drop-shadow(0 0 8px rgba(220, 38, 38, 0.6));
     }
+
     50% {
         filter: drop-shadow(0 0 16px rgba(220, 38, 38, 0.9));
     }
@@ -234,11 +293,14 @@
 }
 
 @keyframes pulse-sos {
-    0%, 100% { 
+
+    0%,
+    100% {
         box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
         transform: scale(1);
     }
-    50% { 
+
+    50% {
         box-shadow: 0 4px 20px rgba(220, 38, 38, 0.7);
         transform: scale(1.02);
     }
@@ -250,19 +312,19 @@
     font-size: 13px;
     font-weight: 600;
     border: 2px solid transparent;
-    
+
     &.priority-high {
         background: var(--high);
         color: #fff;
         border-color: var(--high);
     }
-    
+
     &.priority-medium {
         background: var(--medium);
         color: #000;
         border-color: var(--medium);
     }
-    
+
     &.priority-low {
         background: var(--low);
         color: #000;
@@ -397,7 +459,8 @@
     border-top: 1px solid #e5e7eb;
 }
 
-.close-btn, .pdf-btn {
+.close-btn,
+.pdf-btn {
     padding: 10px 24px;
     background: #fff;
     border: 1px solid #d1d5db;
@@ -471,8 +534,17 @@
 }
 
 @keyframes pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.8; transform: scale(1.05); }
+
+    0%,
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.8;
+        transform: scale(1.05);
+    }
 }
 
 .delete-confirmation-modal .modal-body {
