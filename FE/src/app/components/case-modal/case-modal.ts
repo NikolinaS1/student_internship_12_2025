@@ -232,6 +232,8 @@ export class CaseModal implements OnChanges {
       return;
     }
 
+    this.isLoading = true;
+
     let fullDescription = this.caseData.symptoms ? this.caseData.symptoms.trim() : '';
   
     if (this.caseData.quickSymptoms && this.caseData.quickSymptoms.length > 0) {
@@ -294,7 +296,6 @@ export class CaseModal implements OnChanges {
   }
 
   submitCase(caseDTO: CreateCaseDTO, fullDescription: string): void {
-    this.isLoading = true;
     const request = this.editMode && this.existingCase
       ? this.caseService.updateRegularCase(this.existingCase.id, caseDTO)
       : this.caseService.createRegularCase(caseDTO);

@@ -144,6 +144,7 @@ export class SosModal implements OnChanges {
   }
 
   createSosCase(): void {
+    this.isLoading = true;
     const sosDTO: SosCaseDTO = {
       patientName: this.caseData.patientName,
       birthYear: this.caseData.birthYear,
@@ -181,7 +182,6 @@ export class SosModal implements OnChanges {
   }
 
   submitSosCase(sosDTO: SosCaseDTO): void {
-    this.isLoading = true;
     this.caseService.createSosCase(sosDTO).subscribe({
       next: (response) => {
         this.caseService.getCaseById(response.id).subscribe({
@@ -209,7 +209,6 @@ export class SosModal implements OnChanges {
   submitUpdateSosCase(sosDTO: SosCaseDTO): void {
     if (!this.existingCase) return;
 
-    this.isLoading = true;
     this.caseService.updateSosCase(this.existingCase.id, sosDTO).subscribe({
       next: (response) => {
         this.caseService.getCaseById(response.id).subscribe({
