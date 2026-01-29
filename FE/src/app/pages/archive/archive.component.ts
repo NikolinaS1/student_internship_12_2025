@@ -8,11 +8,12 @@ import { CustomSortDropdownComponent } from '../../components/cases-sort/cases-s
 import { OverlayModalComponent } from '../../components/overlay-modal/overlay-modal.component';
 import { AuthService } from '../../services/auth.service';
 import { formatCoordinate } from '../../utils/format-coordinate';
+import { Header } from '../../components/header/header';
 
 @Component({
   selector: 'app-archive',
   standalone: true,
-  imports: [CommonModule, CustomSortDropdownComponent, DatePipe, OverlayModalComponent],
+  imports: [CommonModule, CustomSortDropdownComponent, DatePipe, OverlayModalComponent, Header],
   templateUrl: './archive.component.html',
   styleUrl: './archive.component.scss'
 })

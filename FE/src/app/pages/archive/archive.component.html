@@ -1,17 +1,5 @@
 <div class="page">
-  <header class="topbar">
-    <div class="topbar__inner">
-      <div class="brand">
-        <div class="brand__title">MCX Hospital</div>
-        <div class="brand__subtitle">Archived Cases</div>
-      </div>
-
-      <div class="topbar__actions">
-        <button type="button" class="btn btn--primary" (click)="authService.logout()">Logout</button>
-      </div>
-    </div>
-  </header>
-
+  <app-header portalType="Hospital Portal" userRole="HOSPITAL"></app-header>
 
   <!-- ALL CLOSED CASES -->
   <div class="archive-container">
