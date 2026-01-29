@@ -186,13 +186,13 @@
             type="text"
             placeholder="Type a message..."
             class="input"
-            [disabled]="!isActive()"
+            [disabled]="!isAcknowledged()"
           />
           <button
             type="button"
             (click)="onSend()"
             class="btn btn--ghost"
-            [disabled]="!messageText.trim() || !isActive()"
+            [disabled]="!messageText.trim() || !isAcknowledged()"
           >
             Send
           </button>
