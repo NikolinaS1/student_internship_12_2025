@@ -88,6 +88,8 @@ export class CaseManagementComponent implements OnInit, OnDestroy {
  */
   getPriorityClass(priority: string): string {
     switch (priority.toLowerCase()) {
+      case 'sos':
+        return 'priority-sos';
       case 'high':
         return 'priority-high';
       case 'medium':
