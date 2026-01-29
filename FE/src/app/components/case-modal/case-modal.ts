@@ -76,6 +76,8 @@ export class CaseModal implements OnChanges {
     longitude: 15.966568
   }
 
+  isLoading = false;
+
   constructor(private caseService: CaseService) {}
 
   ngOnChanges(changes: SimpleChanges) {
@@ -292,6 +294,7 @@ export class CaseModal implements OnChanges {
   }
 
   submitCase(caseDTO: CreateCaseDTO, fullDescription: string): void {
+    this.isLoading = true;
     const request = this.editMode && this.existingCase
       ? this.caseService.updateRegularCase(this.existingCase.id, caseDTO)
       : this.caseService.createRegularCase(caseDTO);
@@ -309,15 +312,18 @@ export class CaseModal implements OnChanges {
               this.caseCreated.emit(caseToEmit);
             }
             localStorage.setItem('newCaseId', caseToEmit.id.toString());
+            this.isLoading = false;
             this.closeModal();
           },
           error: (error) => {
             alert('Case created but failed to fetch details.');
+            this.isLoading = false;
             this.closeModal();
           }
         });
       },
       error: (error) => {
+        this.isLoading = false;
         this.handleError(error);
       }
     });
