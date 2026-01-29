@@ -8,6 +8,7 @@ import { ConfigService } from './config.service';
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private  baseUrl = '';
+  private lastError = '';
 
   constructor(
   private http: HttpClient,
@@ -74,6 +75,7 @@ private authHeaders(): HttpHeaders {
       );
       const token = resp?.token || resp?.accessToken || null;
       if (token) {
+        this.lastError = '';
         localStorage.setItem('auth_token', token);
         localStorage.setItem('loggedIn', 'true');
 
@@ -90,9 +92,19 @@ private authHeaders(): HttpHeaders {
         return true;
       }
       return false;
-    } catch (err) {
+    } catch (err: any) {
+      // Pohvati specifičnu error poruku sa backend-a
+      if (err?.error?.error) {
+        this.lastError = err.error.error;
+      } else {
+        this.lastError = '';
+      }
       return false;
     }
+  }
+
+  getLastError(): string {
+    return this.lastError;
   }
 
    getUserId(): number {

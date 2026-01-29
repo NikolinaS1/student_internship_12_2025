@@ -12,6 +12,8 @@ export interface User {
     role: UserRole;
     username: string;
     isEnabled?: boolean;
+    createdAt?: string;
+    updatedAt?: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -58,7 +60,9 @@ export class UserService {
                     id: typeof u.id === 'string' ? parseInt(u.id, 10) : u.id,
                     role: u.role,
                     username: u.username,
-                    isEnabled: u.isEnabled
+                    isEnabled: u.isEnabled,
+                    createdAt: u.createdAt,
+                    updatedAt: u.updatedAt
                 }));
                 this.usersSubject.next(mappedUsers);
                 console.log('Loaded users:', mappedUsers);

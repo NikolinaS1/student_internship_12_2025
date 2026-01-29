@@ -132,28 +132,36 @@
         font-size: 13px;
         font-weight: 600;
         color: #64748b;
-        padding: 0 14px;
+        padding: 0 8px;
 
         &:nth-child(1) { /* Username */
-            width: 25%;
+            width: 20%;
         }
 
         &:nth-child(2) { /* Role */
-            width: 15%;
-            text-align: center;
-        }
-
-        &:nth-child(3) { /* Status */
             width: 12%;
             text-align: center;
         }
 
-        &:nth-child(4) { /* User ID */
-            width: 28%;
+        &:nth-child(3) { /* User ID */
+            width: 10%;
         }
 
-        &:nth-child(5) { /* Actions */
-            width: 20%;
+        &:nth-child(4) { /* Created */
+            width: 16%;
+        }
+
+        &:nth-child(5) { /* Modified */
+            width: 16%;
+        }
+
+        &:nth-child(6) { /* Actions */
+            width: 13%;
+            text-align: center;
+        }
+
+        &:nth-child(7) { /* Status */
+            width: 13%;
             text-align: center;
         }
     }
@@ -164,7 +172,7 @@
         border-radius: 14px;
 
         td {
-            padding: 14px;
+            padding: 10px 8px;
             font-size: 14px;
             color: #0f172a;
 
@@ -176,18 +184,18 @@
             &:last-child {
                 border-top-right-radius: 14px;
                 border-bottom-right-radius: 14px;
-                padding-right: 14px;
+                padding-right: 8px;
             }
 
             &:nth-child(2) { /* Role */
                 text-align: center;
             }
 
-            &:nth-child(3) { /* Status */
+            &:nth-child(6) { /* Actions */
                 text-align: center;
             }
 
-            &:nth-child(5) { /* Actions */
+            &:nth-child(7) { /* Status */
                 text-align: center;
             }
         }
