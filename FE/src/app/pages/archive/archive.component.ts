@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, Input } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
 import { CaseService } from '../../hospital-services/case-store.service';
@@ -24,7 +24,7 @@ export class ArchiveComponent implements OnInit {
   readonly authService = inject(AuthService);
 
   archivedCases: CaseModel[] = [];
-  sortOption: SortOption = 'priority-high-low';
+  sortOption: SortOption = 'time-newest';
   sortOptions = this.sortService.getSortOptions();
   selectedCase: CaseModel | null = null;
   currentYear: number = new Date().getFullYear();

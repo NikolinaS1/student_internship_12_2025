@@ -11,7 +11,7 @@ import { SortOption } from '../../hospital-services/sorting-cases.service';
 })
 export class CustomSortDropdownComponent {
   @Input() sortOptions: { value: SortOption; label: string }[] = [];
-  @Input() selectedOption: SortOption = 'priority-high-low';
+  @Input() selectedOption: SortOption = 'time-newest';
   @Output() sortChange = new EventEmitter<SortOption>();
 
   isOpen = false;
