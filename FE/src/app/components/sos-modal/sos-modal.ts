@@ -30,6 +30,8 @@ export class SosModal implements OnChanges {
 
   currentStep = 1;
 
+  isLoading = false;
+
   caseData = {
     patientName: '',
     birthYear: 1980,
@@ -179,22 +181,26 @@ export class SosModal implements OnChanges {
   }
 
   submitSosCase(sosDTO: SosCaseDTO): void {
+    this.isLoading = true;
     this.caseService.createSosCase(sosDTO).subscribe({
       next: (response) => {
         this.caseService.getCaseById(response.id).subscribe({
           next: (fullCase) => {
             const caseToEmit: Case = this.mapBackendResponseToCase(fullCase);
             this.caseCreated.emit(caseToEmit);
+            this.isLoading = false;
             this.closeModal();
           },
           error: (error) => {
             console.error('Failed to fetch SOS case details:', error);
             alert('SOS Case created but failed to fetch details.');
+            this.isLoading = false;
             this.closeModal();
           }
         });
       },
       error: (error) => {
+        this.isLoading = false;
         this.handleError(error, 'create');
       }
     });
@@ -203,22 +209,26 @@ export class SosModal implements OnChanges {
   submitUpdateSosCase(sosDTO: SosCaseDTO): void {
     if (!this.existingCase) return;
 
+    this.isLoading = true;
     this.caseService.updateSosCase(this.existingCase.id, sosDTO).subscribe({
       next: (response) => {
         this.caseService.getCaseById(response.id).subscribe({
           next: (fullCase) => {
             const caseToEmit: Case = this.mapBackendResponseToCase(fullCase);
             this.caseUpdated.emit(caseToEmit);
+            this.isLoading = false;
             this.closeModal();
           },
           error: (error) => {
             console.error('Failed to fetch updated SOS case details:', error);
             alert('SOS Case updated but failed to fetch details.');
+            this.isLoading = false;
             this.closeModal();
           }
         });
       },
       error: (error) => {
+        this.isLoading = false;
         this.handleError(error, 'update');
       }
     });

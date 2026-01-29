@@ -106,9 +106,13 @@
         class="btn-create sos-create-btn" 
         *ngIf="currentStep === 2"
         (click)="createSosCase()"
-        [disabled]="!canProceed()"
+        [disabled]="!canProceed() || isLoading"
+        [class.loading]="isLoading"
       >
-        🚨 {{ editMode ? 'Update SOS Case' : 'Create SOS Case' }}
+        <span class="spinner" *ngIf="isLoading"></span>
+        <span [class.button-text-hidden]="isLoading">
+          🚨 {{ editMode ? 'Update SOS Case' : 'Create SOS Case' }}
+        </span>
       </button>
     </div>
   </div>
