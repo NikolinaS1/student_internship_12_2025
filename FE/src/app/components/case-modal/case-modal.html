@@ -207,9 +207,13 @@
         class="btn-create" 
         *ngIf="currentStep === 3"
         (click)="createCase()"
-        [disabled]="!canProceed()"
+        [disabled]="!canProceed() || isLoading"
+        [class.loading]="isLoading"
       >
-        {{ editMode ? 'Update Case' : 'Create Case' }}
+        <span class="spinner" *ngIf="isLoading"></span>
+        <span [class.button-text-hidden]="isLoading">
+          {{ editMode ? 'Update Case' : 'Create Case' }}
+        </span>
       </button>
     </div>
   </div>
