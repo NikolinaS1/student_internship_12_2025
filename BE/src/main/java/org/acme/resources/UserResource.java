@@ -27,6 +27,15 @@ public class UserResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response login(UserLogin login) {
+        
+        User userCheck = User.find("name", login.name()).firstResult();
+        if(userCheck != null && (userCheck.getIsEnabled() == null || !userCheck.getIsEnabled())){
+            return Response
+                    .status(Response.Status.UNAUTHORIZED)
+                    .entity(Map.of("error", "Your account is disabled. Contact your system administrator"))
+                    .build();
+        }
+        
         User user = userService.login(login);
         if(user == null){
             return Response

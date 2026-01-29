@@ -13,6 +13,11 @@ public class UserService {
         if (user == null) {
             return null;
         }
+        
+        if (user.getIsEnabled() == null || !user.getIsEnabled()) {
+            return null;
+        }
+        
         String passwordHash = user.getPassword();
 
         if(!BcryptUtil.matches(login.password(), passwordHash)) {
