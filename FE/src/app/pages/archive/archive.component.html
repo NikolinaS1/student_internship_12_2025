@@ -51,7 +51,7 @@
                 <div class="case-card__meta">{{ currentYear - c.birthYear }} years old • #{{ c.id }}</div>
               </div>
               <span [class]="'priority-badge priority-' + (c.isSos ? 'sos' : c.priority.toLowerCase())">
-                {{ c.isSos ? 'SOS' : c.priority }}
+                {{ c.priority }}
               </span>
             </div>
 
