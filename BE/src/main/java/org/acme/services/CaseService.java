@@ -34,7 +34,7 @@ public class CaseService {
         populateCommonFields(caseEntity, user, request.patientName(), request.birthYear(),
                 request.sex(), request.description(), request.latitude(), request.longitude());
         caseEntity.setIsSos(true);
-        caseEntity.setPriority(Priority.HIGH);
+        caseEntity.setPriority(Priority.SOS);
 
         caseEntity.persist();
         return caseEntity;
