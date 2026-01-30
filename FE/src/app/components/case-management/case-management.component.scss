@@ -177,13 +177,18 @@
 }
 
 .sent {
-    background: #f3f4f6;
-    color: #6b7280;
+    background: #dbeafe;
+    color: #1e40af;
 }
 
 .acknowledged {
-    background: #dbeafe;
-    color: #1e40af;
+    background: #dcfedb;
+    color: #1eaf25;
+}
+
+.closed {
+    background: #f3f4f6;
+    color: #6b7280;
 }
 
 @keyframes glow-sos {
@@ -439,14 +444,19 @@
     font-weight: 600 !important;
 
     &.sent {
-        background: #f3f4f6;
-        color: #6b7280;
-    }
-
-    &.acknowledged {
         background: #dbeafe;
         color: #1e40af;
     }
+
+    &.acknowledged {
+        background: #dcfedb;
+        color: #1eaf25;
+    }
+
+    &.closed {
+        background: #f3f4f6;
+        color: #6b7280;
+    }    
 }
 
 /* MODAL ACTION BUTTONS */

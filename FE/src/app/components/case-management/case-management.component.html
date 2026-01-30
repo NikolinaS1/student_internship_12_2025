@@ -39,8 +39,8 @@
                 <td>{{ currentYear - c.birthYear }}</td>
 
                 <td>
-                    <span class="badge" [ngClass]="c.acknowledged ? 'acknowledged' : 'sent'">
-                        {{ c.acknowledged ? 'ACKNOWLEDGED' : 'SENT' }}
+                    <span class="badge" [ngClass]="!c.isActive ? 'closed' : (c.acknowledged ? 'acknowledged' : 'sent')">
+                        {{ !c.isActive ? 'CLOSED' : (c.acknowledged ? 'ACKNOWLEDGED' : 'SENT') }}
                     </span>
                 </td>
 
@@ -157,8 +157,9 @@
                 </div>
                 <div class="info-item">
                     <label>Status</label>
-                    <span class="status-badge" [ngClass]="selectedCase.acknowledged ? 'acknowledged' : 'sent'">{{
-                        selectedCase.acknowledged ? 'Acknowledged' : 'Sent' }}</span>
+                    <span class="status-badge" [ngClass]="!selectedCase.isActive ? 'closed' : (selectedCase.acknowledged ? 'acknowledged' : 'sent')">
+                        {{ !selectedCase.isActive ? 'Closed' : (selectedCase.acknowledged ? 'Acknowledged' : 'Sent') }}
+                    </span>
                 </div>
                 <div class="info-item">
                     <label>Active</label>
