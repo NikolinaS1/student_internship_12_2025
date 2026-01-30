@@ -49,6 +49,14 @@ export class UserService {
       });
     }
 
+    private sortUsersByCreatedAtDesc(users: User[]): User[] {
+        return [...users].sort((a, b) => this.getCreatedAtTime(b) - this.getCreatedAtTime(a));
+    }
+
+    private getCreatedAtTime(user: User): number {
+        return user.createdAt ? new Date(user.createdAt).getTime() : 0;
+    }
+
 
 
     private loadUsers(): void {
@@ -64,7 +72,7 @@ export class UserService {
                     createdAt: u.createdAt,
                     updatedAt: u.updatedAt
                 }));
-                this.usersSubject.next(mappedUsers);
+                this.usersSubject.next(this.sortUsersByCreatedAtDesc(mappedUsers));
                 console.log('Loaded users:', mappedUsers);
             },
             error: error => {
@@ -85,7 +93,7 @@ export class UserService {
     create(userData: { username: string; password: string; role: UserRole }): void {
         this.http.post<User>(this.apiUrl, userData, { headers: this.authHeaders() }).subscribe({
             next: newUser => {
-                const users = [newUser, ...this.usersSubject.value];
+                const users = this.sortUsersByCreatedAtDesc([newUser, ...this.usersSubject.value]);
                 this.usersSubject.next(users);
             },
             error: error => {
@@ -94,9 +102,11 @@ export class UserService {
                 const mockUser: User = {
                     id: Date.now(),
                     username: userData.username,
-                    role: userData.role
+                    role: userData.role,
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString()
                 };
-                const users = [mockUser, ...this.usersSubject.value];
+                const users = this.sortUsersByCreatedAtDesc([mockUser, ...this.usersSubject.value]);
                 this.usersSubject.next(users);
             }
         });
@@ -111,7 +121,7 @@ export class UserService {
                 const users = this.usersSubject.value.map(u =>
                     u.id === user.id ? updatedUser : u
                 );
-                this.usersSubject.next(users);
+                this.usersSubject.next(this.sortUsersByCreatedAtDesc(users));
 
                 if (password) {
                     const passwordData = { newPassword: password };
@@ -131,7 +141,7 @@ export class UserService {
                 const users = this.usersSubject.value.map(u =>
                     u.id === user.id ? user : u
                 );
-                this.usersSubject.next(users);
+                this.usersSubject.next(this.sortUsersByCreatedAtDesc(users));
             }
         });
     }
@@ -150,7 +160,7 @@ export class UserService {
         const users = this.usersSubject.value.map(u =>
             u.id === userId ? { ...u, isEnabled } : u
         );
-        this.usersSubject.next(users);
+        this.usersSubject.next(this.sortUsersByCreatedAtDesc(users));
     }
 
     /* delete(id: number): void {
